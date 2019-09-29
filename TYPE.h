@@ -26,11 +26,7 @@ typedef pair<Word_Type, Word_Value> SINGLE_WORD;
 bool hasReturnValue(vector<SINGLE_WORD> Words, string FunctionName) {
     for (int i = 0; i < Words.size(); i++) {
         if (Words[i].second == FunctionName) {
-            if (Words[i - 1].second == "void") {
-                return false;
-            } else {
-                return true;
-            }
+            return !(Words[i - 1].second == "void");
         }
     }
     return false;
