@@ -4,7 +4,7 @@
 
 #ifndef COMPILER_SYNTAXANALYSIS_H
 #define COMPILER_SYNTAXANALYSIS_H
-#include "WordAnalysis.h"
+
 #include "SyntaxAnalyseFunction.h"
 #include <vector>
 

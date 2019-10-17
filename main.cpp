@@ -1,6 +1,6 @@
 #include <string>
-#include "WordAnalysis.h"
-#include "SyntaxAnalysis.h"
+#include "WordAnalysis/WordAnalysis.h"
+#include "SyntaxAnalysis/SyntaxAnalysis.h"
 
 using namespace std;
 

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "TYPE.h"
+#include "../TYPE.h"
 #include "ExpressionDeal.h"
 using namespace std;
 

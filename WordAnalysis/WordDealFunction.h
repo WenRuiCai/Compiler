@@ -9,7 +9,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include "TYPE.h"
+#include "../TYPE.h"
 
 using namespace std;
 

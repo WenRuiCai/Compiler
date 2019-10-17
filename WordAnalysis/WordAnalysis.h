@@ -10,7 +10,7 @@
 #include <string>
 #include "WordDealFunction.h"
 #include <vector>
-#include "TYPE.h"
+#include "../TYPE.h"
 
 class WordAnalysis {
 private:
