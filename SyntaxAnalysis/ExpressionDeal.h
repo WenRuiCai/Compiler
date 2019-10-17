@@ -11,6 +11,7 @@ void factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 
 extern void Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 extern bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int isFactor);
+
 #endif //COMPILER_EXPRESSIONDEAL_H
 
 void factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
