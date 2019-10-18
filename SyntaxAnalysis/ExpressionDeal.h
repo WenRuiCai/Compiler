@@ -16,7 +16,7 @@ extern bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& ou
 
 void factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     if (WORD_TYPE == "IDENFR") {
-        if (Words[PointNum + 1].first == "LPARENT") {
+        if (Words[PointNum + 1].WORD.first == "LPARENT") {
             functionCall(Words, PointNum, output, 1);
         }
         else {

@@ -107,11 +107,11 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
 //变量声明
 void Variable_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     if ((WORD_TYPE != "INTTK" && WORD_TYPE != "CHARTK") ||
-        (Words[PointNum + 2].first == "LPARENT")) {
+        (Words[PointNum + 2].WORD.first == "LPARENT")) {
         return;
     }
     while ("INTTK" == WORD_TYPE || "CHARTK" == WORD_TYPE) {
-        if (Words[PointNum + 2].first == "LPARENT") {
+        if (Words[PointNum + 2].WORD.first == "LPARENT") {
             output << "<变量说明>" << endl;
             return;
         }
@@ -200,7 +200,7 @@ bool Function_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstr
 
 //无返回值函数
 bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
-    if (WORD_TYPE != "VOIDTK" || Words[PointNum + 1].first == "MAINTK")
+    if (WORD_TYPE != "VOIDTK" || Words[PointNum + 1].WORD.first == "MAINTK")
         return false;
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "IDENFR") {

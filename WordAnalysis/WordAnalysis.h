@@ -31,7 +31,6 @@ private:
 
 public:
     WordAnalysis(ifstream& inputCode, ofstream& outputFile) {
-        string code;
         char each; int flag = 0;
         while ((each = inputCode.get()) != EOF) {
             if (each == '"') {

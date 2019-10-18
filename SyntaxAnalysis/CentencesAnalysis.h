@@ -157,7 +157,7 @@ bool forCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
 }
 
 bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
-    if (WORD_TYPE != "IDENFR" || Words[PointNum + 1].first == "LPARENT")
+    if (WORD_TYPE != "IDENFR" || Words[PointNum + 1].WORD.first == "LPARENT")
         return false;
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "LBRACK") {
@@ -256,8 +256,8 @@ bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
  * 搜索标识符前的类型符
  */
 bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int isFactor) {
-    string name = Words[PointNum].second;
-    if (WORD_TYPE != "IDENFR" || Words[PointNum + 1].first != "LPARENT")
+    string name = Words[PointNum].WORD.second;
+    if (WORD_TYPE != "IDENFR" || Words[PointNum + 1].WORD.first != "LPARENT")
         return false;
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "LPARENT") {

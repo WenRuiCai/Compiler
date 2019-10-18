@@ -25,14 +25,14 @@ bool dealString(stringstream& input, ofstream& output, string data,
             }
         }
         if (flag == 1) { //字符串不含空格，可以直接返回
-            OUTPUT_AND_ADD("STRCON", data.substr(1, i - 1));
+            OUTPUT_AND_ADD("STRCON", data.substr(1, i - 1), input);
         } else { //此时字符串可是含有空格的哟
             string thisString = data.substr(1);
             char getChar;
             while ((getChar = input.get()) != '"') {
                 thisString += getChar;
             }
-            OUTPUT_AND_ADD("STRCON", thisString);
+            OUTPUT_AND_ADD("STRCON", thisString, input);
         }
         return true;
     } else {
@@ -40,7 +40,7 @@ bool dealString(stringstream& input, ofstream& output, string data,
     }
 }
 
-bool isString_PureNumber_Or_PureIdentify_And_Deal(ofstream& output,
+bool isString_PureNumber_Or_PureIdentify_And_Deal(stringstream& input,
         string data, vector<SINGLE_WORD> &word_vector) {
     if ((data[0] >= '0' && data[0] <= '9') || (data[0] == '-' || data[0] == '+')) {
         //纯数字串
@@ -51,15 +51,15 @@ bool isString_PureNumber_Or_PureIdentify_And_Deal(ofstream& output,
         }
         switch (data[0]) {
             case '+':
-                OUTPUT_AND_ADD("PLUS", "+");
-                OUTPUT_AND_ADD("INTCON", data.substr(1));
+                OUTPUT_AND_ADD("PLUS", "+", input);
+                OUTPUT_AND_ADD("INTCON", data.substr(1), input);
                 break;
             case '-':
-                OUTPUT_AND_ADD("MINU", "-");
-                OUTPUT_AND_ADD("INTCON", data.substr(1));
+                OUTPUT_AND_ADD("MINU", "-", input);
+                OUTPUT_AND_ADD("INTCON", data.substr(1), input);
                 break;
             default:
-                OUTPUT_AND_ADD("INTCON", data);
+                OUTPUT_AND_ADD("INTCON", data, input);
                 break;
         }
         return true;
@@ -71,7 +71,7 @@ bool isString_PureNumber_Or_PureIdentify_And_Deal(ofstream& output,
                 return false;
             }
         }
-        OUTPUT_AND_ADD("IDENFR", data);
+        OUTPUT_AND_ADD("IDENFR", data, input);
     } else {
         return false;
     }
@@ -81,72 +81,72 @@ bool isString_PureNumber_Or_PureIdentify_And_Deal(ofstream& output,
 bool Deal_Single_Word_Part(stringstream& input, ofstream& output,
                     string data, vector<SINGLE_WORD> &word_vector) {
     if (data == "const") {
-        OUTPUT_AND_ADD("CONSTTK", data);
+        OUTPUT_AND_ADD("CONSTTK", data, input);
     } else if (data == "int") {
-        OUTPUT_AND_ADD("INTTK", data);
+        OUTPUT_AND_ADD("INTTK", data, input);
     } else if (data == "char") {
-        OUTPUT_AND_ADD("CHARTK", data);
+        OUTPUT_AND_ADD("CHARTK", data, input);
     } else if (data == "void") {
-        OUTPUT_AND_ADD("VOIDTK", data);
+        OUTPUT_AND_ADD("VOIDTK", data, input);
     } else if (data == "main") {
-        OUTPUT_AND_ADD("MAINTK", data);
+        OUTPUT_AND_ADD("MAINTK", data, input);
     } else if (data == "if") {
-        OUTPUT_AND_ADD("IFTK", data);
+        OUTPUT_AND_ADD("IFTK", data, input);
     } else if (data == "else") {
-        OUTPUT_AND_ADD("ELSETK", data);
+        OUTPUT_AND_ADD("ELSETK", data, input);
     } else if (data == "do") {
-        OUTPUT_AND_ADD("DOTK", data);
+        OUTPUT_AND_ADD("DOTK", data, input);
     } else if (data == "while") {
-        OUTPUT_AND_ADD("WHILETK", data);
+        OUTPUT_AND_ADD("WHILETK", data, input);
     } else if (data == "for") {
-        OUTPUT_AND_ADD("FORTK", data);
+        OUTPUT_AND_ADD("FORTK", data, input);
     } else if (data == "scanf") {
-        OUTPUT_AND_ADD("SCANFTK", data);
+        OUTPUT_AND_ADD("SCANFTK", data, input);
     } else if (data == "printf") {
-        OUTPUT_AND_ADD("PRINTFTK", data);
+        OUTPUT_AND_ADD("PRINTFTK", data, input);
     } else if (data == "return") {
-        OUTPUT_AND_ADD("RETURNTK", data);
+        OUTPUT_AND_ADD("RETURNTK", data, input);
     } else if (data == "+") {
-        OUTPUT_AND_ADD("PLUS", data);
+        OUTPUT_AND_ADD("PLUS", data, input);
     } else if (data == "-") {
-        OUTPUT_AND_ADD("MINU", data);
+        OUTPUT_AND_ADD("MINU", data, input);
     } else if (data == "*") {
-        OUTPUT_AND_ADD("MULT", data);
+        OUTPUT_AND_ADD("MULT", data, input);
     } else if (data == "/") {
-        OUTPUT_AND_ADD("DIV", data);
+        OUTPUT_AND_ADD("DIV", data, input);
     } else if (data == "<") {
-        OUTPUT_AND_ADD("LSS", data);
+        OUTPUT_AND_ADD("LSS", data, input);
     } else if (data == "<=") {
-        OUTPUT_AND_ADD("LEQ", data);
+        OUTPUT_AND_ADD("LEQ", data, input);
     } else if (data == ">") {
-        OUTPUT_AND_ADD("GRE", data);
+        OUTPUT_AND_ADD("GRE", data, input);
     } else if (data == ">=") {
-        OUTPUT_AND_ADD("GEQ", data);
+        OUTPUT_AND_ADD("GEQ", data, input);
     } else if (data == "==") {
-        OUTPUT_AND_ADD("EQL", data);
+        OUTPUT_AND_ADD("EQL", data, input);
     } else if (data == "!=") {
-        OUTPUT_AND_ADD("NEQ", data);
+        OUTPUT_AND_ADD("NEQ", data, input);
     } else if (data == "=") {
-        OUTPUT_AND_ADD("ASSIGN", data);
+        OUTPUT_AND_ADD("ASSIGN", data, input);
     } else if (data == ";") {
-        OUTPUT_AND_ADD("SEMICN", data);
+        OUTPUT_AND_ADD("SEMICN", data, input);
     } else if (data == ",") {
-        OUTPUT_AND_ADD("COMMA", data);
+        OUTPUT_AND_ADD("COMMA", data, input);
     } else if (data == "(") {
-        OUTPUT_AND_ADD("LPARENT", data);
+        OUTPUT_AND_ADD("LPARENT", data, input);
     } else if (data == ")") {
-        OUTPUT_AND_ADD("RPARENT", data);
+        OUTPUT_AND_ADD("RPARENT", data, input);
     } else if (data == "[") {
-        OUTPUT_AND_ADD("LBRACK", data);
+        OUTPUT_AND_ADD("LBRACK", data, input);
     } else if (data == "]") {
-        OUTPUT_AND_ADD("RBRACK", data);
+        OUTPUT_AND_ADD("RBRACK", data, input);
     } else if (data == "{") {
-        OUTPUT_AND_ADD("LBRACE", data);
+        OUTPUT_AND_ADD("LBRACE", data, input);
     } else if (data == "}") {
-        OUTPUT_AND_ADD("RBRACE", data);
+        OUTPUT_AND_ADD("RBRACE", data, input);
     } else if (data[0] == '\'' && data[2] == '\'' && data.length() == 3) {
-        OUTPUT_AND_ADD("CHARCON", data.substr(1, 1));
-    } else if (!isString_PureNumber_Or_PureIdentify_And_Deal(output, data, word_vector) &&
+        OUTPUT_AND_ADD("CHARCON", data.substr(1, 1), input);
+    } else if (!isString_PureNumber_Or_PureIdentify_And_Deal(input, data, word_vector) &&
                 !dealString(input, output, data, word_vector)) {
         return false;
     }
