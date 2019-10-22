@@ -6,7 +6,6 @@
 #define COMPILER_SYNTAXANALYSIS_H
 
 #include "SyntaxAnalyseFunction.h"
-#include <vector>
 
 using namespace std;
 

@@ -5,12 +5,7 @@
 #ifndef COMPILER_WORDANALYSIS_H
 #define COMPILER_WORDANALYSIS_H
 
-#include <iostream>
-#include <fstream>
-#include <string>
 #include "WordDealFunction.h"
-#include <vector>
-#include "../TYPE.h"
 
 class WordAnalysis {
 private:
@@ -23,7 +18,9 @@ private:
                 stringstream buffer;
                 Cut_Component_With_Space(buffer, data);
                 while (buffer >> data) {
-                    Deal_Single_Word_Part(input, outputFile, data, Words);
+                    if (!Deal_Single_Word_Part(input, outputFile, data, Words)) {
+                        wordError.addError(searchLine(input.tellg(), code));
+                    }
                 }
             }
         }

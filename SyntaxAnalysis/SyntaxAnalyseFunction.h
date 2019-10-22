@@ -68,6 +68,7 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
         PRINT_WORD_AND_ADDPOINT;
         while (true) {
             if (WORD_TYPE == "IDENFR") {
+                symbolTable.nowLevelAddItem("INTTK", WORD_VALUE, CONST, LINE, 0);
                 PRINT_WORD_AND_ADDPOINT;
                 if (WORD_TYPE == "ASSIGN") {
                     PRINT_WORD_AND_ADDPOINT;
@@ -86,6 +87,7 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
         PRINT_WORD_AND_ADDPOINT;
         while (true) {
             if (WORD_TYPE == "IDENFR") {
+                symbolTable.nowLevelAddItem("CHARTK", WORD_VALUE, CONST, LINE, 0);
                 PRINT_WORD_AND_ADDPOINT;
                 if (WORD_TYPE == "ASSIGN") {
                     PRINT_WORD_AND_ADDPOINT;
@@ -123,15 +125,24 @@ void Variable_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outp
 
 //变量定义
 void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
+    string thistype = Words[PointNum - 1].WORD.first;
     while (WORD_TYPE == "IDENFR") {
+        string thisValue = WORD_VALUE;
+        int thisline = LINE;
         PRINT_WORD_AND_ADDPOINT;
-        if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; continue; }
+        if (WORD_TYPE == "COMMA") {
+            symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 0);
+            PRINT_WORD_AND_ADDPOINT;
+            continue;
+        }
         else if (WORD_TYPE == "SEMICN") {
+            symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 0);
             output << "<变量定义>" << endl;
             PRINT_WORD_AND_ADDPOINT;
             break;
         }
         else if (WORD_TYPE == "LBRACK") {
+            symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 1);
             PRINT_WORD_AND_ADDPOINT;
             No_Symbol_Number(Words, PointNum, output);
             if (WORD_TYPE == "RBRACK") {
@@ -158,8 +169,10 @@ void Parameters(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     }
     //参数声明
     while (WORD_TYPE == "CHARTK" || WORD_TYPE == "INTTK") {
+        string thistype = WORD_TYPE;
         PRINT_WORD_AND_ADDPOINT;
         if (WORD_TYPE == "IDENFR") {
+            symbolTable.nowLevelAddItem(thistype, WORD_VALUE, PARA, LINE, 0);
             PRINT_WORD_AND_ADDPOINT;
             if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; }
             else {
@@ -174,8 +187,11 @@ void Parameters(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
 bool Function_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     if (WORD_TYPE != "INTTK" && WORD_TYPE != "CHARTK")
         return false;
+    string thistype = WORD_TYPE;
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "IDENFR") {
+        symbolTable.nowLevelAddItem(thistype, WORD_VALUE, FUNC, LINE, 0);
+        symbolTable.addLevel();
         PRINT_WORD_AND_ADDPOINT;
         output << "<声明头部>" << endl;
         if (WORD_TYPE == "LPARENT") {
@@ -189,6 +205,7 @@ bool Function_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstr
                     if (WORD_TYPE == "RBRACE") {
                         PRINT_WORD_AND_ADDPOINT;
                         output << "<有返回值函数定义>" << endl;
+                        symbolTable.dropOutLevel();
                         return true;
                     }
                 }
@@ -204,6 +221,8 @@ bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, o
         return false;
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "IDENFR") {
+        symbolTable.nowLevelAddItem("VOIDTK", WORD_VALUE, FUNC, LINE, 0);
+        symbolTable.addLevel();
         PRINT_WORD_AND_ADDPOINT;
         if (WORD_TYPE == "LPARENT") {
             PRINT_WORD_AND_ADDPOINT;
@@ -216,6 +235,7 @@ bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, o
                     if (WORD_TYPE == "RBRACE") {
                         PRINT_WORD_AND_ADDPOINT;
                         output << "<无返回值函数定义>" << endl;
+                        symbolTable.dropOutLevel();
                         return true;
                     }
                 }
@@ -229,6 +249,8 @@ bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, o
 void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "MAINTK") {
+        symbolTable.nowLevelAddItem("VOIDTK", WORD_VALUE, MAIN, LINE, 0);
+        symbolTable.addLevel();
         PRINT_WORD_AND_ADDPOINT;
         if (WORD_TYPE == "LPARENT") {
             PRINT_WORD_AND_ADDPOINT;
@@ -240,6 +262,7 @@ void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
                     if (WORD_TYPE == "RBRACE") {
                         PRINT_WORD_AND_ADDPOINT;
                         output << "<主函数>" << endl;
+                        symbolTable.dropOutLevel();
                         return;
                     }
                 }
@@ -250,6 +273,7 @@ void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
 
 //整个程序
 void Program_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
+    symbolTable.addLevel();
     Const_Analysis(Words, PointNum, output);
     Variable_Analysis(Words, PointNum, output);
     while (Function_With_Return_Value(Words, PointNum, output) ||

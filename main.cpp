@@ -1,4 +1,4 @@
-#include <string>
+#include "TYPE.h"
 #include "WordAnalysis/WordAnalysis.h"
 #include "SyntaxAnalysis/SyntaxAnalysis.h"
 
@@ -11,5 +11,6 @@ int main() {
     outputCode.open("output.txt");
     WordAnalysis wordAnalysis(inputCode, outputCode);
     SyntaxAnalysis syntaxAnalysis(wordAnalysis.getWords(), outputCode);
+    int i = 0;
     return 0;
 }

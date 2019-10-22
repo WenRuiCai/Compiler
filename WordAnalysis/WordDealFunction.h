@@ -5,10 +5,6 @@
 #ifndef COMPILER_WORDDEALFUNCTION_H
 #define COMPILER_WORDDEALFUNCTION_H
 
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
 #include "../TYPE.h"
 
 using namespace std;
@@ -31,6 +27,11 @@ bool dealString(stringstream& input, ofstream& output, string data,
             char getChar;
             while ((getChar = input.get()) != '"') {
                 thisString += getChar;
+                ////词法错误：包含非法字符
+                if (!(getChar == 32 || getChar == 33 || (getChar >= 35 && getChar <= 126))) {
+                    wordError.addError(searchLine(input.tellg(), code));
+                }
+                ////////////////////////
             }
             OUTPUT_AND_ADD("STRCON", thisString, input);
         }
@@ -40,7 +41,7 @@ bool dealString(stringstream& input, ofstream& output, string data,
     }
 }
 
-bool isString_PureNumber_Or_PureIdentify_And_Deal(stringstream& input,
+bool isString_PureNumber_Or_PureIdentify_And_Deal(stringstream& input, ofstream& output,
         string data, vector<SINGLE_WORD> &word_vector) {
     if ((data[0] >= '0' && data[0] <= '9') || (data[0] == '-' || data[0] == '+')) {
         //纯数字串
@@ -145,8 +146,13 @@ bool Deal_Single_Word_Part(stringstream& input, ofstream& output,
     } else if (data == "}") {
         OUTPUT_AND_ADD("RBRACE", data, input);
     } else if (data[0] == '\'' && data[2] == '\'' && data.length() == 3) {
+        if (!(data[1] == '+' || data[1] == '-' || data[1] == '*' || data[1] == '/' ||
+              data[1] == '_' || (data[1] >= 'a' && data[1] <= 'z') ||
+              (data[1] >= 'A' && data[1] <= 'Z') || (data[1] >= '0' && data[1] <= '9'))) {
+            wordError.addError(searchLine(input.tellg(), code));
+        }
         OUTPUT_AND_ADD("CHARCON", data.substr(1, 1), input);
-    } else if (!isString_PureNumber_Or_PureIdentify_And_Deal(input, data, word_vector) &&
+    } else if (!isString_PureNumber_Or_PureIdentify_And_Deal(input, output, data, word_vector) &&
                 !dealString(input, output, data, word_vector)) {
         return false;
     }

@@ -1,8 +1,7 @@
 //
 // Created by 84443 on 2019/10/18.
 //
-#include <string>
-#include <sstream>
+#include <bits/stdc++.h>
 using namespace std;
 
 #ifndef COMPILER_SEARCHLINE_H
