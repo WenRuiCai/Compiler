@@ -22,7 +22,7 @@ bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
 void condition(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 void parameterValueList(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<string>& types);
 
-extern void No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
+extern bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 
 #endif //COMPILER_CENTENCESANALYSIS_H
 
@@ -178,8 +178,11 @@ bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
     symbolTable.hasAssignForConst(WORD_VALUE, LINE);
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "LBRACK") {
+        int line = LINE;
         PRINT_WORD_AND_ADDPOINT;
-        expression(Words, PointNum, output);
+        if (expression(Words, PointNum, output) != INT_Express) {
+            symbolTable.addArrayIndexError(line);
+        }
         if (WORD_TYPE == "RBRACK") {
             PRINT_WORD_AND_ADDPOINT;
         }

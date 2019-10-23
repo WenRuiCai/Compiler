@@ -11,13 +11,13 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
 ExpressionFlag item(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 
-extern void Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
+extern bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 extern bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int isFactor);
 
 #endif //COMPILER_EXPRESSIONDEAL_H
 
 ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
-    ExpressionFlag flag;
+    ExpressionFlag flag = NONE_Express;
     if (WORD_TYPE == "IDENFR") {
         string name = WORD_VALUE;
         if (Words[PointNum + 1].WORD.first == "LPARENT") {
@@ -28,8 +28,11 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
             symbolTable.nameHasNotDefined(WORD_VALUE, LINE);
             PRINT_WORD_AND_ADDPOINT;
             if (WORD_TYPE == "LBRACK") {
+                int line = LINE;
                 PRINT_WORD_AND_ADDPOINT;
-                expression(Words, PointNum, output);
+                if (expression(Words, PointNum, output) != INT_Express) {
+                    symbolTable.addArrayIndexError(line);
+                }
                 if (WORD_TYPE == "RBRACK") {
                     PRINT_WORD_AND_ADDPOINT;
                 }

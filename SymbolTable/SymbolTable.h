@@ -9,6 +9,7 @@ enum ExpressionFlag {
 #include "TableItem.h"
 #include "../Errors/NameDefineError.h"
 #include "../Errors/FunctionParameterError.h"
+#include "../Errors/SymbolError.h"
 
 class SymbolTable {
 private:
@@ -169,6 +170,10 @@ public:
         return INT_Express;
     }
 
+    void addArrayIndexError(int line) {
+        nameDefineError.addError('i', line);
+    }
+
     bool noReturnCentenceError(bool hasReturnCentence, int line) {
         int counter = 0;
         for (TableItem item : symbolStackTable[0].getItems()) {
@@ -207,6 +212,26 @@ public:
             }
         }
         return true;
+    }
+
+    void loss_SEMICN_Error(int line) {
+        symbolError.addError('k', line);
+    }
+
+    void loss_RBRACK_Error(int line) {
+        symbolError.addError('m', line);
+    }
+
+    void loss_RPARENT_Error(int line) {
+        symbolError.addError('l', line);
+    }
+
+    void loss_WHILETK_Error(int line) {
+        symbolError.addError('n', line);
+    }
+
+    void addAssignValueError(int line) {
+        nameDefineError.addError('o', line);
     }
 };
 

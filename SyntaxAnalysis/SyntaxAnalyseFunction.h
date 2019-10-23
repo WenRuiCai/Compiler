@@ -13,8 +13,8 @@ void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
 bool Function_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
-void No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
-void Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
+bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
+bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 void Parameters(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 
@@ -35,20 +35,25 @@ void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& ou
 }
 
 //整数
-void Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
+bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     if (WORD_TYPE == "PLUS" || WORD_TYPE == "MINU") {
         PRINT_WORD_AND_ADDPOINT;
     }
-    No_Symbol_Number(Words, PointNum, output);
-    output << "<整数>" << endl;
+    if (No_Symbol_Number(Words, PointNum, output)) {
+        output << "<整数>" << endl;
+        return true;
+    }
+    return false;
 }
 
 //无符号整数
-void No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
+bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     if (WORD_TYPE == "INTCON") {
         PRINT_WORD_AND_ADDPOINT;
         output << "<无符号整数>" << endl;
+        return true;
     }
+    return false;
 }
 
 //常量声明
@@ -72,7 +77,13 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
                 PRINT_WORD_AND_ADDPOINT;
                 if (WORD_TYPE == "ASSIGN") {
                     PRINT_WORD_AND_ADDPOINT;
-                    Number(Words, PointNum, output);
+                    if (!Number(Words, PointNum, output)) {
+                        if (WORD_TYPE == "CHARCON") {
+                            PRINT_WORD_AND_ADDPOINT;
+                        } else {
+                            symbolTable.addAssignValueError(LINE);
+                        }
+                    }
                     if (WORD_TYPE == "SEMICN") {
                         output << "<常量定义>" << endl;
                         PRINT_WORD_AND_ADDPOINT;
@@ -93,13 +104,15 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
                     PRINT_WORD_AND_ADDPOINT;
                     if (WORD_TYPE == "CHARCON") {
                         PRINT_WORD_AND_ADDPOINT;
-                        if (WORD_TYPE == "SEMICN") {
-                            output << "<常量定义>" << endl;
-                            PRINT_WORD_AND_ADDPOINT;
-                            break;
-                        }
-                        else if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; continue; }
+                    } else if (!Number(Words, PointNum, output)) {
+                        symbolTable.addAssignValueError(LINE);
                     }
+                    if (WORD_TYPE == "SEMICN") {
+                        output << "<常量定义>" << endl;
+                        PRINT_WORD_AND_ADDPOINT;
+                        break;
+                    }
+                    else if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; continue; }
                 }
             }
         }
