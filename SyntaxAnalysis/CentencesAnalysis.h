@@ -110,7 +110,6 @@ bool whileCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
         Centence(Words, PointNum, output);
         output << "<循环语句>" << endl;
         return true;
-
     }
     return false;
 }
@@ -122,18 +121,21 @@ bool doWhileCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
     Centence(Words, PointNum, output);
     if (WORD_TYPE == "WHILETK") {
         PRINT_WORD_AND_ADDPOINT;
-        if (WORD_TYPE == "LPARENT") {
-            PRINT_WORD_AND_ADDPOINT;
-            condition(Words, PointNum, output);
-            if (WORD_TYPE == "RPARENT") {
-                PRINT_WORD_AND_ADDPOINT;
-            } else {
-                symbolTable.loss_RPARENT_Error(LINE);
-            }
-            output << "<循环语句>" << endl;
-            return true;
-        }
+    } else {
+        symbolTable.loss_WHILETK_Error(LINE);
     }
+    if (WORD_TYPE == "LPARENT") {
+        PRINT_WORD_AND_ADDPOINT;
+        condition(Words, PointNum, output);
+        if (WORD_TYPE == "RPARENT") {
+            PRINT_WORD_AND_ADDPOINT;
+        } else {
+            symbolTable.loss_RPARENT_Error(LINE);
+        }
+        output << "<循环语句>" << endl;
+        return true;
+    }
+
     return false;
 }
 
