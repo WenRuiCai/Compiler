@@ -160,15 +160,17 @@ void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
             No_Symbol_Number(Words, PointNum, output);
             if (WORD_TYPE == "RBRACK") {
                 PRINT_WORD_AND_ADDPOINT;
-                if (WORD_TYPE == "COMMA") {
-                    PRINT_WORD_AND_ADDPOINT;
-                    continue;
-                }
-                else if (WORD_TYPE == "SEMICN") {
-                    output << "<变量定义>" << endl;
-                    PRINT_WORD_AND_ADDPOINT;
-                    break;
-                }
+            } else {
+                symbolTable.loss_RBRACK_Error(LINE);
+            }
+            if (WORD_TYPE == "COMMA") {
+                PRINT_WORD_AND_ADDPOINT;
+                continue;
+            }
+            else if (WORD_TYPE == "SEMICN") {
+                output << "<变量定义>" << endl;
+                PRINT_WORD_AND_ADDPOINT;
+                break;
             }
         }
     }
@@ -212,17 +214,20 @@ bool Function_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstr
             Parameters(Words, PointNum, output);
             if (WORD_TYPE == "RPARENT") {
                 PRINT_WORD_AND_ADDPOINT;
-                if (WORD_TYPE == "LBRACE") {
+            } else {
+                symbolTable.loss_RPARENT_Error(LINE);
+            }
+            if (WORD_TYPE == "LBRACE") {
+                PRINT_WORD_AND_ADDPOINT;
+                Component_Centences(Words, PointNum, output);
+                if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
-                    Component_Centences(Words, PointNum, output);
-                    if (WORD_TYPE == "RBRACE") {
-                        PRINT_WORD_AND_ADDPOINT;
-                        output << "<有返回值函数定义>" << endl;
-                        symbolTable.dropOutLevel();
-                        return true;
-                    }
+                    output << "<有返回值函数定义>" << endl;
+                    symbolTable.dropOutLevel();
+                    return true;
                 }
             }
+
         }
     }
     return false;
@@ -242,15 +247,17 @@ bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, o
             Parameters(Words, PointNum, output);
             if (WORD_TYPE == "RPARENT") {
                 PRINT_WORD_AND_ADDPOINT;
-                if (WORD_TYPE == "LBRACE") {
+            } else {
+                symbolTable.loss_RPARENT_Error(LINE);
+            }
+            if (WORD_TYPE == "LBRACE") {
+                PRINT_WORD_AND_ADDPOINT;
+                Component_Centences(Words, PointNum, output);
+                if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
-                    Component_Centences(Words, PointNum, output);
-                    if (WORD_TYPE == "RBRACE") {
-                        PRINT_WORD_AND_ADDPOINT;
-                        output << "<无返回值函数定义>" << endl;
-                        symbolTable.dropOutLevel();
-                        return true;
-                    }
+                    output << "<无返回值函数定义>" << endl;
+                    symbolTable.dropOutLevel();
+                    return true;
                 }
             }
         }
@@ -269,15 +276,17 @@ void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
             PRINT_WORD_AND_ADDPOINT;
             if (WORD_TYPE == "RPARENT") {
                 PRINT_WORD_AND_ADDPOINT;
-                if (WORD_TYPE == "LBRACE") {
+            } else {
+                symbolTable.loss_RPARENT_Error(LINE);
+            }
+            if (WORD_TYPE == "LBRACE") {
+                PRINT_WORD_AND_ADDPOINT;
+                Component_Centences(Words, PointNum, output);
+                if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
-                    Component_Centences(Words, PointNum, output);
-                    if (WORD_TYPE == "RBRACE") {
-                        PRINT_WORD_AND_ADDPOINT;
-                        output << "<主函数>" << endl;
-                        symbolTable.dropOutLevel();
-                        return;
-                    }
+                    output << "<主函数>" << endl;
+                    symbolTable.dropOutLevel();
+                    return;
                 }
             }
         }

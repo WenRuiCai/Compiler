@@ -35,6 +35,8 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
                 }
                 if (WORD_TYPE == "RBRACK") {
                     PRINT_WORD_AND_ADDPOINT;
+                } else {
+                    symbolTable.loss_RBRACK_Error(LINE);
                 }
             }
             flag = symbolTable.find_ID_Kind(name);
@@ -45,8 +47,10 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
         expression(Words, PointNum, output);
         if (WORD_TYPE == "RPARENT") {
             PRINT_WORD_AND_ADDPOINT;
-            flag = INT_Express;
+        } else {
+            symbolTable.loss_RPARENT_Error(LINE);
         }
+        flag = INT_Express;
     }
     else if (WORD_TYPE == "CHARCON") {
         PRINT_WORD_AND_ADDPOINT;
