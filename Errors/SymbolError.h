@@ -25,6 +25,10 @@ public:
         }
         symbolErrors.push_back(compileError);
     }
+
+    vector<CompileError> getErrors() {
+        return this->symbolErrors;
+    }
 };
 
 SymbolError symbolError;

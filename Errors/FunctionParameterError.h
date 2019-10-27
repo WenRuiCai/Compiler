@@ -25,6 +25,9 @@ public:
         functionParameterErrors.push_back(compileError);
     }
 
+    vector<CompileError> getErrors() {
+        return this->functionParameterErrors;
+    }
 };
 
 FunctionParameterError functionParameterError;

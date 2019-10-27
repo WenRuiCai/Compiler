@@ -154,28 +154,32 @@ bool forCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
                 expression(Words, PointNum, output);
                 if (WORD_TYPE == "SEMICN") {
                     PRINT_WORD_AND_ADDPOINT;
-                    condition(Words, PointNum, output);
-                    if (WORD_TYPE == "SEMICN") {
-                        PRINT_WORD_AND_ADDPOINT; //;
-                        symbolTable.nameHasNotDefined(WORD_VALUE, LINE);
-                        symbolTable.hasAssignForConst(WORD_VALUE, LINE);
-                        PRINT_WORD_AND_ADDPOINT; //IDENFR
-                        PRINT_WORD_AND_ADDPOINT; //=
-                        symbolTable.nameHasNotDefined(WORD_VALUE, LINE);
-                        PRINT_WORD_AND_ADDPOINT; //IDENFR
-                        PRINT_WORD_AND_ADDPOINT; //+ | -
-                        No_Symbol_Number(Words, PointNum, output); //STEP
-                        output << "<步长>" << endl;
-                        if (WORD_TYPE == "RPARENT") {
-                            PRINT_WORD_AND_ADDPOINT;
-                        } else {
-                            symbolTable.loss_RPARENT_Error(LINE);
-                        }
-                        Centence(Words, PointNum, output);
-                        output << "<循环语句>" << endl;
-                        return true;
-                    }
+                } else {
+                    symbolTable.loss_SEMICN_Error(LINE);
                 }
+                condition(Words, PointNum, output);
+                if (WORD_TYPE == "SEMICN") {
+                    PRINT_WORD_AND_ADDPOINT; //;
+                } else {
+                    symbolTable.loss_SEMICN_Error(LINE);
+                }
+                symbolTable.nameHasNotDefined(WORD_VALUE, LINE);
+                symbolTable.hasAssignForConst(WORD_VALUE, LINE);
+                PRINT_WORD_AND_ADDPOINT; //IDENFR
+                PRINT_WORD_AND_ADDPOINT; //=
+                symbolTable.nameHasNotDefined(WORD_VALUE, LINE);
+                PRINT_WORD_AND_ADDPOINT; //IDENFR
+                PRINT_WORD_AND_ADDPOINT; //+ | -
+                No_Symbol_Number(Words, PointNum, output); //STEP
+                output << "<步长>" << endl;
+                if (WORD_TYPE == "RPARENT") {
+                    PRINT_WORD_AND_ADDPOINT;
+                } else {
+                    symbolTable.loss_RPARENT_Error(LINE);
+                }
+                Centence(Words, PointNum, output);
+                output << "<循环语句>" << endl;
+                return true;
             }
         }
     }
@@ -207,6 +211,8 @@ bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
     output << "<赋值语句>" << endl;
     if (WORD_TYPE == "SEMICN") {
         PRINT_WORD_AND_ADDPOINT;
+    } else {
+        symbolTable.loss_SEMICN_Error(LINE);
     }
     return true;
 }
@@ -237,8 +243,10 @@ bool printfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
             output << "<写语句>" << endl;
             PRINT_WORD_AND_ADDPOINT;
             return true;
+        } else {
+            symbolTable.loss_SEMICN_Error(LINE);
+            return true;
         }
-
     }
     return false;
 }
@@ -266,6 +274,9 @@ bool scanfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
             output << "<读语句>" << endl;
             PRINT_WORD_AND_ADDPOINT;
             return true;
+        } else {
+            symbolTable.loss_SEMICN_Error(LINE);
+            return true;
         }
     }
     return false;
@@ -292,6 +303,9 @@ bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
         output << "<返回语句>" << endl;
         PRINT_WORD_AND_ADDPOINT;
         symbolTable.returnCentenceIsCorrect(flag, line);
+        return true;
+    } else {
+        symbolTable.loss_SEMICN_Error(LINE);
         return true;
     }
     return false;
@@ -326,8 +340,12 @@ bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, i
         else {
             output << "<无返回值函数调用语句>" << endl;
         }
-        if (WORD_TYPE == "SEMICN" && !isFactor) {
-            PRINT_WORD_AND_ADDPOINT;
+        if (!isFactor) {
+            if (WORD_TYPE == "SEMICN") {
+                PRINT_WORD_AND_ADDPOINT;
+            } else {
+                symbolTable.loss_SEMICN_Error(LINE);
+            }
         }
     }
     return true;

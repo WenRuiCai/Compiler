@@ -90,6 +90,10 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
                         break;
                     }
                     else if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; continue; }
+                    else {
+                        symbolTable.loss_SEMICN_Error(LINE);
+                        break;
+                    }
                 }
             }
         }
@@ -113,6 +117,10 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
                         break;
                     }
                     else if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; continue; }
+                    else {
+                        symbolTable.loss_SEMICN_Error(LINE);
+                        break;
+                    }
                 }
             }
         }
@@ -171,7 +179,13 @@ void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
                 output << "<变量定义>" << endl;
                 PRINT_WORD_AND_ADDPOINT;
                 break;
+            } else {
+                symbolTable.loss_SEMICN_Error(LINE);
+                break;
             }
+        } else {
+            symbolTable.loss_SEMICN_Error(LINE);
+            break;
         }
     }
 }

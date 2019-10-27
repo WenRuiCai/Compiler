@@ -28,6 +28,10 @@ public:
         }
         nameDefineErrors.push_back(compileError);
     }
+
+    vector<CompileError> getErrors() {
+        return this->nameDefineErrors;
+    }
 };
 
 NameDefineError nameDefineError;
