@@ -28,7 +28,7 @@ int main() {
         vector<CompileError>::iterator iterator = allErrors.begin();
         CompileError error = *(iterator);
         for (vector<CompileError>::iterator iter = allErrors.begin(); iter != allErrors.end(); iter++) {
-            if ((*iter).error_Happened_Line <= error.error_Happened_Line) {
+            if ((*iter).error_Happened_Line < error.error_Happened_Line) {
                 iterator = iter;
                 error = (*iterator);
             }
