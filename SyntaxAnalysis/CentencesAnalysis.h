@@ -358,15 +358,15 @@ bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, i
 }
 
 bool Centence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
-    if (ifCentence(Words, PointNum, output)) { /*output << "<语句>" << endl;*/ return true; }
-    if (whileCentence(Words, PointNum, output)) { /*output << "<语句>" << endl;*/ return true; }
-    if (forCentence(Words, PointNum, output)) { /*output << "<语句>" << endl;*/ return true; }
-    if (doWhileCentence(Words, PointNum, output)) { /*output << "<语句>" << endl;*/ return true; }
-    if (functionCall(Words, PointNum, output, 0)) { /*output << "<语句>" << endl;*/ return true; }
-    if (assignCentence(Words, PointNum, output)) { /*output << "<语句>" << endl;*/ return true; }
-    if (printfCentence(Words, PointNum, output)) { /*output << "<语句>" << endl;*/ return true; }
-    if (scanfCentence(Words, PointNum, output)) { /*output << "<语句>" << endl;*/ return true; }
-    if (returnCentence(Words, PointNum, output)) { /*output << "<语句>" << endl;*/ return true; }
+    if (ifCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
+    if (whileCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
+    if (forCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
+    if (doWhileCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
+    if (functionCall(Words, PointNum, output, 0)) { cout << "<语句>" << endl; return true; }
+    if (assignCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
+    if (printfCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
+    if (scanfCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
+    if (returnCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
     if (WORD_TYPE == "LBRACE") {
         PRINT_WORD_AND_ADDPOINT;
         while (Centence(Words, PointNum, output));
