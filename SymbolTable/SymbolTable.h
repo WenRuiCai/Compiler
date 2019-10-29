@@ -214,6 +214,13 @@ public:
         return true;
     }
 
+    /*
+     * k和o同时不报的情况下，第一个点0
+     * 报o不报k的情况下，第一个点60
+     * 所以第一个错误是o型错误
+     * 报k且报o的情况下，第一个点13
+     * 所以后面一定有k型错误，而且最重要的是，可能是o型错误导致的k型错误，所以会多报错
+     */
     void loss_SEMICN_Error(int line) {
         symbolError.addError('k', line);
     }
