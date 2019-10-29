@@ -1,7 +1,11 @@
 //
 // Created by 84443 on 2019/10/18.
 //
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <vector>
 #include "CompileError.h"
 
 using namespace std;
@@ -23,7 +27,7 @@ public:
             }
         }
         WordErrors.push_back(error);
-        cout << "word error : " << line << endl;
+        //cout << "word error : " << line << endl;
     }
 
     vector<CompileError> getErrors() {

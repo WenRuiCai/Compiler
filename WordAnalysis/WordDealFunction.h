@@ -9,8 +9,7 @@
 
 using namespace std;
 
-bool dealString(stringstream& input, ofstream& output, string data,
-                vector<SINGLE_WORD> &word_vector) {
+bool dealString(stringstream& input, string data, vector<SINGLE_WORD> &word_vector) {
     int flag = 0;
     if (data[0] == '"') {
         int i;
@@ -23,9 +22,14 @@ bool dealString(stringstream& input, ofstream& output, string data,
         if (flag == 1) { //字符串不含空格，可以直接返回
             OUTPUT_AND_ADD("STRCON", data.substr(1, i - 1), input);
         } else { //此时字符串可是含有空格的哟
+            int line = searchLine(input.tellg(), code);
             string thisString = data.substr(1);
             char getChar;
             while ((getChar = input.get()) != '"') {
+                if (getChar == '\n') {
+                    wordError.addError(line);
+                    break;
+                }
                 thisString += getChar;
                 ////词法错误：包含非法字符
                 if (!(getChar == 32 || getChar == 33 || (getChar >= 35 && getChar <= 126))) {
@@ -41,8 +45,7 @@ bool dealString(stringstream& input, ofstream& output, string data,
     }
 }
 
-bool isString_PureNumber_Or_PureIdentify_And_Deal(stringstream& input, ofstream& output,
-        string data, vector<SINGLE_WORD> &word_vector) {
+bool isString_PureNumber_Or_PureIdentify_And_Deal(stringstream& input, string data, vector<SINGLE_WORD> &word_vector) {
     if ((data[0] >= '0' && data[0] <= '9') || (data[0] == '-' || data[0] == '+')) {
         //纯数字串
         for (int i = 1; i < data.length(); i++) {
@@ -52,14 +55,24 @@ bool isString_PureNumber_Or_PureIdentify_And_Deal(stringstream& input, ofstream&
         }
         switch (data[0]) {
             case '+':
+                if (data.substr(1).length() > 1 && data.substr(1).at(0) == '0') {
+                    wordError.addError(searchLine(input.tellg(), code));
+                }
                 OUTPUT_AND_ADD("PLUS", "+", input);
                 OUTPUT_AND_ADD("INTCON", data.substr(1), input);
                 break;
             case '-':
+                if (data.substr(1).length() > 1 && data.substr(1).at(0) == '0') {
+                    wordError.addError(searchLine(input.tellg(), code));
+                }
                 OUTPUT_AND_ADD("MINU", "-", input);
                 OUTPUT_AND_ADD("INTCON", data.substr(1), input);
                 break;
             default:
+                if (data.length() > 1 && data[0] == '0') {
+                    //数字有前导0
+                    wordError.addError(searchLine(input.tellg(), code));
+                }
                 OUTPUT_AND_ADD("INTCON", data, input);
                 break;
         }
@@ -79,8 +92,7 @@ bool isString_PureNumber_Or_PureIdentify_And_Deal(stringstream& input, ofstream&
     return true;
 }
 
-bool Deal_Single_Word_Part(stringstream& input, ofstream& output,
-                    string data, vector<SINGLE_WORD> &word_vector) {
+bool Deal_Single_Word_Part(stringstream& input, string data, vector<SINGLE_WORD> &word_vector) {
     if (data == "const") {
         OUTPUT_AND_ADD("CONSTTK", data, input);
     } else if (data == "int") {
@@ -152,14 +164,14 @@ bool Deal_Single_Word_Part(stringstream& input, ofstream& output,
             wordError.addError(searchLine(input.tellg(), code));
         }
         OUTPUT_AND_ADD("CHARCON", data.substr(1, 1), input);
-    } else if (!isString_PureNumber_Or_PureIdentify_And_Deal(input, output, data, word_vector) &&
-                !dealString(input, output, data, word_vector)) {
+    } else if (!isString_PureNumber_Or_PureIdentify_And_Deal(input, data, word_vector) &&
+                !dealString(input, data, word_vector)) {
         return false;
     }
     return true;
 }
 
-void Cut_Component_With_Space(stringstream& stringstream1, string nowData) {
+void Cut_Component_With_Space(stringstream& stringstream1, string nowData, int filestreamPoint) {
     string newData = "";
     for (int pointNum = 0; pointNum < nowData.length(); pointNum++) {
         char i = nowData[pointNum];
@@ -180,7 +192,13 @@ void Cut_Component_With_Space(stringstream& stringstream1, string nowData) {
                 break;
             case '\'':
                 newData = newData + " '" + nowData[pointNum + 1] + "' ";
-                pointNum += 2;
+                if (nowData[pointNum + 2] == '\'') {
+                    pointNum += 2;
+                }
+                else {
+                    pointNum += 1;
+                    wordError.addError(searchLine(filestreamPoint, code));
+                }
                 break;
             case '=':
                 if (nowData[pointNum + 1] == '=') {

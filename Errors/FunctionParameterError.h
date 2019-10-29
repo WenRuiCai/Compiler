@@ -1,7 +1,11 @@
 //
 // Created by 84443 on 2019/10/22.
 //
-#include "bits/stdc++.h"
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <vector>
 #include "CompileError.h"
 using namespace std;
 

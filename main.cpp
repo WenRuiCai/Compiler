@@ -8,8 +8,8 @@ int main() {
     ifstream inputCode;
     inputCode.open("testfile.txt");
     ofstream outputCode;
-    outputCode.open("output.txt");
-    WordAnalysis wordAnalysis(inputCode, outputCode);
+    outputCode.open("error.txt");
+    WordAnalysis wordAnalysis(inputCode);
     SyntaxAnalysis syntaxAnalysis(wordAnalysis.getWords(), outputCode);
     vector<CompileError> allErrors;
     for (CompileError error : wordError.getErrors()) {
@@ -24,10 +24,17 @@ int main() {
     for (CompileError error : symbolError.getErrors()) {
         allErrors.push_back(error);
     }
-    int a;
-    /*
-     * 错误项h还存在很多问题，每个if分支如果不存在return语句那么就会报错
-     * 错误项f存在问题，char和char类型比较是允许出现的（会不会是我只要表达式是char就判错？？）
-     */
+    while (allErrors.size() > 0) {
+        vector<CompileError>::iterator iterator = allErrors.begin();
+        CompileError error = *(iterator);
+        for (vector<CompileError>::iterator iter = allErrors.begin(); iter != allErrors.end(); iter++) {
+            if ((*iter).error_Happened_Line <= error.error_Happened_Line) {
+                iterator = iter;
+                error = (*iterator);
+            }
+        }
+        outputCode << error.error_Happened_Line << " " << error.errorKind << endl;
+        allErrors.erase(iterator);
+    }
     return 0;
 }

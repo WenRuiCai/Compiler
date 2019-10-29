@@ -17,7 +17,7 @@ bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
 bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 void Parameters(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
-
+extern bool hasReturnCentence;
 #endif //COMPILER_SYNTAXANALYSEFUNCTION_H
 
 //复合语句
@@ -29,9 +29,11 @@ void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& ou
     ///   接下来是最复杂的语句列分析    ///
     ///                              ///
     ////////////////////////////////////
+    hasReturnCentence = false;
     while (Centence(Words, PointNum, output));
-    output << "<语句列>" << endl;
-    output << "<复合语句>" << endl;
+    cout << "<语句列>" << endl;
+    cout << "<复合语句>" << endl;
+    symbolTable.noReturnCentenceError(hasReturnCentence, LINE);
 }
 
 //整数
@@ -40,7 +42,7 @@ bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
         PRINT_WORD_AND_ADDPOINT;
     }
     if (No_Symbol_Number(Words, PointNum, output)) {
-        output << "<整数>" << endl;
+        cout << "<整数>" << endl;
         return true;
     }
     return false;
@@ -50,7 +52,7 @@ bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
 bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     if (WORD_TYPE == "INTCON") {
         PRINT_WORD_AND_ADDPOINT;
-        output << "<无符号整数>" << endl;
+        cout << "<无符号整数>" << endl;
         return true;
     }
     return false;
@@ -64,7 +66,7 @@ void Const_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
         PRINT_WORD_AND_ADDPOINT;
         Const_Define(Words, PointNum, output);
     }
-    output << "<常量说明>" << endl;
+    cout << "<常量说明>" << endl;
 }
 
 //常量定义
@@ -75,26 +77,26 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             if (WORD_TYPE == "IDENFR") {
                 symbolTable.nowLevelAddItem("INTTK", WORD_VALUE, CONST, LINE, 0);
                 PRINT_WORD_AND_ADDPOINT;
-                if (WORD_TYPE == "ASSIGN") {
+            }
+            if (WORD_TYPE == "ASSIGN") {
+                PRINT_WORD_AND_ADDPOINT;
+            }
+            if (!Number(Words, PointNum, output)) {
+                if (WORD_TYPE == "CHARCON") {
                     PRINT_WORD_AND_ADDPOINT;
-                    if (!Number(Words, PointNum, output)) {
-                        if (WORD_TYPE == "CHARCON") {
-                            PRINT_WORD_AND_ADDPOINT;
-                        } else {
-                            symbolTable.addAssignValueError(LINE);
-                        }
-                    }
-                    if (WORD_TYPE == "SEMICN") {
-                        output << "<常量定义>" << endl;
-                        PRINT_WORD_AND_ADDPOINT;
-                        break;
-                    }
-                    else if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; continue; }
-                    else {
-                        symbolTable.loss_SEMICN_Error(LINE);
-                        break;
-                    }
+                } else {
+                    symbolTable.addAssignValueError(LINE);
                 }
+            }
+            if (WORD_TYPE == "SEMICN") {
+                cout << "<常量定义>" << endl;
+                PRINT_WORD_AND_ADDPOINT;
+                break;
+            }
+            else if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; continue; }
+            else {
+                symbolTable.loss_SEMICN_Error(PRE_WORD_LINE);
+                break;
             }
         }
     }
@@ -104,24 +106,24 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             if (WORD_TYPE == "IDENFR") {
                 symbolTable.nowLevelAddItem("CHARTK", WORD_VALUE, CONST, LINE, 0);
                 PRINT_WORD_AND_ADDPOINT;
-                if (WORD_TYPE == "ASSIGN") {
-                    PRINT_WORD_AND_ADDPOINT;
-                    if (WORD_TYPE == "CHARCON") {
-                        PRINT_WORD_AND_ADDPOINT;
-                    } else if (!Number(Words, PointNum, output)) {
-                        symbolTable.addAssignValueError(LINE);
-                    }
-                    if (WORD_TYPE == "SEMICN") {
-                        output << "<常量定义>" << endl;
-                        PRINT_WORD_AND_ADDPOINT;
-                        break;
-                    }
-                    else if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; continue; }
-                    else {
-                        symbolTable.loss_SEMICN_Error(LINE);
-                        break;
-                    }
-                }
+            }
+            if (WORD_TYPE == "ASSIGN") {
+                PRINT_WORD_AND_ADDPOINT;
+            }
+            if (WORD_TYPE == "CHARCON") {
+                PRINT_WORD_AND_ADDPOINT;
+            } else if (!Number(Words, PointNum, output)) {
+                symbolTable.addAssignValueError(LINE);
+            }
+            if (WORD_TYPE == "SEMICN") {
+                cout << "<常量定义>" << endl;
+                PRINT_WORD_AND_ADDPOINT;
+                break;
+            }
+            else if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; continue; }
+            else {
+                symbolTable.loss_SEMICN_Error(PRE_WORD_LINE);
+                break;
             }
         }
     }
@@ -135,56 +137,67 @@ void Variable_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outp
     }
     while ("INTTK" == WORD_TYPE || "CHARTK" == WORD_TYPE) {
         if (Words[PointNum + 2].WORD.first == "LPARENT") {
-            output << "<变量说明>" << endl;
+            cout << "<变量说明>" << endl;
             return;
         }
         PRINT_WORD_AND_ADDPOINT;
         Variable_Define(Words, PointNum, output);
     }
-    output << "<变量说明>" << endl;
+    cout << "<变量说明>" << endl;
 }
 
 //变量定义
 void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     string thistype = Words[PointNum - 1].WORD.first;
-    while (WORD_TYPE == "IDENFR") {
+    ///如果标识符出现词法错误，在此处我的处理是将其删除，
+    /// 所以如果标识符出现了词法错误后，语法分析就不能够检测到标识符
+    /// Update ：应该解决了
+    bool hasWrongId = (WORD_TYPE == "COMMA" || WORD_TYPE == "SEMICN" || WORD_TYPE == "LBRACK");
+    while (WORD_TYPE == "IDENFR" || hasWrongId) {
         string thisValue = WORD_VALUE;
         int thisline = LINE;
-        PRINT_WORD_AND_ADDPOINT;
-        if (WORD_TYPE == "COMMA") {
-            symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 0);
+        if (!hasWrongId) {
             PRINT_WORD_AND_ADDPOINT;
+        }
+        if (WORD_TYPE == "COMMA") {
+            if (!hasWrongId)
+                symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 0);
+            PRINT_WORD_AND_ADDPOINT;
+            hasWrongId = (WORD_TYPE == "COMMA" || WORD_TYPE == "SEMICN" || WORD_TYPE == "LBRACK");
             continue;
         }
         else if (WORD_TYPE == "SEMICN") {
-            symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 0);
-            output << "<变量定义>" << endl;
+            if (!hasWrongId)
+                symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 0);
+            cout << "<变量定义>" << endl;
             PRINT_WORD_AND_ADDPOINT;
             break;
         }
         else if (WORD_TYPE == "LBRACK") {
-            symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 1);
+            if (!hasWrongId)
+                symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 1);
             PRINT_WORD_AND_ADDPOINT;
             No_Symbol_Number(Words, PointNum, output);
             if (WORD_TYPE == "RBRACK") {
                 PRINT_WORD_AND_ADDPOINT;
             } else {
-                symbolTable.loss_RBRACK_Error(LINE);
+                symbolTable.loss_RBRACK_Error(PRE_WORD_LINE);
             }
             if (WORD_TYPE == "COMMA") {
                 PRINT_WORD_AND_ADDPOINT;
+                hasWrongId = (WORD_TYPE == "COMMA" || WORD_TYPE == "SEMICN" || WORD_TYPE == "LBRACK");
                 continue;
             }
             else if (WORD_TYPE == "SEMICN") {
-                output << "<变量定义>" << endl;
+                cout << "<变量定义>" << endl;
                 PRINT_WORD_AND_ADDPOINT;
                 break;
             } else {
-                symbolTable.loss_SEMICN_Error(LINE);
+                symbolTable.loss_SEMICN_Error(PRE_WORD_LINE);
                 break;
             }
         } else {
-            symbolTable.loss_SEMICN_Error(LINE);
+            symbolTable.loss_SEMICN_Error(PRE_WORD_LINE);
             break;
         }
     }
@@ -193,7 +206,7 @@ void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
 //函数参数列
 void Parameters(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     if (WORD_TYPE == "RPARENT") {
-        output << "<参数表>" << endl;
+        cout << "<参数表>" << endl;
         return;
     }
     //参数声明
@@ -205,7 +218,7 @@ void Parameters(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             PRINT_WORD_AND_ADDPOINT;
             if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; }
             else {
-                output << "<参数表>" << endl;
+                cout << "<参数表>" << endl;
                 return;
             }
         }
@@ -222,21 +235,21 @@ bool Function_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstr
         symbolTable.nowLevelAddItem(thistype, WORD_VALUE, FUNC, LINE, 0);
         symbolTable.addLevel();
         PRINT_WORD_AND_ADDPOINT;
-        output << "<声明头部>" << endl;
+        cout << "<声明头部>" << endl;
         if (WORD_TYPE == "LPARENT") {
             PRINT_WORD_AND_ADDPOINT;
             Parameters(Words, PointNum, output);
             if (WORD_TYPE == "RPARENT") {
                 PRINT_WORD_AND_ADDPOINT;
             } else {
-                symbolTable.loss_RPARENT_Error(LINE);
+                symbolTable.loss_RPARENT_Error(PRE_WORD_LINE);
             }
             if (WORD_TYPE == "LBRACE") {
                 PRINT_WORD_AND_ADDPOINT;
                 Component_Centences(Words, PointNum, output);
                 if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
-                    output << "<有返回值函数定义>" << endl;
+                    cout << "<有返回值函数定义>" << endl;
                     symbolTable.dropOutLevel();
                     return true;
                 }
@@ -262,14 +275,14 @@ bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, o
             if (WORD_TYPE == "RPARENT") {
                 PRINT_WORD_AND_ADDPOINT;
             } else {
-                symbolTable.loss_RPARENT_Error(LINE);
+                symbolTable.loss_RPARENT_Error(PRE_WORD_LINE);
             }
             if (WORD_TYPE == "LBRACE") {
                 PRINT_WORD_AND_ADDPOINT;
                 Component_Centences(Words, PointNum, output);
                 if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
-                    output << "<无返回值函数定义>" << endl;
+                    cout << "<无返回值函数定义>" << endl;
                     symbolTable.dropOutLevel();
                     return true;
                 }
@@ -291,14 +304,14 @@ void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
             if (WORD_TYPE == "RPARENT") {
                 PRINT_WORD_AND_ADDPOINT;
             } else {
-                symbolTable.loss_RPARENT_Error(LINE);
+                symbolTable.loss_RPARENT_Error(PRE_WORD_LINE);
             }
             if (WORD_TYPE == "LBRACE") {
                 PRINT_WORD_AND_ADDPOINT;
                 Component_Centences(Words, PointNum, output);
                 if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
-                    output << "<主函数>" << endl;
+                    cout << "<主函数>" << endl;
                     symbolTable.dropOutLevel();
                     return;
                 }
@@ -315,5 +328,5 @@ void Program_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
     while (Function_With_Return_Value(Words, PointNum, output) ||
            Function_Not_With_Return_Value(Words, PointNum, output));
     Function_Main(Words, PointNum, output);
-    output << "<程序>" << endl;
+    cout << "<程序>" << endl;
 }

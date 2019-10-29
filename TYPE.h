@@ -1,7 +1,11 @@
 ﻿//
 // Created by 84443 on 2019/9/27.
 //
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <vector>
 #include "WordAnalysis/SearchLine.h"
 #include "Errors/WordError.h"
 
@@ -66,8 +70,11 @@ struct SINGLE_WORD {
 #define LINE \
     Words[PointNum].line
 
+#define PRE_WORD_LINE \
+    Words[PointNum - 1].line
+
 #define PRINT_WORD_AND_ADDPOINT \
-    output << Words[PointNum].WORD.first << " " << Words[PointNum].WORD.second << endl; \
+    cout << Words[PointNum].WORD.first << " " << Words[PointNum].WORD.second << endl; \
     PointNum++
 
 //////////////////////////////////////////////////////

@@ -11,14 +11,14 @@ class WordAnalysis {
 private:
     vector<SINGLE_WORD> Words;
 
-    void beginBuild(stringstream& input, ofstream& outputFile) {
+    void beginBuild(stringstream& input) {
         string data;
         while (input >> data) {
-            if (!Deal_Single_Word_Part(input, outputFile, data, Words)) {
+            if (!Deal_Single_Word_Part(input, data, Words)) {
                 stringstream buffer;
-                Cut_Component_With_Space(buffer, data);
+                Cut_Component_With_Space(buffer, data, input.tellg());
                 while (buffer >> data) {
-                    if (!Deal_Single_Word_Part(input, outputFile, data, Words)) {
+                    if (!Deal_Single_Word_Part(input, data, Words)) {
                         wordError.addError(searchLine(input.tellg(), code));
                     }
                 }
@@ -27,7 +27,7 @@ private:
     }
 
 public:
-    WordAnalysis(ifstream& inputCode, ofstream& outputFile) {
+    WordAnalysis(ifstream& inputCode) {
         char each; int flag = 0;
         while ((each = inputCode.get()) != EOF) {
             if (each == '"') {
@@ -39,7 +39,7 @@ public:
         }
         stringstream input;
         input << code;
-        beginBuild(input, outputFile);
+        beginBuild(input);
     }
 
     vector<SINGLE_WORD> getWords() {

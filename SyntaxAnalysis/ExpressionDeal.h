@@ -36,7 +36,7 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
                 if (WORD_TYPE == "RBRACK") {
                     PRINT_WORD_AND_ADDPOINT;
                 } else {
-                    symbolTable.loss_RBRACK_Error(LINE);
+                    symbolTable.loss_RBRACK_Error(PRE_WORD_LINE);
                 }
             }
             flag = symbolTable.find_ID_Kind(name);
@@ -48,7 +48,7 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
         if (WORD_TYPE == "RPARENT") {
             PRINT_WORD_AND_ADDPOINT;
         } else {
-            symbolTable.loss_RPARENT_Error(LINE);
+            symbolTable.loss_RPARENT_Error(PRE_WORD_LINE);
         }
         flag = INT_Express;
     }
@@ -60,7 +60,7 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
         Number(Words, PointNum, output);
         flag = INT_Express;
     }
-    output << "<因子>" << endl;
+    cout << "<因子>" << endl;
     return flag;
 }
 
@@ -73,7 +73,7 @@ ExpressionFlag item(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
         factor(Words, PointNum, output);
         counter++;
     }
-    output << "<项>" << endl;
+    cout << "<项>" << endl;
     return (counter > 1) ? INT_Express : flag;
 }
 
@@ -89,6 +89,6 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
         item(Words, PointNum, output);
         counter++;
     }
-    output << "<表达式>" << endl;
+    cout << "<表达式>" << endl;
     return (counter > 1) ? INT_Express : flag;
 }
