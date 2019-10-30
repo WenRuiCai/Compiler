@@ -55,25 +55,28 @@ bool isString_PureNumber_Or_PureIdentify_And_Deal(stringstream& input, string da
         }
         switch (data[0]) {
             case '+':
+                OUTPUT_AND_ADD("PLUS", "+", input);
                 if (data.substr(1).length() > 1 && data.substr(1).at(0) == '0') {
                     wordError.addError(searchLine(input.tellg(), code));
+                } else {
+                    OUTPUT_AND_ADD("INTCON", data.substr(1), input);
                 }
-                OUTPUT_AND_ADD("PLUS", "+", input);
-                OUTPUT_AND_ADD("INTCON", data.substr(1), input);
                 break;
             case '-':
+                OUTPUT_AND_ADD("MINU", "-", input);
                 if (data.substr(1).length() > 1 && data.substr(1).at(0) == '0') {
                     wordError.addError(searchLine(input.tellg(), code));
+                } else {
+                    OUTPUT_AND_ADD("INTCON", data.substr(1), input);
                 }
-                OUTPUT_AND_ADD("MINU", "-", input);
-                OUTPUT_AND_ADD("INTCON", data.substr(1), input);
                 break;
             default:
                 if (data.length() > 1 && data[0] == '0') {
                     //数字有前导0
                     wordError.addError(searchLine(input.tellg(), code));
+                } else {
+                    OUTPUT_AND_ADD("INTCON", data, input);
                 }
-                OUTPUT_AND_ADD("INTCON", data, input);
                 break;
         }
         return true;
@@ -162,6 +165,7 @@ bool Deal_Single_Word_Part(stringstream& input, string data, vector<SINGLE_WORD>
               data[1] == '_' || (data[1] >= 'a' && data[1] <= 'z') ||
               (data[1] >= 'A' && data[1] <= 'Z') || (data[1] >= '0' && data[1] <= '9'))) {
             wordError.addError(searchLine(input.tellg(), code));
+            return false;
         }
         OUTPUT_AND_ADD("CHARCON", data.substr(1, 1), input);
     } else if (!isString_PureNumber_Or_PureIdentify_And_Deal(input, data, word_vector) &&
@@ -191,8 +195,8 @@ void Cut_Component_With_Space(stringstream& stringstream1, string nowData, int f
                 newData = newData + " " + i + " ";
                 break;
             case '\'':
-                newData = newData + " '" + nowData[pointNum + 1] + "' ";
                 if (nowData[pointNum + 2] == '\'') {
+                    newData = newData + " '" + nowData[pointNum + 1] + "' ";
                     pointNum += 2;
                 }
                 else {
