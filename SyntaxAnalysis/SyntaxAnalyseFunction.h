@@ -113,7 +113,7 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             if (WORD_TYPE == "CHARCON") {
                 PRINT_WORD_AND_ADDPOINT;
             } else if (!Number(Words, PointNum, output)) {
-                symbolTable.addAssignValueError(LINE);
+                symbolTable.addAssignValueError(PRE_WORD_LINE);
             }
             if (WORD_TYPE == "SEMICN") {
                 cout << "<常量定义>" << endl;
