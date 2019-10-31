@@ -81,12 +81,17 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             if (WORD_TYPE == "ASSIGN") {
                 PRINT_WORD_AND_ADDPOINT;
             }
+            int errorflag = 0;
             if (!Number(Words, PointNum, output)) {
                 if (WORD_TYPE == "CHARCON") {
                     PRINT_WORD_AND_ADDPOINT;
                 } else {
                     symbolTable.addAssignValueError(PRE_WORD_LINE);
+                    errorflag = 1;
                 }
+            }
+            if ((NEXT_WORD_TYPE == "SEMICN" || NEXT_WORD_TYPE == "COMMA") && errorflag == 1) {
+                PointNum++;
             }
             if (WORD_TYPE == "SEMICN") {
                 cout << "<常量定义>" << endl;
@@ -110,10 +115,15 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             if (WORD_TYPE == "ASSIGN") {
                 PRINT_WORD_AND_ADDPOINT;
             }
+            int errorflag = 0;
             if (WORD_TYPE == "CHARCON") {
                 PRINT_WORD_AND_ADDPOINT;
             } else if (!Number(Words, PointNum, output)) {
                 symbolTable.addAssignValueError(PRE_WORD_LINE);
+                errorflag = 1;
+            }
+            if ((NEXT_WORD_TYPE == "SEMICN" || NEXT_WORD_TYPE == "COMMA") && errorflag == 1) {
+                PointNum++;
             }
             if (WORD_TYPE == "SEMICN") {
                 cout << "<常量定义>" << endl;

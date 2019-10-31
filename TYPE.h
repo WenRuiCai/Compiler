@@ -64,6 +64,9 @@ struct SINGLE_WORD {
 #define WORD_TYPE \
     Words[PointNum].WORD.first
 
+#define NEXT_WORD_TYPE \
+    Words[PointNum + 1].WORD.first
+
 #define WORD_VALUE \
     Words[PointNum].WORD.second
 
