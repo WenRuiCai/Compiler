@@ -34,33 +34,33 @@ extern bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream
 
 void parameterValueList(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<string>& types) {
     if (WORD_TYPE == "RPARENT") {
-        cout << "<值参数表>" << endl;
+        //cout << "<值参数表>" << endl;
         return;
     }
 
     ExpressionFlag flag;
-    flag = expression(Words, PointNum, output);
+    flag = expression(Words, PointNum, output, false);
     types.push_back((flag == INT_Express) ? "INTTK" : "CHARTK");
 
     while (WORD_TYPE == "COMMA") {
         PRINT_WORD_AND_ADDPOINT;
-        flag = expression(Words, PointNum, output);
+        flag = expression(Words, PointNum, output, false);
         types.push_back((flag == INT_Express) ? "INTTK" : "CHARTK");
     }
-    cout << "<值参数表>" << endl;
+    //cout << "<值参数表>" << endl;
 }
 
 void condition(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     int flag = 0, line;
 
-    if (expression(Words, PointNum, output) == CHAR_Express) flag = 1;
+    if (expression(Words, PointNum, output, false) == CHAR_Express) flag = 1;
 
     if (WORD_TYPE == "LSS" || WORD_TYPE == "LEQ"
         || WORD_TYPE == "GRE" || WORD_TYPE == "GEQ"
         || WORD_TYPE == "EQL" || WORD_TYPE == "NEQ") {
         line = LINE;
         PRINT_WORD_AND_ADDPOINT;
-        ExpressionFlag flag1 = expression(Words, PointNum, output);
+        ExpressionFlag flag1 = expression(Words, PointNum, output, false);
         if (flag1 == CHAR_Express) {
             if (flag != 1) {
                 symbolTable.addConditionTypeError(line);
@@ -71,7 +71,7 @@ void condition(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             }
         }
     }
-    cout << "<条件>" << endl;
+    //cout << "<条件>" << endl;
 }
 
 bool ifCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
@@ -90,11 +90,11 @@ bool ifCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
         if (WORD_TYPE == "ELSETK") {
             PRINT_WORD_AND_ADDPOINT;
             Centence(Words, PointNum, output);
-            cout << "<条件语句>" << endl;
+            //cout << "<条件语句>" << endl;
             return true;
         }
         else {
-            cout << "<条件语句>" << endl;
+            //cout << "<条件语句>" << endl;
             return true;
         }
     }
@@ -114,7 +114,7 @@ bool whileCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
             symbolTable.loss_RPARENT_Error(PRE_WORD_LINE);
         }
         Centence(Words, PointNum, output);
-        cout << "<循环语句>" << endl;
+        //cout << "<循环语句>" << endl;
         return true;
     }
     return false;
@@ -138,7 +138,7 @@ bool doWhileCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
         } else {
             symbolTable.loss_RPARENT_Error(PRE_WORD_LINE);
         }
-        cout << "<循环语句>" << endl;
+        //cout << "<循环语句>" << endl;
         return true;
     }
 
@@ -157,7 +157,7 @@ bool forCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             PRINT_WORD_AND_ADDPOINT;
             if (WORD_TYPE == "ASSIGN") {
                 PRINT_WORD_AND_ADDPOINT;
-                expression(Words, PointNum, output);
+                expression(Words, PointNum, output, false);
                 if (WORD_TYPE == "SEMICN") {
                     PRINT_WORD_AND_ADDPOINT;
                 } else {
@@ -177,14 +177,14 @@ bool forCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
                 PRINT_WORD_AND_ADDPOINT; //IDENFR
                 PRINT_WORD_AND_ADDPOINT; //+ | -
                 No_Symbol_Number(Words, PointNum, output); //STEP
-                cout << "<步长>" << endl;
+                //cout << "<步长>" << endl;
                 if (WORD_TYPE == "RPARENT") {
                     PRINT_WORD_AND_ADDPOINT;
                 } else {
                     symbolTable.loss_RPARENT_Error(PRE_WORD_LINE);
                 }
                 Centence(Words, PointNum, output);
-                cout << "<循环语句>" << endl;
+                //cout << "<循环语句>" << endl;
                 return true;
             }
         }
@@ -201,7 +201,7 @@ bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
     if (WORD_TYPE == "LBRACK") {
         int line = LINE;
         PRINT_WORD_AND_ADDPOINT;
-        if (expression(Words, PointNum, output) != INT_Express) {
+        if (expression(Words, PointNum, output, false) != INT_Express) {
             symbolTable.addArrayIndexError(line);
         }
         if (WORD_TYPE == "RBRACK") {
@@ -212,9 +212,9 @@ bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
     }
     if (WORD_TYPE == "ASSIGN") {
         PRINT_WORD_AND_ADDPOINT;
-        expression(Words, PointNum, output);
+        expression(Words, PointNum, output, false);
     }
-    cout << "<赋值语句>" << endl;
+    //cout << "<赋值语句>" << endl;
     if (WORD_TYPE == "SEMICN") {
         PRINT_WORD_AND_ADDPOINT;
     } else {
@@ -231,14 +231,14 @@ bool printfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
         PRINT_WORD_AND_ADDPOINT;
         if (WORD_TYPE == "STRCON") {
             PRINT_WORD_AND_ADDPOINT;
-            cout << "<字符串>" << endl;
+            //cout << "<字符串>" << endl;
             if (WORD_TYPE == "COMMA") {
                 PRINT_WORD_AND_ADDPOINT;
-                expression(Words, PointNum, output);
+                expression(Words, PointNum, output, false);
             }
         }
         else {
-            expression(Words, PointNum, output);
+            expression(Words, PointNum, output, false);
         }
         if (WORD_TYPE == "RPARENT") {
             PRINT_WORD_AND_ADDPOINT;
@@ -246,7 +246,7 @@ bool printfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
             symbolTable.loss_RPARENT_Error(PRE_WORD_LINE);
         }
         if (WORD_TYPE == "SEMICN") {
-            cout << "<写语句>" << endl;
+            //cout << "<写语句>" << endl;
             PRINT_WORD_AND_ADDPOINT;
             return true;
         } else {
@@ -277,7 +277,7 @@ bool scanfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
             symbolTable.loss_RPARENT_Error(PRE_WORD_LINE);
         }
         if (WORD_TYPE == "SEMICN") {
-            cout << "<读语句>" << endl;
+            //cout << "<读语句>" << endl;
             PRINT_WORD_AND_ADDPOINT;
             return true;
         } else {
@@ -298,7 +298,7 @@ bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "LPARENT") {
         PRINT_WORD_AND_ADDPOINT;
-        flag = expression(Words, PointNum, output);
+        flag = expression(Words, PointNum, output, false);
         if (WORD_TYPE == "RPARENT") {
             PRINT_WORD_AND_ADDPOINT;
         } else {
@@ -306,7 +306,7 @@ bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
         }
     }
     if (WORD_TYPE == "SEMICN") {
-        cout << "<返回语句>" << endl;
+        //cout << "<返回语句>" << endl;
         PRINT_WORD_AND_ADDPOINT;
         symbolTable.returnCentenceIsCorrect(flag, line);
         return true;
@@ -341,10 +341,10 @@ bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, i
             symbolTable.loss_RPARENT_Error(PRE_WORD_LINE);
         }
         if (hasReturnValue(Words, name)) {
-            cout << "<有返回值函数调用语句>" << endl;
+            //cout << "<有返回值函数调用语句>" << endl;
         }
         else {
-            cout << "<无返回值函数调用语句>" << endl;
+            //cout << "<无返回值函数调用语句>" << endl;
         }
         if (!isFactor) {
             if (WORD_TYPE == "SEMICN") {
@@ -358,28 +358,28 @@ bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, i
 }
 
 bool Centence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
-    if (ifCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
-    if (whileCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
-    if (forCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
-    if (doWhileCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
-    if (functionCall(Words, PointNum, output, 0)) { cout << "<语句>" << endl; return true; }
-    if (assignCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
-    if (printfCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
-    if (scanfCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
-    if (returnCentence(Words, PointNum, output)) { cout << "<语句>" << endl; return true; }
+    if (ifCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (whileCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (forCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (doWhileCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (functionCall(Words, PointNum, output, 0)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (assignCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (printfCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (scanfCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (returnCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
     if (WORD_TYPE == "LBRACE") {
         PRINT_WORD_AND_ADDPOINT;
         while (Centence(Words, PointNum, output));
-        cout << "<语句列>" << endl;
+        //cout << "<语句列>" << endl;
         if (WORD_TYPE == "RBRACE") {
             PRINT_WORD_AND_ADDPOINT;
-            cout << "<语句>" << endl;
+            //cout << "<语句>" << endl;
             return true;
         }
     }
     if (WORD_TYPE == "SEMICN") {
         PRINT_WORD_AND_ADDPOINT;
-        cout << "<语句>" << endl;
+        //cout << "<语句>" << endl;
         return true;
     }
     return false;

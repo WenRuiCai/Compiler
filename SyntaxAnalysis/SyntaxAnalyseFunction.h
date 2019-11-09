@@ -31,8 +31,8 @@ void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& ou
     ////////////////////////////////////
     hasReturnCentence = false;
     while (Centence(Words, PointNum, output));
-    cout << "<语句列>" << endl;
-    cout << "<复合语句>" << endl;
+    //cout << "<语句列>" << endl;
+    //cout << "<复合语句>" << endl;
     symbolTable.noReturnCentenceError(hasReturnCentence, LINE);
 }
 
@@ -42,7 +42,7 @@ bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
         PRINT_WORD_AND_ADDPOINT;
     }
     if (No_Symbol_Number(Words, PointNum, output)) {
-        cout << "<整数>" << endl;
+        //cout << "<整数>" << endl;
         return true;
     }
     return false;
@@ -52,7 +52,7 @@ bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
 bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     if (WORD_TYPE == "INTCON") {
         PRINT_WORD_AND_ADDPOINT;
-        cout << "<无符号整数>" << endl;
+        //cout << "<无符号整数>" << endl;
         return true;
     }
     return false;
@@ -66,7 +66,7 @@ void Const_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
         PRINT_WORD_AND_ADDPOINT;
         Const_Define(Words, PointNum, output);
     }
-    cout << "<常量说明>" << endl;
+    //cout << "<常量说明>" << endl;
 }
 
 //常量定义
@@ -94,7 +94,7 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
                 PointNum++;
             }
             if (WORD_TYPE == "SEMICN") {
-                cout << "<常量定义>" << endl;
+                //cout << "<常量定义>" << endl;
                 PRINT_WORD_AND_ADDPOINT;
                 break;
             }
@@ -126,7 +126,7 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
                 PointNum++;
             }
             if (WORD_TYPE == "SEMICN") {
-                cout << "<常量定义>" << endl;
+                //cout << "<常量定义>" << endl;
                 PRINT_WORD_AND_ADDPOINT;
                 break;
             }
@@ -147,13 +147,13 @@ void Variable_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outp
     }
     while ("INTTK" == WORD_TYPE || "CHARTK" == WORD_TYPE) {
         if (Words[PointNum + 2].WORD.first == "LPARENT") {
-            cout << "<变量说明>" << endl;
+            //cout << "<变量说明>" << endl;
             return;
         }
         PRINT_WORD_AND_ADDPOINT;
         Variable_Define(Words, PointNum, output);
     }
-    cout << "<变量说明>" << endl;
+    //cout << "<变量说明>" << endl;
 }
 
 //变量定义
@@ -179,7 +179,7 @@ void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
         else if (WORD_TYPE == "SEMICN") {
             if (!hasWrongId)
                 symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 0);
-            cout << "<变量定义>" << endl;
+            //cout << "<变量定义>" << endl;
             PRINT_WORD_AND_ADDPOINT;
             break;
         }
@@ -199,7 +199,7 @@ void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
                 continue;
             }
             else if (WORD_TYPE == "SEMICN") {
-                cout << "<变量定义>" << endl;
+                //cout << "<变量定义>" << endl;
                 PRINT_WORD_AND_ADDPOINT;
                 break;
             } else {
@@ -216,7 +216,7 @@ void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
 //函数参数列
 void Parameters(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     if (WORD_TYPE == "RPARENT") {
-        cout << "<参数表>" << endl;
+        //cout << "<参数表>" << endl;
         return;
     }
     //参数声明
@@ -228,7 +228,7 @@ void Parameters(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             PRINT_WORD_AND_ADDPOINT;
             if (WORD_TYPE == "COMMA") { PRINT_WORD_AND_ADDPOINT; }
             else {
-                cout << "<参数表>" << endl;
+                //cout << "<参数表>" << endl;
                 return;
             }
         }
@@ -244,8 +244,9 @@ bool Function_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstr
     if (WORD_TYPE == "IDENFR") {
         symbolTable.nowLevelAddItem(thistype, WORD_VALUE, FUNC, LINE, 0);
         symbolTable.addLevel();
+        symbolTable.addBlock(0, WORD_VALUE);
         PRINT_WORD_AND_ADDPOINT;
-        cout << "<声明头部>" << endl;
+        //cout << "<声明头部>" << endl;
         if (WORD_TYPE == "LPARENT") {
             PRINT_WORD_AND_ADDPOINT;
             Parameters(Words, PointNum, output);
@@ -259,7 +260,7 @@ bool Function_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstr
                 Component_Centences(Words, PointNum, output);
                 if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
-                    cout << "<有返回值函数定义>" << endl;
+                    //cout << "<有返回值函数定义>" << endl;
                     symbolTable.dropOutLevel();
                     return true;
                 }
@@ -278,6 +279,7 @@ bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, o
     if (WORD_TYPE == "IDENFR") {
         symbolTable.nowLevelAddItem("VOIDTK", WORD_VALUE, FUNC, LINE, 0);
         symbolTable.addLevel();
+        symbolTable.addBlock(0, WORD_VALUE);
         PRINT_WORD_AND_ADDPOINT;
         if (WORD_TYPE == "LPARENT") {
             PRINT_WORD_AND_ADDPOINT;
@@ -292,7 +294,7 @@ bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, o
                 Component_Centences(Words, PointNum, output);
                 if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
-                    cout << "<无返回值函数定义>" << endl;
+                    //cout << "<无返回值函数定义>" << endl;
                     symbolTable.dropOutLevel();
                     return true;
                 }
@@ -308,6 +310,7 @@ void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
     if (WORD_TYPE == "MAINTK") {
         symbolTable.nowLevelAddItem("VOIDTK", WORD_VALUE, MAIN, LINE, 0);
         symbolTable.addLevel();
+        symbolTable.addBlock(1, "main");
         PRINT_WORD_AND_ADDPOINT;
         if (WORD_TYPE == "LPARENT") {
             PRINT_WORD_AND_ADDPOINT;
@@ -321,7 +324,7 @@ void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
                 Component_Centences(Words, PointNum, output);
                 if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
-                    cout << "<主函数>" << endl;
+                    //cout << "<主函数>" << endl;
                     symbolTable.dropOutLevel();
                     return;
                 }
@@ -338,5 +341,5 @@ void Program_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
     while (Function_With_Return_Value(Words, PointNum, output) ||
            Function_Not_With_Return_Value(Words, PointNum, output));
     Function_Main(Words, PointNum, output);
-    cout << "<程序>" << endl;
+    //cout << "<程序>" << endl;
 }

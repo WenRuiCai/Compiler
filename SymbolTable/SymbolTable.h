@@ -10,11 +10,15 @@ enum ExpressionFlag {
 #include "../Errors/NameDefineError.h"
 #include "../Errors/FunctionParameterError.h"
 #include "../Errors/SymbolError.h"
+#include "../Codemid/FunctionBlock.h"
 
 class SymbolTable {
 private:
     vector<Level> symbolStackTable;
     int nowlevel = 0;
+    FunctionBlock MainBlock = FunctionBlock();
+    vector<FunctionBlock> functionBlocks;
+    int nowBlock = 0;
 
     bool nameDuplicated(string name) {
         Level level = symbolStackTable[nowlevel];
@@ -41,6 +45,20 @@ public:
         Level newLevel = Level();
         this->symbolStackTable.push_back(newLevel);
         this->nowlevel = symbolStackTable.size() - 1;
+    }
+
+    void addBlock(int flag, string name) {
+        if (flag == 1) {
+            this->nowBlock = -1;
+        } else {
+            FunctionBlock block = FunctionBlock();
+            this->functionBlocks.push_back(block);
+            this->nowBlock = this->functionBlocks.size() - 1;
+        }
+    }
+
+    FunctionBlock& getNowBlock() {
+        return (this->nowBlock == -1) ? MainBlock : (this->functionBlocks[nowBlock]);
     }
 
     void dropOutLevel() {
