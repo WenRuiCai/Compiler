@@ -18,29 +18,42 @@ class factorMidCode {
     enum FactorKind{
         EXP,
         PURE_IDENFR,
-        PURE_ARRAY,
-        ARRAY_WITH_EXP,
-        FUNCTION
+        ARRAY,
+        FUNCTION,
+        INTCON,
+        CHARCON
     };
 private:
     string factorResultID;
     ExpressionMidCode* factor_exp = NULL;
     string IDENFR;
     FactorKind factorKind;
+    char charcon;
+    int intcon;
 
 public:
     void setFactor_exp(ExpressionMidCode* pointer) {
         this->factor_exp = pointer;
-        this->factorKind = EXP;
     }
 
     void factor_is_functioncall() {}
 
-    void factor_is_array() {}
+    void factor_is_exp() {
+        this->factorKind = EXP;
+    }
+
+    void factor_is_intcon() {}
+
+    void factor_is_charcon(string char_value) {
+        this->factorKind = CHARCON;  this->charcon = char_value[0];
+    }
+
+    void factor_is_array(string name) {
+        this->factorKind = ARRAY;   this->IDENFR = name;
+    }
 
     void factor_is_pure_idenfr(string name) {
-        this->IDENFR = name;
-        this->factorKind = PURE_IDENFR;
+        this->IDENFR = name;    this->factorKind = PURE_IDENFR;
     }
 
     ExpressionMidCode& getFactorExp() {

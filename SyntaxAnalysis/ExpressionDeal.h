@@ -22,8 +22,10 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
      * 目前已经建立完了表达式的层次结构
      * 接下来需要在factor中进行三元式的生成
      * 比如，在因子仅为一个标识符的情况下，就不用Ti来表示了
-     *      这里已经处理了因子是单个纯标识符的情况，其他情况还需处理
-     *      加油呀！！
+     *      这里已经处理了因子是单个纯标识符,以及纯表达式的情况
+     *      已经处理了因子是数组的情况
+     *      已经处理了字符常量的情况
+     *      剩余：函数调用、数字常量
      */
     ExpressionFlag flag = NONE_Express;
     if (WORD_TYPE == "IDENFR") {
@@ -46,8 +48,10 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
                 } else {
                     symbolTable.loss_RBRACK_Error(PRE_WORD_LINE);
                 }
+                expBlock.getNowItem().getNowFactor().factor_is_array(name);
+            } else {
+                expBlock.getNowItem().getNowFactor().factor_is_pure_idenfr(name);
             }
-            expBlock.getNowItem().getNowFactor().factor_is_pure_idenfr(name);
             flag = symbolTable.find_ID_Kind(name);
         }
     }
@@ -59,9 +63,11 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
         } else {
             symbolTable.loss_RPARENT_Error(PRE_WORD_LINE);
         }
+        expBlock.getNowItem().getNowFactor().factor_is_exp();
         flag = INT_Express;
     }
     else if (WORD_TYPE == "CHARCON") {
+        expBlock.getNowItem().getNowFactor().factor_is_charcon(WORD_VALUE);
         PRINT_WORD_AND_ADDPOINT;
         flag = CHAR_Express;
     }
