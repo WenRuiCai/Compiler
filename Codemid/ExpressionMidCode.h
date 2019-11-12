@@ -42,7 +42,9 @@ public:
         this->factorKind = EXP;
     }
 
-    void factor_is_intcon() {}
+    void factor_is_intcon(int num) {
+        this->factorKind = INTCON;  this->intcon = num;
+    }
 
     void factor_is_charcon(string char_value) {
         this->factorKind = CHARCON;  this->charcon = char_value[0];

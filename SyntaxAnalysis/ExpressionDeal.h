@@ -11,7 +11,7 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
 ExpressionFlag item(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, ExpressionMidCode& expBlock);
 ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, ExpressionMidCode& expBlock);
 
-extern bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
+extern bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* intcon);
 extern bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int isFactor);
 
 #endif //COMPILER_EXPRESSIONDEAL_H
@@ -24,8 +24,8 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
      * 比如，在因子仅为一个标识符的情况下，就不用Ti来表示了
      *      这里已经处理了因子是单个纯标识符,以及纯表达式的情况
      *      已经处理了因子是数组的情况
-     *      已经处理了字符常量的情况
-     *      剩余：函数调用、数字常量
+     *      已经处理了字符常量、數字常量的情况
+     *      剩余：函数调用
      */
     ExpressionFlag flag = NONE_Express;
     if (WORD_TYPE == "IDENFR") {
@@ -72,7 +72,9 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
         flag = CHAR_Express;
     }
     else {
-        Number(Words, PointNum, output);
+        int intcon1 = 0;
+        Number(Words, PointNum, output, &intcon1);
+        expBlock.getNowItem().getNowFactor().factor_is_intcon(intcon1);
         flag = INT_Express;
     }
     //cout << "<因子>" << endl;

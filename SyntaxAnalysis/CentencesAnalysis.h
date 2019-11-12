@@ -22,7 +22,7 @@ bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
 void condition(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 void parameterValueList(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<string>& types);
 
-extern bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
+extern bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* intcon);
 
 #endif //COMPILER_CENTENCESANALYSIS_H
 
@@ -176,7 +176,7 @@ bool forCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
                 symbolTable.nameHasNotDefined(WORD_VALUE, LINE);
                 PRINT_WORD_AND_ADDPOINT; //IDENFR
                 PRINT_WORD_AND_ADDPOINT; //+ | -
-                No_Symbol_Number(Words, PointNum, output); //STEP
+                No_Symbol_Number(Words, PointNum, output, NULL); //STEP
                 //cout << "<步长>" << endl;
                 if (WORD_TYPE == "RPARENT") {
                     PRINT_WORD_AND_ADDPOINT;

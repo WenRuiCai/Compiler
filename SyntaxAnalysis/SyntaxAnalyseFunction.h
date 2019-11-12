@@ -13,8 +13,8 @@ void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
 bool Function_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
-bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
-bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
+bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* intcon);
+bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* intcon);
 void Parameters(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 extern bool hasReturnCentence;
@@ -37,20 +37,28 @@ void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& ou
 }
 
 //整数
-bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
+bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* intcon) {
+    int flag1 = 0;
     if (WORD_TYPE == "PLUS" || WORD_TYPE == "MINU") {
+        flag1 = (WORD_TYPE == "PLUS") ? 0 : 1;
         PRINT_WORD_AND_ADDPOINT;
     }
-    if (No_Symbol_Number(Words, PointNum, output)) {
+    if (No_Symbol_Number(Words, PointNum, output, intcon)) {
         //cout << "<整数>" << endl;
+        if (intcon != NULL) {
+            (*intcon) = (flag1 == 0) ? (*intcon) : ((*intcon) * -1);
+        }
         return true;
     }
     return false;
 }
 
 //无符号整数
-bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
+bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* intcon) {
     if (WORD_TYPE == "INTCON") {
+        if (intcon != NULL) {
+            *intcon = stoi(WORD_VALUE);
+        }
         PRINT_WORD_AND_ADDPOINT;
         //cout << "<无符号整数>" << endl;
         return true;
@@ -82,7 +90,7 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
                 PRINT_WORD_AND_ADDPOINT;
             }
             int errorflag = 0;
-            if (!Number(Words, PointNum, output)) {
+            if (!Number(Words, PointNum, output, NULL)) {
                 if (WORD_TYPE == "CHARCON") {
                     PRINT_WORD_AND_ADDPOINT;
                 } else {
@@ -118,7 +126,7 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             int errorflag = 0;
             if (WORD_TYPE == "CHARCON") {
                 PRINT_WORD_AND_ADDPOINT;
-            } else if (!Number(Words, PointNum, output)) {
+            } else if (!Number(Words, PointNum, output, NULL)) {
                 symbolTable.addAssignValueError(PRE_WORD_LINE);
                 errorflag = 1;
             }
@@ -187,7 +195,7 @@ void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
             if (!hasWrongId)
                 symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 1);
             PRINT_WORD_AND_ADDPOINT;
-            No_Symbol_Number(Words, PointNum, output);
+            No_Symbol_Number(Words, PointNum, output, NULL);
             if (WORD_TYPE == "RBRACK") {
                 PRINT_WORD_AND_ADDPOINT;
             } else {
