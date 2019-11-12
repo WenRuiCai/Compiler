@@ -8,7 +8,7 @@
 #include "calculateExp.h"
 
 class ExpressionMidCode;
-
+class FunctionCallMidCode;
 
 
 /////////////////////////////////////////////////
@@ -30,13 +30,22 @@ private:
     FactorKind factorKind;
     char charcon;
     int intcon;
+    FunctionCallMidCode* functionCallMid = NULL;
 
 public:
     void setFactor_exp(ExpressionMidCode* pointer) {
         this->factor_exp = pointer;
     }
 
-    void factor_is_functioncall() {}
+    void setFunctionCall(FunctionCallMidCode* pointer) {this->functionCallMid = pointer;}
+
+    FunctionCallMidCode& getFunctionCall() {
+        return *this->functionCallMid;
+    }
+
+    void factor_is_functioncall() {
+        this->factorKind = FUNCTION;
+    }
 
     void factor_is_exp() {
         this->factorKind = EXP;
@@ -134,4 +143,33 @@ public:
     }
 };
 
+
+
+/////////////////////////////////////////////////
+///                 函数调用                   ///
+/////////////////////////////////////////////////
+class FunctionCallMidCode {
+private:
+    vector<ExpressionMidCode> parameterValues;
+    string functionName;
+    string functionReturnValueID;
+    int nowParameter = -1;
+
+public:
+    FunctionCallMidCode(string name) {
+        this->functionName = name;
+        this->functionReturnValueID = to_string(ID_counter++);
+    }
+
+    ExpressionMidCode& getNowParameterExp() {
+        return this->parameterValues[nowParameter];
+    }
+
+    void addParameterValue() {
+        ExpressionMidCode expressionMidCode = ExpressionMidCode();
+        expressionMidCode.init();
+        this->parameterValues.push_back(expressionMidCode);
+        this->nowParameter = this->parameterValues.size() - 1;
+    }
+};
 #endif //COMPILER_EXPRESSIONMIDCODE_H

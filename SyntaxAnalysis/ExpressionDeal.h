@@ -3,11 +3,12 @@
 //
 #include "../TYPE.h"
 #include "../SymbolTable/SymbolTable.h"
+#include "../Codemid/ExpressionMidCode.h"
 
 #ifndef COMPILER_EXPRESSIONDEAL_H
 #define COMPILER_EXPRESSIONDEAL_H
 
-ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, bool isFactor);
+ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int expflag);
 ExpressionFlag item(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, ExpressionMidCode& expBlock);
 ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, ExpressionMidCode& expBlock);
 
@@ -31,6 +32,8 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
     if (WORD_TYPE == "IDENFR") {
         string name = WORD_VALUE;
         if (Words[PointNum + 1].WORD.first == "LPARENT") {
+            expBlock.getNowItem().getNowFactor().setFunctionCall(new FunctionCallMidCode(name));
+            expBlock.getNowItem().getNowFactor().factor_is_functioncall();
             functionCall(Words, PointNum, output, 1);
             flag = symbolTable.findFunctionKind(name);
         }
@@ -40,7 +43,7 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
             if (WORD_TYPE == "LBRACK") {
                 int line = LINE;
                 PRINT_WORD_AND_ADDPOINT;
-                if (expression(Words, PointNum, output, true) != INT_Express) {
+                if (expression(Words, PointNum, output, 1) != INT_Express) {
                     symbolTable.addArrayIndexError(line);
                 }
                 if (WORD_TYPE == "RBRACK") {
@@ -57,7 +60,7 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
     }
     else if (WORD_TYPE == "LPARENT") {
         PRINT_WORD_AND_ADDPOINT;
-        expression(Words, PointNum, output, true);
+        expression(Words, PointNum, output, 1);
         if (WORD_TYPE == "RPARENT") {
             PRINT_WORD_AND_ADDPOINT;
         } else {
@@ -99,22 +102,27 @@ ExpressionFlag item(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output,
     return (counter > 1) ? INT_Express : flag;
 }
 
-ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, bool isFactor) {
+ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int expflag) {
     if (WORD_TYPE == "PLUS" || WORD_TYPE == "MINU") {
         PRINT_WORD_AND_ADDPOINT;
     }
-    if (!isFactor) {
+    if (expflag == 0) {
         symbolTable.getNowBlock().addExpressionMidCode();
-    } else {
+    } else if (expflag == 1) {
         symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().setFactor_exp(new ExpressionMidCode());
         symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().getFactorExp().init();
+    } else {
+        symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().getFunctionCall().addParameterValue();
     }
     //得到当前的表达式块，给表达式最终的结果一个标号Ti
     int counter = 0;
     ExpressionFlag flag = item(Words, PointNum, output,
-            (!isFactor) ?
+            (expflag == 0) ?
             symbolTable.getNowBlock().getNowExp() :
-            symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().getFactorExp());
+            ((expflag == 1) ?
+            symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().getFactorExp() :
+            symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().getFunctionCall().getNowParameterExp())
+            );
     /*
      * 表达式是由多个项通过加法运算符连接起来的，所以我们需要每个项
      * 这里只需要每个项的标号，然后通过加法运算符连接起来（自顶向下的思想）
@@ -122,16 +130,22 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
     counter++;
     while (WORD_TYPE == "PLUS" || WORD_TYPE == "MINU") {
 
-        ((!isFactor) ?
+        ((expflag == 0) ?
         symbolTable.getNowBlock().getNowExp() :
-        symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().getFactorExp()).
+        ((expflag == 1) ?
+        symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().getFactorExp() :
+        symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().getFunctionCall().getNowParameterExp())
+        ).
         addOP((WORD_TYPE == "PLUS") ? ADD : SUB);
 
         PRINT_WORD_AND_ADDPOINT;
         item(Words, PointNum, output,
-                (!isFactor) ?
+                (expflag == 0) ?
                 symbolTable.getNowBlock().getNowExp() :
-                symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().getFactorExp());
+                ((expflag == 1) ?
+                symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().getFactorExp() :
+                symbolTable.getNowBlock().getNowExp().getNowItem().getNowFactor().getFunctionCall().getNowParameterExp())
+                );
         counter++;
     }
     //cout << "<表达式>" << endl;

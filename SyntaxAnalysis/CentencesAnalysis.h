@@ -20,7 +20,7 @@ bool printfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
 bool scanfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 void condition(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
-void parameterValueList(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<string>& types);
+void parameterValueList(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<string>& types, bool isFactor);
 
 extern bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* intcon);
 
@@ -32,19 +32,19 @@ extern bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream
  * 因此只需考虑后续动作即可
  */
 
-void parameterValueList(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<string>& types) {
+void parameterValueList(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<string>& types, bool isFactor) {
     if (WORD_TYPE == "RPARENT") {
         //cout << "<值参数表>" << endl;
         return;
     }
 
     ExpressionFlag flag;
-    flag = expression(Words, PointNum, output, false);
+    flag = expression(Words, PointNum, output, (!isFactor) ? 0 : 2);
     types.push_back((flag == INT_Express) ? "INTTK" : "CHARTK");
 
     while (WORD_TYPE == "COMMA") {
         PRINT_WORD_AND_ADDPOINT;
-        flag = expression(Words, PointNum, output, false);
+        flag = expression(Words, PointNum, output, (!isFactor) ? 0 : 2);
         types.push_back((flag == INT_Express) ? "INTTK" : "CHARTK");
     }
     //cout << "<值参数表>" << endl;
@@ -53,14 +53,14 @@ void parameterValueList(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& out
 void condition(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     int flag = 0, line;
 
-    if (expression(Words, PointNum, output, false) == CHAR_Express) flag = 1;
+    if (expression(Words, PointNum, output, 0) == CHAR_Express) flag = 1;
 
     if (WORD_TYPE == "LSS" || WORD_TYPE == "LEQ"
         || WORD_TYPE == "GRE" || WORD_TYPE == "GEQ"
         || WORD_TYPE == "EQL" || WORD_TYPE == "NEQ") {
         line = LINE;
         PRINT_WORD_AND_ADDPOINT;
-        ExpressionFlag flag1 = expression(Words, PointNum, output, false);
+        ExpressionFlag flag1 = expression(Words, PointNum, output, 0);
         if (flag1 == CHAR_Express) {
             if (flag != 1) {
                 symbolTable.addConditionTypeError(line);
@@ -157,7 +157,7 @@ bool forCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             PRINT_WORD_AND_ADDPOINT;
             if (WORD_TYPE == "ASSIGN") {
                 PRINT_WORD_AND_ADDPOINT;
-                expression(Words, PointNum, output, false);
+                expression(Words, PointNum, output, 0);
                 if (WORD_TYPE == "SEMICN") {
                     PRINT_WORD_AND_ADDPOINT;
                 } else {
@@ -201,7 +201,7 @@ bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
     if (WORD_TYPE == "LBRACK") {
         int line = LINE;
         PRINT_WORD_AND_ADDPOINT;
-        if (expression(Words, PointNum, output, false) != INT_Express) {
+        if (expression(Words, PointNum, output, 0) != INT_Express) {
             symbolTable.addArrayIndexError(line);
         }
         if (WORD_TYPE == "RBRACK") {
@@ -212,7 +212,7 @@ bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
     }
     if (WORD_TYPE == "ASSIGN") {
         PRINT_WORD_AND_ADDPOINT;
-        expression(Words, PointNum, output, false);
+        expression(Words, PointNum, output, 0);
     }
     //cout << "<赋值语句>" << endl;
     if (WORD_TYPE == "SEMICN") {
@@ -234,11 +234,11 @@ bool printfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
             //cout << "<字符串>" << endl;
             if (WORD_TYPE == "COMMA") {
                 PRINT_WORD_AND_ADDPOINT;
-                expression(Words, PointNum, output, false);
+                expression(Words, PointNum, output, 0);
             }
         }
         else {
-            expression(Words, PointNum, output, false);
+            expression(Words, PointNum, output, 0);
         }
         if (WORD_TYPE == "RPARENT") {
             PRINT_WORD_AND_ADDPOINT;
@@ -298,7 +298,7 @@ bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "LPARENT") {
         PRINT_WORD_AND_ADDPOINT;
-        flag = expression(Words, PointNum, output, false);
+        flag = expression(Words, PointNum, output, 0);
         if (WORD_TYPE == "RPARENT") {
             PRINT_WORD_AND_ADDPOINT;
         } else {
@@ -331,7 +331,7 @@ bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, i
     if (WORD_TYPE == "LPARENT") {
         PRINT_WORD_AND_ADDPOINT;
         vector<string> types;
-        parameterValueList(Words, PointNum, output, types);
+        parameterValueList(Words, PointNum, output, types, isFactor);
         if (!symbolTable.parameterNumHasError(name, line, types.size())) {
             symbolTable.parameterTypeHasError(name, line, types);
         }
