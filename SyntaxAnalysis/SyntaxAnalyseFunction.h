@@ -45,7 +45,7 @@ bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* in
     }
     if (No_Symbol_Number(Words, PointNum, output, intcon)) {
         //cout << "<整数>" << endl;
-        if (intcon != NULL) {
+        if (intcon != nullptr) {
             (*intcon) = (flag1 == 0) ? (*intcon) : ((*intcon) * -1);
         }
         return true;
@@ -56,7 +56,7 @@ bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* in
 //无符号整数
 bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* intcon) {
     if (WORD_TYPE == "INTCON") {
-        if (intcon != NULL) {
+        if (intcon != nullptr) {
             *intcon = stoi(WORD_VALUE);
         }
         PRINT_WORD_AND_ADDPOINT;
@@ -90,7 +90,7 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
                 PRINT_WORD_AND_ADDPOINT;
             }
             int errorflag = 0;
-            if (!Number(Words, PointNum, output, NULL)) {
+            if (!Number(Words, PointNum, output, nullptr)) {
                 if (WORD_TYPE == "CHARCON") {
                     PRINT_WORD_AND_ADDPOINT;
                 } else {
@@ -126,7 +126,7 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
             int errorflag = 0;
             if (WORD_TYPE == "CHARCON") {
                 PRINT_WORD_AND_ADDPOINT;
-            } else if (!Number(Words, PointNum, output, NULL)) {
+            } else if (!Number(Words, PointNum, output, nullptr)) {
                 symbolTable.addAssignValueError(PRE_WORD_LINE);
                 errorflag = 1;
             }
@@ -195,7 +195,7 @@ void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
             if (!hasWrongId)
                 symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 1);
             PRINT_WORD_AND_ADDPOINT;
-            No_Symbol_Number(Words, PointNum, output, NULL);
+            No_Symbol_Number(Words, PointNum, output, nullptr);
             if (WORD_TYPE == "RBRACK") {
                 PRINT_WORD_AND_ADDPOINT;
             } else {

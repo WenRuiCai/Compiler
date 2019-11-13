@@ -51,6 +51,8 @@ public:
         this->isLeftId = false; this->isRightId = false;
     }
 
+    string getResultID() { return this->result_id; }
+
     string toString() {
         string a = result_id + " = ";
         if (isLeftId) a += leftNum_id; else a += leftNum;
@@ -58,7 +60,7 @@ public:
         if (op == ADD) a += "+"; else if (op == SUB) a += '-'; else if (op == DIV) a += '/'; else if (op == MULT) a += '*';
         a += " ";
         if (isRightId) a += rightNum_id; else a += rightNum;
-        return a;
+        return a + '\n';
     }
 };
 
