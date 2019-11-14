@@ -196,6 +196,7 @@ public:
     }
 
     string toString() {
+        fill_mid_three_unit_exps();
         //把每个因子的运算表达式输出，同时将所有calculatExp的string表示输出
         string result = "";
         int factorNum = 0;
@@ -294,6 +295,7 @@ private:
 
 public:
     string toString() {
+        fill_mid_three_unit_exps();
         string result = "";
         if (this->itemMidCodes.size() == 1) {
             result += itemMidCodes[0].toString();
