@@ -20,7 +20,7 @@ private:
 public:
     FunctionCallMidCode(string name) {
         this->functionName = name;
-        this->functionReturnValueID = "t" + to_string(ID_counter++);
+        this->functionReturnValueID = "T" + to_string(ID_counter++);
     }
 
     string getFunctionReturnValueID() {

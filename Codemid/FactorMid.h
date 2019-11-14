@@ -32,6 +32,10 @@ private:
     int intcon;
     FunctionCallMidCode* functionCallMid = nullptr;
     string thisString;
+    /*
+     * factor如果是单个标识符，int常量，char常量，那么factorResultID就是这些
+     * 如果是其他，那么factorResult是Ti，此时需要同时输出thisString
+     */
 
 public:
     char getCharcon() { return this->charcon; }
@@ -42,7 +46,8 @@ public:
      */
     void setString_CHAR_INT_IDENFR() {
         if (this->factorKind == CHARCON) {
-            this->factorResultID = &"" [ charcon];
+            string s(1, this->charcon);
+            this->factorResultID = "\'" + s + "\'";
         } else if (this->factorKind == INTCON) {
             this->factorResultID = to_string(intcon);
         } else if (this->factorKind == PURE_IDENFR) {
@@ -114,7 +119,7 @@ public:
     }
 
     void init() {
-        factorResultID = "t" + to_string(ID_counter++);
+        factorResultID = "T" + to_string(ID_counter++);
     }
 };
 

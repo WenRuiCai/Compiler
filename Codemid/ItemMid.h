@@ -16,6 +16,7 @@ private:
     vector<OP> ops;
     vector<calculateExp> mid_three_unit_Exps;
     int nowFactor;
+    bool mid_three_unit_Exps_hasFilled = false;
 
     void fill_mid_three_unit_exps() {
         //将factor和op组合填入三元式中
@@ -75,6 +76,7 @@ private:
                 num++;
             }
         }
+        mid_three_unit_Exps_hasFilled = true;
     }
 
 public:
@@ -83,10 +85,13 @@ public:
     }
 
     string toString() {
-        fill_mid_three_unit_exps();
+        if (!mid_three_unit_Exps_hasFilled) {
+            fill_mid_three_unit_exps();
+        }
         //把每个因子的运算表达式输出，同时将所有calculatExp的string表示输出
         string result = "";
         int factorNum = 0;
+        //如果项只由一个因子组成，那么当前项的string就是factor的string，当前项的id就是factor的id
         if (factorMidCodes.size() == 1) {
             if (!(factorMidCodes[0].getFactorKind() == INTCON ||
                   factorMidCodes[0].getFactorKind() == CHARCON ||
@@ -127,7 +132,7 @@ public:
     }
 
     void init() {
-        this->itemResultID = "t" + to_string(ID_counter++);
+        this->itemResultID = "T" + to_string(ID_counter++);
     }
 
     factorMidCode& getNowFactor() {

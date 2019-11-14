@@ -128,6 +128,7 @@ ExpressionFlag item(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output,
         counter++;
     }
     //cout << "<项>" << endl;
+    expBlock.getNowItem().toString();
     return (counter > 1) ? INT_Express : flag;
 }
 
@@ -173,5 +174,6 @@ ExpressionFlag expression_work(vector<SINGLE_WORD>& Words, int& PointNum, ofstre
         counter++;
     }
     //cout << "<表达式>" << endl;
+    expBlock.toString();
     return (counter > 1) ? INT_Express : flag;
 }

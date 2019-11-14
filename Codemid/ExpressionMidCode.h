@@ -17,6 +17,7 @@ private:
     vector<OP> ops;
     vector<calculateExp> mid_three_unit_Exps;
     int nowItem;
+    bool mid_three_unit_Exps_hasFilled = false;
 
     void fill_mid_three_unit_exps() {
         int num = 0;
@@ -33,12 +34,16 @@ private:
                                 ID_counter++));
             }
         }
+        this->mid_three_unit_Exps_hasFilled = true;
     }
 
 public:
     bool hasOnlyOneItem() { return this->itemMidCodes.size() == 1;}
+
     string toString() {
-        fill_mid_three_unit_exps();
+        if (!mid_three_unit_Exps_hasFilled) {
+            fill_mid_three_unit_exps();
+        }
         string result = "";
         if (this->itemMidCodes.size() == 1) {
             result += itemMidCodes[0].toString();
@@ -56,13 +61,15 @@ public:
                 result += mid_three_unit_Exps[i].toString();
             }
         }
+        this->expResultID =
+                mid_three_unit_Exps[mid_three_unit_Exps.size() - 1].getResultID();
         return result;
     }
 
     string getExpResultID() { return this->expResultID; }
 
     void init() {
-        this->expResultID = "t" + to_string(ID_counter++);
+        this->expResultID = "T" + to_string(ID_counter++);
     }
 
     void addItem() {
