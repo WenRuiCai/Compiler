@@ -6,6 +6,7 @@
 #define COMPILER_FUNCTIONBLOCK_H
 
 #include "ExpressionMidCode.h"
+#include "FunctionCallMid.h"
 
 class FunctionBlock {
     vector<ExpressionMidCode> expressionMidCodes;

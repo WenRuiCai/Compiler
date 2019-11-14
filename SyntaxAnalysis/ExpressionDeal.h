@@ -3,7 +3,7 @@
 //
 #include "../TYPE.h"
 #include "../SymbolTable/SymbolTable.h"
-#include "../Codemid/ExpressionMidCode.h"
+#include "../Codemid/FunctionCallMid.h"
 
 #ifndef COMPILER_EXPRESSIONDEAL_H
 #define COMPILER_EXPRESSIONDEAL_H
@@ -137,8 +137,14 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
         PRINT_WORD_AND_ADDPOINT;
     }
     if (expflag == 0) {
+        cout << "\n-------------------Now is EXP--------------------------\n";
         symbolTable.getNowBlock().addExpressionMidCode();
-        return expression_work(Words, PointNum, output, symbolTable.getNowBlock().getNowExp());
+        ExpressionFlag f = expression_work(Words, PointNum, output, symbolTable.getNowBlock().getNowExp());
+        string s = symbolTable.getNowBlock().getNowExp().toString();
+        if (s != "") cout << "exp :  " << s;
+        else cout << "exp :  " << symbolTable.getNowBlock().getNowExp().getExpResultID();
+        cout << "\n-------------------Now this EXP finished--------------------------\n";
+        return f;
     } else if (expflag == 1) {
         factorMid->setFactor_exp(new ExpressionMidCode());
         factorMid->getFactorExp().init();
