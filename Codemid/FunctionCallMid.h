@@ -6,36 +6,42 @@
 #define COMPILER_FUNCTIONCALLMID_H
 
 #include "ExpressionMidCode.h"
+#include "CentenceMid.h"
 
 /////////////////////////////////////////////////
 ///                 函数调用                   ///
 /////////////////////////////////////////////////
-class FunctionCallMidCode {
+class FunctionCallMidCode : public CentenceMid {
 private:
     vector<ExpressionMidCode> parameterValues;
     string functionName;
     string functionReturnValueID;
     int nowParameter = -1;
 
+    void addParameterValue() {
+        ExpressionMidCode expressionMidCode = ExpressionMidCode();
+        expressionMidCode.init();
+        this->parameterValues.push_back(expressionMidCode);
+        this->nowParameter = this->parameterValues.size() - 1;
+    }
+
 public:
     FunctionCallMidCode(string name) {
         this->functionName = name;
         this->functionReturnValueID = "T" + to_string(ID_counter++);
+        this->kind = FUNCTIONCALL;
     }
 
     string getFunctionReturnValueID() {
         return this->functionReturnValueID;
     }
 
-    ExpressionMidCode& getNowParameterExp() {
-        return this->parameterValues[nowParameter];
+    void setExp() {
+        addParameterValue();
     }
 
-    void addParameterValue() {
-        ExpressionMidCode expressionMidCode = ExpressionMidCode();
-        expressionMidCode.init();
-        this->parameterValues.push_back(expressionMidCode);
-        this->nowParameter = this->parameterValues.size() - 1;
+    ExpressionMidCode* getNowExp() {
+        return &this->parameterValues[nowParameter];
     }
 
     string toString() {

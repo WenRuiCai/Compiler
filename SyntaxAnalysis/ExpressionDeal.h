@@ -152,9 +152,9 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
         return expression_work(Words, PointNum, output, factorMid->getFactorExp());
     }
     else {
-        factorMid->getFunctionCall().addParameterValue();
+        factorMid->getFunctionCall().setExp();
         return expression_work(Words, PointNum, output,
-                               factorMid->getFunctionCall().getNowParameterExp());
+                               *factorMid->getFunctionCall().getNowExp());
     }
 }
 
