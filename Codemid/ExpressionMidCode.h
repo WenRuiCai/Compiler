@@ -28,10 +28,9 @@ private:
                 mid_three_unit_Exps.push_back(calculateExp(left, right, ops[i], ID_counter++));
             } else {
                 string a = itemMidCodes[num++].getItemResultID();
-                mid_three_unit_Exps.push_back(calculateExp(a,
-                                mid_three_unit_Exps[mid_three_unit_Exps.size() - 1].getResultID(),
-                                ops[i],
-                                ID_counter++));
+                mid_three_unit_Exps.push_back(calculateExp(
+                        mid_three_unit_Exps[mid_three_unit_Exps.size() - 1].getResultID(),
+                        a, ops[i], ID_counter++));
             }
         }
         this->mid_three_unit_Exps_hasFilled = true;
