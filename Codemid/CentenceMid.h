@@ -40,15 +40,15 @@ public:
     /*
      * 设置当前语句中的表达式，在FunctionBlock中可以查找到
      */
-    virtual void setExp();
+    void setExp();
     /*
      * 当前语句现在正在填充的表达式
      */
-    virtual ExpressionMidCode* getNowExp();
+    ExpressionMidCode* getNowExp();
     /*
      * 输出中间代码的方法
      */
-    virtual string toString();
+    string toString();
 
 };
 
