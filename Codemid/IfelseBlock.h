@@ -17,7 +17,16 @@ private:
 
     vector<CentenceMid*> conditionSatisfieldBlock;
     vector<CentenceMid*> conditionUnsatisfieldBlock;
+    int isElseBlock = 0;
 public:
+
+    void conditionSatisfieldBlock_Finished() {
+        this->isElseBlock = 1;
+    }
+
+    vector<CentenceMid*>* getCentenceBlock() {
+        return (isElseBlock) ? &conditionUnsatisfieldBlock : &conditionSatisfieldBlock;
+    }
 
     void setExp() {
         if (flag == -1) {

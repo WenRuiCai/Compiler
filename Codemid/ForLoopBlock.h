@@ -22,6 +22,10 @@ private:
 
 public:
 
+    vector<CentenceMid*>* getCentenceBlock() {
+        return &this->loopBlock;
+    }
+
     void setCmp(string type) {
         this->compare = (type == "LSS") ? LESS :
                         ((type == "LEQ") ? LESS_EQL :
