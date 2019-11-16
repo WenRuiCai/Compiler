@@ -55,11 +55,11 @@ public:
 
     string toString() {
         string a = result_id + " = ";
-        if (isLeftId) a += leftNum_id; else a += leftNum;
+        if (isLeftId) a += leftNum_id; else a += to_string(leftNum);
         a += " ";
         if (op == ADD) a += "+"; else if (op == SUB) a += '-'; else if (op == DIV) a += '/'; else if (op == MULT) a += '*';
         a += " ";
-        if (isRightId) a += rightNum_id; else a += rightNum;
+        if (isRightId) a += rightNum_id; else a += to_string(rightNum);
         return a + '\n';
     }
 };
