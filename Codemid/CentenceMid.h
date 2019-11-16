@@ -37,6 +37,11 @@ enum CentenceKind {
 class CentenceMid {
 public:
     CentenceKind kind;
+
+    /*
+     * if、循环等语句都包含语句列，我们要建立语句列的递归结构，这里可以得到当前语句的直接下属语句列
+     */
+    vector<CentenceMid*> getCentenceBlock();
     /*
      * 设置当前语句中的表达式，在FunctionBlock中可以查找到
      */
