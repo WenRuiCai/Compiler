@@ -17,10 +17,10 @@ enum conditionCompare {
 };
 
 enum CentenceKind {
-    IFELSE,
-    WHILE,
-    DOWHILE,
-    FOR,
+    IFELSE = -1,
+    WHILE = -2,
+    DOWHILE = -3,
+    FOR = -4,
     PRINTF,
     SCANF,
     FUNCTIONCALL,
