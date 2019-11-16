@@ -14,7 +14,7 @@ private:
     ExpressionMidCode conditionRightExp;
     int flag = -1;
 
-    vector<CentenceMid> loopBlock;
+    vector<CentenceMid*> loopBlock;
 
 public:
     void setCmp(string type) {

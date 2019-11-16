@@ -15,8 +15,8 @@ private:
     ExpressionMidCode conditionRightExp;
     int flag = -1;
 
-    vector<CentenceMid> conditionSatisfieldBlock;
-    vector<CentenceMid> conditionUnsatisfieldBlock;
+    vector<CentenceMid*> conditionSatisfieldBlock;
+    vector<CentenceMid*> conditionUnsatisfieldBlock;
 public:
 
     void setExp() {

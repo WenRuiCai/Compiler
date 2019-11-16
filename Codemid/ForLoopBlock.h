@@ -18,7 +18,7 @@ private:
     ExpressionMidCode conditionRightExp;
     int step;
     bool isAdd;
-    vector<CentenceMid> loopBlock;
+    vector<CentenceMid*> loopBlock;
 
 public:
 
