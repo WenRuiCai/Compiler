@@ -16,12 +16,12 @@ void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
 bool No_Symbol_Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* intcon);
 bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* intcon);
 void Parameters(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
-void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
+void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<CentenceMid*>* centenceBlock);
 extern bool hasReturnCentence;
 #endif //COMPILER_SYNTAXANALYSEFUNCTION_H
 
 //复合语句
-void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
+void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<CentenceMid*>* centenceBlock) {
     Const_Analysis(Words, PointNum, output);
     Variable_Analysis(Words, PointNum, output);
     ////////////////////////////////////
@@ -265,7 +265,7 @@ bool Function_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstr
             }
             if (WORD_TYPE == "LBRACE") {
                 PRINT_WORD_AND_ADDPOINT;
-                Component_Centences(Words, PointNum, output);
+                Component_Centences(Words, PointNum, output, symbolTable.getNowBlock().getCentenceBlock());
                 if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
                     //cout << "<有返回值函数定义>" << endl;
@@ -299,7 +299,7 @@ bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, o
             }
             if (WORD_TYPE == "LBRACE") {
                 PRINT_WORD_AND_ADDPOINT;
-                Component_Centences(Words, PointNum, output);
+                Component_Centences(Words, PointNum, output, symbolTable.getNowBlock().getCentenceBlock());
                 if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
                     //cout << "<无返回值函数定义>" << endl;
@@ -329,7 +329,7 @@ void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
             }
             if (WORD_TYPE == "LBRACE") {
                 PRINT_WORD_AND_ADDPOINT;
-                Component_Centences(Words, PointNum, output);
+                Component_Centences(Words, PointNum, output, symbolTable.getNowBlock().getCentenceBlock());
                 if (WORD_TYPE == "RBRACE") {
                     PRINT_WORD_AND_ADDPOINT;
                     //cout << "<主函数>" << endl;
