@@ -17,7 +17,7 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
 
 extern bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, int* intcon);
 extern bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output,
-        int isFactor, factorMidCode* factorMid);
+        int isFactor, factorMidCode* factorMid, vector<CentenceMid*>* centenceBlock);
 
 #endif //COMPILER_EXPRESSIONDEAL_H
 
@@ -39,7 +39,8 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
         if (Words[PointNum + 1].WORD.first == "LPARENT") {
             expBlock.getNowItem().getNowFactor().setFunctionCall(new FunctionCallMidCode(name));
             expBlock.getNowItem().getNowFactor().factor_is_functioncall();
-            functionCall(Words, PointNum, output, 1, expBlock.getNowItem().getNowFactorPointer());
+            functionCall(Words, PointNum, output, 1,
+                    expBlock.getNowItem().getNowFactorPointer(), nullptr);
 
             expBlock.getNowItem().getNowFactor().setString_FUNCTION(
                     expBlock.getNowItem().getNowFactor().getFunctionCall().toString(),
@@ -191,6 +192,13 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
             ReturnCentence* returnCentence = static_cast<ReturnCentence*>(centence);
             returnCentence->setExp();
             ExpressionMidCode& xi = *returnCentence->getNowExp();
+            ExpressionFlag f = expression_work(Words, PointNum, output, xi);
+            return f;
+        }
+        if (centence != nullptr && centence->kind == FUNCTIONCALL) {
+            FunctionCallMidCode* functionCall = static_cast<FunctionCallMidCode*>(centence);
+            functionCall->setExp();
+            ExpressionMidCode& xi = *functionCall->getNowExp();
             ExpressionFlag f = expression_work(Words, PointNum, output, xi);
             return f;
         }

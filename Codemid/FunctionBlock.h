@@ -31,6 +31,13 @@ public:
         return &this->centences;
     }
 
+    FunctionCallMidCode* addCentence_FunctionCall(vector<CentenceMid*>* centenceBlock, string s) {
+        FunctionCallMidCode* functionCall = new FunctionCallMidCode(s);
+        addCentence(centenceBlock, functionCall);
+        this->nowCentence = this->centences.size() - 1;
+        return functionCall;
+    }
+
     IfelseBlock* addCentence_IF(vector<CentenceMid*>* centenceBlock) {
         IfelseBlock* ifelseBlock = new IfelseBlock();
         addCentence(centenceBlock, ifelseBlock);

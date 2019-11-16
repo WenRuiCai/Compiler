@@ -17,6 +17,7 @@ private:
     string functionName;
     string functionReturnValueID;
     int nowParameter = -1;
+    bool hasReturnValue;
 
     void addParameterValue() {
         ExpressionMidCode expressionMidCode = ExpressionMidCode();
@@ -30,6 +31,14 @@ public:
         this->functionName = name;
         this->functionReturnValueID = "T" + to_string(ID_counter++);
         this->kind = FUNCTIONCALL;
+    }
+
+    void functionHasReturnValue() {
+        this->hasReturnValue = true;
+    }
+
+    void functionHasNotReturnValue() {
+        this->hasReturnValue = false;
     }
 
     string getFunctionReturnValueID() {
@@ -55,7 +64,10 @@ public:
         for (ExpressionMidCode value : this->parameterValues) {
             result += "push " + value.getExpResultID() + "\n";
         }
-        return result + call + returnCode;
+        if (this->hasReturnValue)
+            return result + call + returnCode;
+        else
+            return result + call;
     }
 };
 
