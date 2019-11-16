@@ -16,6 +16,7 @@ private:
     ExpressionMidCode conditionLeftExp;
     conditionCompare compare;
     ExpressionMidCode conditionRightExp;
+    int flag = -2;
     int step;
     bool isAdd;
     vector<CentenceMid*> loopBlock;
@@ -35,11 +36,29 @@ public:
                         )));
     }
 
-    void setExp() {}
+    void setExp() {
+        if (flag == -2) {
+            IDENFR_VALUE = ExpressionMidCode();
+            IDENFR_VALUE.init();
+            flag++;
+        } else if (flag == -1) {
+            conditionLeftExp = ExpressionMidCode();
+            conditionLeftExp.init();
+            flag++;
+        } else if (flag == 0) {
+            conditionRightExp = ExpressionMidCode();
+            conditionRightExp.init();
+            flag++;
+        }
+    }
 
-    ExpressionMidCode* getNowExp() {}
+    ExpressionMidCode* getNowExp() {
+        return (flag == -1) ? &IDENFR_VALUE : ((flag == 0) ? &conditionLeftExp : &conditionRightExp);
+    }
 
-    string toString() {}
+    string toString() {
+        return "";
+    }
 
     ForLoopBlock() {
         this->kind = FOR;
