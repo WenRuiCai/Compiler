@@ -173,6 +173,27 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
             ExpressionFlag f = expression_work(Words, PointNum, output, xi);
             return f;
         }
+        if (centence != nullptr && centence->kind == ASSIGN) {
+            AssignCentence* assignCentence = static_cast<AssignCentence*>(centence);
+            assignCentence->setExp();
+            ExpressionMidCode& xi = *assignCentence->getNowExp();
+            ExpressionFlag f = expression_work(Words, PointNum, output, xi);
+            return f;
+        }
+        if (centence != nullptr && centence->kind == PRINTF) {
+            PrintfCentence* printfCentence = static_cast<PrintfCentence*>(centence);
+            printfCentence->setExp();
+            ExpressionMidCode& xi = *printfCentence->getNowExp();
+            ExpressionFlag f = expression_work(Words, PointNum, output, xi);
+            return f;
+        }
+        if (centence != nullptr && centence->kind == RETURN) {
+            ReturnCentence* returnCentence = static_cast<ReturnCentence*>(centence);
+            returnCentence->setExp();
+            ExpressionMidCode& xi = *returnCentence->getNowExp();
+            ExpressionFlag f = expression_work(Words, PointNum, output, xi);
+            return f;
+        }
         cout << "\n-------------------Now is EXP--------------------------\n";
         symbolTable.getNowBlock().addExpressionMidCode();
         ExpressionFlag f = expression_work(Words, PointNum, output, symbolTable.getNowBlock().getNowExp());

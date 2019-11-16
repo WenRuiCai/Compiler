@@ -16,10 +16,10 @@ bool forCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, ve
 bool doWhileCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<CentenceMid*>* centenceBlock);
 bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output,
         int isFactor, factorMidCode* factorMid);
-bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
-bool printfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
-bool scanfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
-bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output);
+bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<CentenceMid*>* centenceBlock);
+bool printfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<CentenceMid*>* centenceBlock);
+bool scanfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<CentenceMid*>* centenceBlock);
+bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<CentenceMid*>* centenceBlock);
 void condition(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, CentenceMid* centence);
 void parameterValueList(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<string>& types,
         bool isFactor, factorMidCode* factorMid);
@@ -222,16 +222,19 @@ bool forCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, ve
     return false;
 }
 
-bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
+bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<CentenceMid*>* centenceBlock) {
     if (WORD_TYPE != "IDENFR" || Words[PointNum + 1].WORD.first == "LPARENT")
         return false;
     symbolTable.nameHasNotDefined(WORD_VALUE, LINE);
     symbolTable.hasAssignForConst(WORD_VALUE, LINE);
+    AssignCentence* assignCentence = symbolTable.getNowBlock().addCentence_ASSIGN(centenceBlock);
+    assignCentence->setIDENFR(WORD_VALUE);
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "LBRACK") {
         int line = LINE;
         PRINT_WORD_AND_ADDPOINT;
-        if (expression(Words, PointNum, output, 0, nullptr, nullptr) != INT_Express) {
+        assignCentence->ID_isArray();
+        if (expression(Words, PointNum, output, 0, nullptr, assignCentence) != INT_Express) {
             symbolTable.addArrayIndexError(line);
         }
         if (WORD_TYPE == "RBRACK") {
@@ -242,7 +245,7 @@ bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
     }
     if (WORD_TYPE == "ASSIGN") {
         PRINT_WORD_AND_ADDPOINT;
-        expression(Words, PointNum, output, 0, nullptr, nullptr);
+        expression(Words, PointNum, output, 0, nullptr, assignCentence);
     }
     //cout << "<赋值语句>" << endl;
     if (WORD_TYPE == "SEMICN") {
@@ -253,22 +256,24 @@ bool assignCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
     return true;
 }
 
-bool printfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
+bool printfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<CentenceMid*>* centenceBlock) {
     if (WORD_TYPE != "PRINTFTK")
         return false;
+    PrintfCentence* printfCentence = symbolTable.getNowBlock().addCentence_printf(centenceBlock);
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "LPARENT") {
         PRINT_WORD_AND_ADDPOINT;
         if (WORD_TYPE == "STRCON") {
+            printfCentence->setString(WORD_VALUE);
             PRINT_WORD_AND_ADDPOINT;
             //cout << "<字符串>" << endl;
             if (WORD_TYPE == "COMMA") {
                 PRINT_WORD_AND_ADDPOINT;
-                expression(Words, PointNum, output, 0, nullptr, nullptr);
+                expression(Words, PointNum, output, 0, nullptr, printfCentence);
             }
         }
         else {
-            expression(Words, PointNum, output, 0, nullptr, nullptr);
+            expression(Words, PointNum, output, 0, nullptr, printfCentence);
         }
         if (WORD_TYPE == "RPARENT") {
             PRINT_WORD_AND_ADDPOINT;
@@ -287,15 +292,17 @@ bool printfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output)
     return false;
 }
 
-bool scanfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
+bool scanfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<CentenceMid*>* centenceBlock) {
     if (WORD_TYPE != "SCANFTK")
         return false;
+    ScanfCentece* scanfCentece = symbolTable.getNowBlock().addCentence_SCANF(centenceBlock);
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "LPARENT") {
         PRINT_WORD_AND_ADDPOINT;
         while (WORD_TYPE == "IDENFR") {
             symbolTable.nameHasNotDefined(WORD_VALUE, LINE);
             symbolTable.hasAssignForConst(WORD_VALUE, LINE);
+            scanfCentece->setIDENFR(WORD_VALUE);
             PRINT_WORD_AND_ADDPOINT;
             if (WORD_TYPE == "COMMA") {
                 PRINT_WORD_AND_ADDPOINT;
@@ -318,17 +325,18 @@ bool scanfCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
     return false;
 }
 
-bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
+bool returnCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vector<CentenceMid*>* centenceBlock) {
     if (WORD_TYPE != "RETURNTK") {
         return false;
     }
+    ReturnCentence* returnCentence = symbolTable.getNowBlock().addCentence_RETURN(centenceBlock);
     hasReturnCentence = true;
     ExpressionFlag flag = NONE_Express;
     int line = LINE;
     PRINT_WORD_AND_ADDPOINT;
     if (WORD_TYPE == "LPARENT") {
         PRINT_WORD_AND_ADDPOINT;
-        flag = expression(Words, PointNum, output, 0, nullptr, nullptr);
+        flag = expression(Words, PointNum, output, 0, nullptr, returnCentence);
         if (WORD_TYPE == "RPARENT") {
             PRINT_WORD_AND_ADDPOINT;
         } else {
@@ -396,10 +404,10 @@ bool Centence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, vecto
     if (functionCall(Words, PointNum, output, 0, nullptr)) {
         /*cout << "<语句>" << endl;*/ return true;
     }
-    if (assignCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
-    if (printfCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
-    if (scanfCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
-    if (returnCentence(Words, PointNum, output)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (assignCentence(Words, PointNum, output, centenceBlock)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (printfCentence(Words, PointNum, output, centenceBlock)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (scanfCentence(Words, PointNum, output, centenceBlock)) { /*cout << "<语句>" << endl;*/ return true; }
+    if (returnCentence(Words, PointNum, output, centenceBlock)) { /*cout << "<语句>" << endl;*/ return true; }
     if (WORD_TYPE == "LBRACE") {
         PRINT_WORD_AND_ADDPOINT;
         while (Centence(Words, PointNum, output, centenceBlock));

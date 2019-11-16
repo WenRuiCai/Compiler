@@ -11,6 +11,10 @@
 #include "WhileBlock.h"
 #include "DoWhileBlock.h"
 #include "ForLoopBlock.h"
+#include "AssignCentence.h"
+#include "PrintfCentence.h"
+#include "ReturnCentence.h"
+#include "ScanfCentece.h"
 
 class FunctionBlock {
     vector<ExpressionMidCode> expressionMidCodes;
@@ -53,6 +57,34 @@ public:
         addCentence(centenceBlock, forLoopBlock);
         this->nowCentence = this->centences.size() - 1;
         return forLoopBlock;
+    }
+
+    AssignCentence* addCentence_ASSIGN(vector<CentenceMid*>* centenceBlock) {
+        AssignCentence* assignCentence = new AssignCentence();
+        addCentence(centenceBlock, assignCentence);
+        this->nowCentence = this->centences.size() - 1;
+        return assignCentence;
+    }
+
+    ReturnCentence* addCentence_RETURN(vector<CentenceMid*>* centenceBlock) {
+        ReturnCentence* returnCentence = new ReturnCentence();
+        addCentence(centenceBlock, returnCentence);
+        this->nowCentence = this->centences.size() - 1;
+        return returnCentence;
+    }
+
+    ScanfCentece* addCentence_SCANF(vector<CentenceMid*>* centenceBlock) {
+        ScanfCentece* scanfCentece = new ScanfCentece();
+        addCentence(centenceBlock, scanfCentece);
+        this->nowCentence = this->centences.size() - 1;
+        return scanfCentece;
+    }
+
+    PrintfCentence* addCentence_printf(vector<CentenceMid*>* centenceBlock) {
+        PrintfCentence* printfCentence = new PrintfCentence();
+        addCentence(centenceBlock, printfCentence);
+        this->nowCentence = this->centences.size() - 1;
+        return printfCentence;
     }
 
     CentenceMid* getNowCentence() {
