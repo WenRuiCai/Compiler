@@ -11,7 +11,7 @@
 ExpressionFlag expression_work(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output,
         ExpressionMidCode& expBlock);
 ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output,
-        int expflag, factorMidCode* factorMid);
+        int expflag, factorMidCode* factorMid, CentenceMid* centence);
 ExpressionFlag item(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, ExpressionMidCode& expBlock);
 ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, ExpressionMidCode& expBlock);
 
@@ -55,7 +55,7 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
                 int line = LINE;
                 PRINT_WORD_AND_ADDPOINT;
                 if (expression(Words, PointNum, output, 1,
-                        expBlock.getNowItem().getNowFactorPointer()) != INT_Express) {
+                        expBlock.getNowItem().getNowFactorPointer(), nullptr) != INT_Express) {
                     symbolTable.addArrayIndexError(line);
                 }
                 if (WORD_TYPE == "RBRACK") {
@@ -80,7 +80,7 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
     else if (WORD_TYPE == "LPARENT") {
         PRINT_WORD_AND_ADDPOINT;
         expression(Words, PointNum, output, 1,
-                expBlock.getNowItem().getNowFactorPointer());
+                expBlock.getNowItem().getNowFactorPointer(), nullptr);
         if (WORD_TYPE == "RPARENT") {
             PRINT_WORD_AND_ADDPOINT;
         } else {
@@ -133,11 +133,46 @@ ExpressionFlag item(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output,
 }
 
 ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output,
-        int expflag, factorMidCode* factorMid) {
+        int expflag, factorMidCode* factorMid, CentenceMid* centence) {
     if (WORD_TYPE == "PLUS" || WORD_TYPE == "MINU") {
         PRINT_WORD_AND_ADDPOINT;
     }
-    if (expflag == 0) {
+    if (expflag <= 0) {
+        //expflag < 0仅存在于condition的情况
+        if (expflag == -1) {
+            IfelseBlock* ifelseBlock = static_cast<IfelseBlock *>(centence);
+            ifelseBlock->setExp();
+            ExpressionMidCode& xi = *ifelseBlock->getNowExp();
+            ExpressionFlag f = expression_work(Words, PointNum, output, xi);
+            cout << xi.toString();
+            return f;
+        } else if (expflag == -2) {
+            WhileBlock* whileBlock = static_cast<WhileBlock *>(centence);
+            whileBlock->setExp();
+            ExpressionMidCode& xi = *whileBlock->getNowExp();
+            ExpressionFlag f = expression_work(Words, PointNum, output, xi);
+            return f;
+        } else if (expflag == -3) {
+            DoWhileBlock* doWhileBlock = static_cast<DoWhileBlock*>(centence);
+            doWhileBlock->setExp();
+            ExpressionMidCode& xi = *doWhileBlock->getNowExp();
+            ExpressionFlag f = expression_work(Words, PointNum, output, xi);
+            return f;
+        } else if (expflag == -4) {
+            ForLoopBlock* forLoopBlock = static_cast<ForLoopBlock*>(centence);
+            forLoopBlock->setExp();
+            ExpressionMidCode& xi = *forLoopBlock->getNowExp();
+            ExpressionFlag f = expression_work(Words, PointNum, output, xi);
+            cout << xi.toString();
+            return f;
+        }
+        if (centence != nullptr && centence->kind == FOR) {
+            ForLoopBlock* forLoopBlock = static_cast<ForLoopBlock*>(centence);
+            forLoopBlock->setExp();
+            ExpressionMidCode& xi = *forLoopBlock->getNowExp();
+            ExpressionFlag f = expression_work(Words, PointNum, output, xi);
+            return f;
+        }
         cout << "\n-------------------Now is EXP--------------------------\n";
         symbolTable.getNowBlock().addExpressionMidCode();
         ExpressionFlag f = expression_work(Words, PointNum, output, symbolTable.getNowBlock().getNowExp());

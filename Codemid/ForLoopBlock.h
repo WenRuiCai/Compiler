@@ -23,6 +23,10 @@ private:
 
 public:
 
+    void set_IDENFR(string id) {
+        this->IDENFR = id;
+    }
+
     vector<CentenceMid*>* getCentenceBlock() {
         return &this->loopBlock;
     }
