@@ -30,7 +30,7 @@ void Component_Centences(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& ou
     ///                              ///
     ////////////////////////////////////
     hasReturnCentence = false;
-    while (Centence(Words, PointNum, output));
+    while (Centence(Words, PointNum, output, centenceBlock));
     //cout << "<语句列>" << endl;
     //cout << "<复合语句>" << endl;
     symbolTable.noReturnCentenceError(hasReturnCentence, LINE);
