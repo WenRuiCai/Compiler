@@ -45,9 +45,12 @@ public:
     string toString() {
         string result = "";
         result += (this->kind == "INTTK") ? "int " :
-                ((this->kind == "CHARTK") ? "char " : "void ") + functionName + "()\n";
+                ((this->kind == "CHARTK") ? "char " : "void ");
+        result += this->functionName + "()\n";
         for (TableItem item : this->parameters) {
-            result += "para " + (item.type == "INTTK") ? "int " : "char " + item.name + "\n"
+            result += "para ";
+            result += (item.type == "INTTK") ? "int " : "char ";
+            result += item.name + "\n";
         }
         result += get_centences_component_string(this->centences);
         return result;

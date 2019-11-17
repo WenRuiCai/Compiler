@@ -41,6 +41,15 @@ private:
     }
 
 public:
+    string toString() {
+        string result = "";
+        for (FunctionBlock block : this->functionBlocks) {
+            result += block.toString();
+        }
+        result += MainBlock.toString();
+        return result;
+    }
+
     void addLevel() {
         Level newLevel = Level();
         this->symbolStackTable.push_back(newLevel);
