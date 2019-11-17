@@ -77,7 +77,6 @@ struct SINGLE_WORD {
     Words[PointNum - 1].line
 
 #define PRINT_WORD_AND_ADDPOINT \
-    cout << Words[PointNum].WORD.first << " " << Words[PointNum].WORD.second << endl; \
     PointNum++
 
 //////////////////////////////////////////////////////
