@@ -18,7 +18,11 @@ public:
     }
 
     string toString() {
-        return "";
+        string result = "";
+        for (string string1 : this->IDENFRS) {
+            result += "SCANF " + string1 + "\n";
+        }
+        return result;
     }
 
     ScanfCentece() {

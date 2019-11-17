@@ -22,7 +22,14 @@ public:
     }
 
     string toString() {
-        return "";
+        string result  = "";
+        if (this->returnExp.expHasInit()) {
+            result += this->returnExp.toString();
+            result += "ret " + this->returnExp.getExpResultID() + "\n";
+        } else {
+            result += "ret\n";
+        }
+        return result;
     }
 
     ReturnCentence() {
