@@ -200,6 +200,7 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
             ExpressionFlag f = expression_work(Words, PointNum, output, xi);
             return f;
         }
+        return NONE_Express;
     } else if (expflag == 1) {
         factorMid->setFactor_exp(new ExpressionMidCode());
         factorMid->getFactorExp().init();
