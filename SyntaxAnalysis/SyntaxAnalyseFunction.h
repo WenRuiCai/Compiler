@@ -252,7 +252,7 @@ bool Function_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, ofstr
     if (WORD_TYPE == "IDENFR") {
         symbolTable.nowLevelAddItem(thistype, WORD_VALUE, FUNC, LINE, 0);
         symbolTable.addLevel();
-        symbolTable.addBlock(0, WORD_VALUE);
+        symbolTable.addBlock(0, WORD_VALUE, thistype);
         PRINT_WORD_AND_ADDPOINT;
         //cout << "<声明头部>" << endl;
         if (WORD_TYPE == "LPARENT") {
@@ -287,7 +287,7 @@ bool Function_Not_With_Return_Value(vector<SINGLE_WORD>& Words, int& PointNum, o
     if (WORD_TYPE == "IDENFR") {
         symbolTable.nowLevelAddItem("VOIDTK", WORD_VALUE, FUNC, LINE, 0);
         symbolTable.addLevel();
-        symbolTable.addBlock(0, WORD_VALUE);
+        symbolTable.addBlock(0, WORD_VALUE, "VOIDTK");
         PRINT_WORD_AND_ADDPOINT;
         if (WORD_TYPE == "LPARENT") {
             PRINT_WORD_AND_ADDPOINT;
@@ -318,7 +318,7 @@ void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
     if (WORD_TYPE == "MAINTK") {
         symbolTable.nowLevelAddItem("VOIDTK", WORD_VALUE, MAIN, LINE, 0);
         symbolTable.addLevel();
-        symbolTable.addBlock(1, "main");
+        symbolTable.addBlock(1, "main", "VOIDTK");
         PRINT_WORD_AND_ADDPOINT;
         if (WORD_TYPE == "LPARENT") {
             PRINT_WORD_AND_ADDPOINT;

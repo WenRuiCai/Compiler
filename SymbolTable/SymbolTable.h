@@ -47,11 +47,15 @@ public:
         this->nowlevel = symbolStackTable.size() - 1;
     }
 
-    void addBlock(int flag, string name) {
+    void addBlock(int flag, string name, string function_kind) {
         if (flag == 1) {
             this->nowBlock = -1;
+            MainBlock.set_Function_Name(name);
+            MainBlock.set_Function_Kind(function_kind);
         } else {
             FunctionBlock block = FunctionBlock();
+            block.set_Function_Name(name);
+            block.set_Function_Kind(function_kind);
             this->functionBlocks.push_back(block);
             this->nowBlock = this->functionBlocks.size() - 1;
         }
@@ -80,6 +84,10 @@ public:
         }
         this->symbolStackTable[nowlevel].addItem(type, name, kind, line, dimension, symbolStackTable.size() - 1);
         //cout << symbolStackTable[symbolStackTable.size() - 1].getItems().size() << endl;
+        if (kind == PARA) {
+            this->getNowBlock().functionBlock_addParameter(
+                    TableItem(type, name, kind, line, dimension, symbolStackTable.size() - 1));
+        }
     }
 
     bool parameterNumHasError(string functionName, int line, int paraNum) {

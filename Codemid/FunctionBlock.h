@@ -17,6 +17,9 @@
 #include "ScanfCentece.h"
 
 class FunctionBlock {
+    string kind;
+    string functionName;
+    vector<TableItem> parameters;
     vector<ExpressionMidCode> expressionMidCodes;
     vector<CentenceMid*> centences;
     int nowExpression;
@@ -27,6 +30,29 @@ class FunctionBlock {
     }
 
 public:
+    void functionBlock_addParameter(TableItem para) {
+        this->parameters.push_back(para);
+    }
+
+    void set_Function_Kind(string kind) {
+        this->kind = kind;
+    }
+
+    void set_Function_Name(string name) {
+        this->functionName = name;
+    }
+
+    string toString() {
+        string result = "";
+        result += (this->kind == "INTTK") ? "int " :
+                ((this->kind == "CHARTK") ? "char " : "void ") + functionName + "()\n";
+        for (TableItem item : this->parameters) {
+            result += "para " + (item.type == "INTTK") ? "int " : "char " + item.name + "\n"
+        }
+        result += get_centences_component_string(this->centences);
+        return result;
+    }
+
     vector<CentenceMid*>* getCentenceBlock() {
         return &this->centences;
     }
