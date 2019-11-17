@@ -6,6 +6,7 @@
 #define COMPILER_CENTENCEMID_H
 
 #include "ExpressionMidCode.h"
+#include "MiddleCode.h"
 
 enum conditionCompare {
     GRT,
@@ -21,7 +22,7 @@ enum CentenceKind {
     WHILE = -2,
     DOWHILE = -3,
     FOR = -4,
-    PRINTF,
+    PRINTF = 0,
     SCANF,
     FUNCTIONCALL,
     ASSIGN,

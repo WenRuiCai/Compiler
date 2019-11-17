@@ -50,7 +50,17 @@ public:
     }
 
     string toString() {
-        return "";
+        string result = "";
+        if (ID_EXP.expHasInit()) {
+            result += ID_EXP.toString();
+            result += ID_VALUE.toString();
+            result += IDENFR + "[" + ID_EXP.getExpResultID() + "]" + " = " +
+                    ID_VALUE.getExpResultID() + "\n";
+        } else {
+            result += ID_VALUE.toString();
+            result += IDENFR + " = " + ID_VALUE.getExpResultID() + "\n";
+        }
+        return result;
     }
 
 };

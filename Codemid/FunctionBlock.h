@@ -111,5 +111,42 @@ public:
 
 };
 
+string get_centences_component_string(vector<CentenceMid*>& centencesBlock);
+
+string get_centences_component_string(vector<CentenceMid*>& centencesBlock) {
+    string result = "";
+    for (CentenceMid* centence : centencesBlock) {
+        switch (centence->kind) {
+            case IFELSE:
+                result += static_cast<IfelseBlock*>(centence)->toString();
+                break;
+            case WHILE:
+                result += static_cast<WhileBlock*>(centence)->toString();
+                break;
+            case DOWHILE:
+                result += static_cast<DoWhileBlock*>(centence)->toString();
+                break;
+            case FOR:
+                result += static_cast<ForLoopBlock*>(centence)->toString();
+                break;
+            case PRINTF:
+                result += static_cast<PrintfCentence*>(centence)->toString();
+                break;
+            case SCANF:
+                result += static_cast<ScanfCentece*>(centence)->toString();
+                break;
+            case FUNCTIONCALL:
+                result += static_cast<FunctionCallMidCode*>(centence)->toString();
+                break;
+            case ASSIGN:
+                result += static_cast<AssignCentence*>(centence)->toString();
+                break;
+            case RETURN:
+                result += static_cast<ReturnCentence*>(centence)->toString();
+                break;
+        }
+    }
+    return result;
+}
 
 #endif //COMPILER_FUNCTIONBLOCK_H

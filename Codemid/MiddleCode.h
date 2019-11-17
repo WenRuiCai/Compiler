@@ -4,11 +4,6 @@
 
 #ifndef COMPILER_MIDDLECODE_H
 #define COMPILER_MIDDLECODE_H
-
-#include "FunctionBlock.h"
-
-class MiddleCode {
-
-};
+int label_counter = 0;
 
 #endif //COMPILER_MIDDLECODE_H

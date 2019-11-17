@@ -18,6 +18,7 @@ private:
     vector<calculateExp> mid_three_unit_Exps;
     int nowItem;
     bool mid_three_unit_Exps_hasFilled = false;
+    bool hasInit = false;
 
     void fill_mid_three_unit_exps() {
         int num = 0;
@@ -69,6 +70,11 @@ public:
 
     void init() {
         this->expResultID = "T" + to_string(ID_counter++);
+        this->hasInit = true;
+    }
+
+    bool expHasInit() {
+        return this->hasInit;
     }
 
     void addItem() {
