@@ -201,12 +201,21 @@ bool forCentence(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, ve
                 }
                 symbolTable.nameHasNotDefined(WORD_VALUE, LINE);
                 symbolTable.hasAssignForConst(WORD_VALUE, LINE);
+                forLoopBlock->setIDENFR_STEP(WORD_VALUE);
                 PRINT_WORD_AND_ADDPOINT; //IDENFR
+
                 PRINT_WORD_AND_ADDPOINT; //=
+
                 symbolTable.nameHasNotDefined(WORD_VALUE, LINE);
+                forLoopBlock->setIDENFR_STEP1(WORD_VALUE);
                 PRINT_WORD_AND_ADDPOINT; //IDENFR
+
+                if (WORD_TYPE == "PLUS") {forLoopBlock->setIsAdd();}
                 PRINT_WORD_AND_ADDPOINT; //+ | -
-                No_Symbol_Number(Words, PointNum, output, nullptr); //STEP
+
+                int num = 0;
+                No_Symbol_Number(Words, PointNum, output, &num); //STEP
+                forLoopBlock->set_STEP(num);
                 //cout << "<步长>" << endl;
                 if (WORD_TYPE == "RPARENT") {
                     PRINT_WORD_AND_ADDPOINT;

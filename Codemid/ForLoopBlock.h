@@ -6,8 +6,10 @@
 #define COMPILER_FORLOOPBLOCK_H
 #include "ExpressionMidCode.h"
 #include "CentenceMid.h"
-#include "IfelseBlock.h"
-#include "WhileBlock.h"
+/*
+ * 语句列中的语句可以是任何，但是在本类中无法将其转换成别的语句，所以需要在最顶层中设置接口
+ */
+extern string get_centences_component_string(vector<CentenceMid*>& centencesBlock);
 
 class ForLoopBlock : public CentenceMid {
 private:
@@ -17,11 +19,66 @@ private:
     conditionCompare compare;
     ExpressionMidCode conditionRightExp;
     int flag = -2;
+
+    string IDENFR_STEP;
+    string IDENFR_STEP1;
     int step;
-    bool isAdd;
+    bool isAdd = false;
     vector<CentenceMid*> loopBlock;
 
+    string getConditionString() {
+        string conditionString = "";
+        conditionString += conditionLeftExp.toString();
+        if (conditionRightExp.expHasInit()) {
+            conditionString += conditionRightExp.toString();
+            switch (this->compare) {
+                case LESS:
+                    conditionString += conditionLeftExp.getExpResultID() + " < " +
+                                       conditionRightExp.getExpResultID() + "\n";
+                    break;
+                case LESS_EQL:
+                    conditionString += conditionLeftExp.getExpResultID() + " <= " +
+                                       conditionRightExp.getExpResultID() + "\n";
+                    break;
+                case GRT:
+                    conditionString += conditionLeftExp.getExpResultID() + " > " +
+                                       conditionRightExp.getExpResultID() + "\n";
+                    break;
+                case GRT_EQL:
+                    conditionString += conditionLeftExp.getExpResultID() + " >= " +
+                                       conditionRightExp.getExpResultID() + "\n";
+                    break;
+                case EQL:
+                    conditionString += conditionLeftExp.getExpResultID() + " == " +
+                                       conditionRightExp.getExpResultID() + "\n";
+                    break;
+                case NOTEQL:
+                    conditionString += conditionLeftExp.getExpResultID() + " != " +
+                                       conditionRightExp.getExpResultID() + "\n";
+                    break;
+            }
+        } else {
+            conditionString += conditionLeftExp.getExpResultID() + " != 0\n";
+        }
+        return conditionString;
+    }
 public:
+
+    void setIDENFR_STEP(string s) {
+        this->IDENFR_STEP = s;
+    }
+
+    void setIDENFR_STEP1(string s) {
+        this->IDENFR_STEP1 = s;
+    }
+
+    void set_STEP(int num) {
+        this->step = num;
+    }
+
+    void setIsAdd() {
+        this->isAdd = true;
+    }
 
     void set_IDENFR(string id) {
         this->IDENFR = id;
@@ -61,7 +118,27 @@ public:
     }
 
     string toString() {
-        return "";
+        string result = "";
+        result += this->IDENFR_VALUE.toString();
+        result += this->IDENFR + " = " + this->IDENFR_VALUE.getExpResultID() + "\n";
+
+        string conditionLabel = "condition_" + to_string(label_counter++);
+        string loopLabel = "ForLoop_" + to_string(label_counter++);
+        string leavelLabel = "label_" + to_string(label_counter);
+
+        result += conditionLabel + ":\n";
+        result += getConditionString();
+        result += "BNZ " + loopLabel + "\n";
+        result += "GOTO " + leavelLabel + "\n";
+
+        result += loopLabel + ":\n";
+        result += get_centences_component_string(this->loopBlock);
+
+        result += this->IDENFR_STEP + " = " +
+                this->IDENFR_STEP1 + ((this->isAdd) ? " + " : " - ") + to_string(step) + "\n";
+        result += "GOTO " + conditionLabel + "\n";
+        result += leavelLabel + ":\n";
+        return result;
     }
 
     ForLoopBlock() {
