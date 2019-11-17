@@ -145,7 +145,6 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
             ifelseBlock->setExp();
             ExpressionMidCode& xi = *ifelseBlock->getNowExp();
             ExpressionFlag f = expression_work(Words, PointNum, output, xi);
-            cout << xi.toString();
             return f;
         } else if (expflag == -2) {
             WhileBlock* whileBlock = static_cast<WhileBlock *>(centence);
@@ -164,7 +163,6 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
             forLoopBlock->setExp();
             ExpressionMidCode& xi = *forLoopBlock->getNowExp();
             ExpressionFlag f = expression_work(Words, PointNum, output, xi);
-            cout << xi.toString();
             return f;
         }
         if (centence != nullptr && centence->kind == FOR) {
@@ -202,14 +200,6 @@ ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& o
             ExpressionFlag f = expression_work(Words, PointNum, output, xi);
             return f;
         }
-        cout << "\n-------------------Now is EXP--------------------------\n";
-        symbolTable.getNowBlock().addExpressionMidCode();
-        ExpressionFlag f = expression_work(Words, PointNum, output, symbolTable.getNowBlock().getNowExp());
-        string s = symbolTable.getNowBlock().getNowExp().toString();
-        if (s != "") cout << "exp :  " << s;
-        else cout << "exp :  " << symbolTable.getNowBlock().getNowExp().getExpResultID();
-        cout << "\n-------------------Now this EXP finished--------------------------\n";
-        return f;
     } else if (expflag == 1) {
         factorMid->setFactor_exp(new ExpressionMidCode());
         factorMid->getFactorExp().init();
