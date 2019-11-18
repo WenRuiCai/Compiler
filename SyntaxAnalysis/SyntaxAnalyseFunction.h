@@ -200,10 +200,13 @@ void Variable_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output
             break;
         }
         else if (WORD_TYPE == "LBRACK") {
+            TableItem* item1 = nullptr;
             if (!hasWrongId)
-                symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 1);
+                item1 = symbolTable.nowLevelAddItem(thistype, thisValue, VAR, thisline, 1);
             PRINT_WORD_AND_ADDPOINT;
-            No_Symbol_Number(Words, PointNum, output, nullptr);
+            int num = 0;
+            No_Symbol_Number(Words, PointNum, output, &num);
+            if (item1 != nullptr)   item1->array_lenth = num;
             if (WORD_TYPE == "RBRACK") {
                 PRINT_WORD_AND_ADDPOINT;
             } else {

@@ -21,6 +21,7 @@ struct TableItem {
     int dimension;     ///维数
     int level;         ///所在程序层数
 
+    int array_lenth;
     int const_int_value;
     char const_char_value;
 
