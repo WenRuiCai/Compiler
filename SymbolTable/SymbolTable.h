@@ -321,7 +321,7 @@ void setFunction_Const(FunctionBlock& functionBlock) {
     vector<TableItem>& Consts = functionBlock.getFunctionConsts();
     int rank = 0;
     for (TableItem item : symbolTable.getSymbolTable()[0].getItems()) {
-        if (item.kind == FUNC) {
+        if (item.kind == FUNC || item.kind == MAIN) {
             rank++;
             if (item.name == functionBlock.getName()) break;
         }
@@ -338,7 +338,7 @@ void setFunction_Variable(FunctionBlock& functionBlock) {
     vector<Variable>& functionVariable = functionBlock.getFunctionVariables();
     int rank = 0;
     for (TableItem item : symbolTable.getSymbolTable()[0].getItems()) {
-        if (item.kind == FUNC) {
+        if (item.kind == FUNC || item.kind == MAIN) {
             rank++;
             if (item.name == functionBlock.getName()) break;
         }
