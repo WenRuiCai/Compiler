@@ -15,6 +15,7 @@
 #include "PrintfCentence.h"
 #include "ReturnCentence.h"
 #include "ScanfCentece.h"
+#include "../MIPSCode/Variable.h"
 
 class FunctionBlock {
     string kind;
@@ -24,12 +25,19 @@ class FunctionBlock {
     vector<CentenceMid*> centences;
     int nowExpression;
     int nowCentence;
+    vector<Variable> functionVariables;
 
     void addCentence(vector<CentenceMid*>* centenceBlock, CentenceMid* centence) {
         centenceBlock->push_back(centence);
     }
 
 public:
+    string getName() { return this->functionName; }
+
+    vector<Variable>& getFunctionVariables() {
+        return this->functionVariables;
+    }
+
     void functionBlock_addParameter(TableItem para) {
         this->parameters.push_back(para);
     }
