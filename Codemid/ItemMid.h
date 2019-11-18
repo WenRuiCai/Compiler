@@ -132,7 +132,7 @@ public:
     }
 
     void init() {
-        this->itemResultID = "T" + to_string(ID_counter++);
+        this->itemResultID = "TEMP_VAR_CWR" + to_string(ID_counter++);
     }
 
     factorMidCode& getNowFactor() {

@@ -119,7 +119,7 @@ public:
     }
 
     void init() {
-        factorResultID = "T" + to_string(ID_counter++);
+        factorResultID = "TEMP_VAR_CWR" + to_string(ID_counter++);
     }
 };
 

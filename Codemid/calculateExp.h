@@ -28,25 +28,25 @@ private:
 
 public:
     calculateExp(string left, string right, OP op, int resultId) {
-        this->result_id = "T" + to_string(resultId); this->op = op;
+        this->result_id = "TEMP_VAR_CWR" + to_string(resultId); this->op = op;
         this->leftNum_id = left;  this->rightNum_id = right;
         this->isLeftId = true;  this->isRightId = true;
     }
 
     calculateExp(string left, int right, OP op, int resultId) {
-        this->result_id = "T" + to_string(resultId); this->op = op;
+        this->result_id = "TEMP_VAR_CWR" + to_string(resultId); this->op = op;
         this->leftNum_id = left;  this->rightNum = right;
         this->isLeftId = true;  this->isRightId = false;
     }
 
     calculateExp(int left, string right, OP op, int resultId) {
-        this->result_id = "T" + to_string(resultId); this->op = op;
+        this->result_id = "TEMP_VAR_CWR" + to_string(resultId); this->op = op;
         this->leftNum = left;  this->rightNum_id = right;
         this->isLeftId = false; this->isRightId = true;
     }
 
     calculateExp(int left, int right, OP op, int resultId) {
-        this->result_id = "T" + to_string(resultId); this->op = op;
+        this->result_id = "TEMP_VAR_CWR" + to_string(resultId); this->op = op;
         this->leftNum = left;  this->rightNum = right;
         this->isLeftId = false; this->isRightId = false;
     }

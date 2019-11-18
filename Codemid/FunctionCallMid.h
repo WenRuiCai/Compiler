@@ -29,7 +29,7 @@ private:
 public:
     FunctionCallMidCode(string name) {
         this->functionName = name;
-        this->functionReturnValueID = "T" + to_string(ID_counter++);
+        this->functionReturnValueID = "TEMP_VAR_CWR" + to_string(ID_counter++);
         this->kind = FUNCTIONCALL;
     }
 

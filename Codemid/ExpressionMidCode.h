@@ -69,7 +69,7 @@ public:
     string getExpResultID() { return this->expResultID; }
 
     void init() {
-        this->expResultID = "T" + to_string(ID_counter++);
+        this->expResultID = "TEMP_VAR_CWR" + to_string(ID_counter++);
         this->hasInit = true;
     }
 
