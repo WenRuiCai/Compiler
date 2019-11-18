@@ -27,6 +27,7 @@ class FunctionBlock {
     int nowCentence;
     vector<Variable> functionVariables;
     map<string, Variable> function_GetVar_byName_Map;
+    vector<TableItem> functionConsts;
 
     void addCentence(vector<CentenceMid*>* centenceBlock, CentenceMid* centence) {
         centenceBlock->push_back(centence);
@@ -34,6 +35,8 @@ class FunctionBlock {
 
 public:
     string getName() { return this->functionName; }
+
+    vector<TableItem>& getFunctionConsts() { return this->functionConsts;}
 
     vector<Variable>& getFunctionVariables() {
         return this->functionVariables;

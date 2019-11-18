@@ -14,6 +14,7 @@ enum ExpressionFlag {
 #include "../MIPSCode/Variable.h"
 
 void setFunction_Variable(FunctionBlock& functionBlock);
+void setFunction_Const(FunctionBlock& functionBlock);
 
 class SymbolTable {
 private:
@@ -80,6 +81,7 @@ public:
     void dropOutLevel() {
         this->nowlevel = 0;
         setFunction_Variable(getNowBlock());
+        setFunction_Const(getNowBlock());
     }
 
     vector<Level> getSymbolTable() {
@@ -289,6 +291,16 @@ public:
 
 SymbolTable symbolTable;
 
+vector<TableItem> globalConst;
+
+void setGlobalConst() {
+    for (TableItem item : symbolTable.getSymbolTable()[0].getItems()) {
+        if (item.kind == CONST) {
+            globalConst.push_back(item);
+        }
+    }
+}
+
 void setGlobalVariable(vector<SINGLE_WORD> words) {
     for (SINGLE_WORD word : words) {
         if (word.WORD.first == "STRCON") {
@@ -305,6 +317,23 @@ void setGlobalVariable(vector<SINGLE_WORD> words) {
     }
 }
 
+void setFunction_Const(FunctionBlock& functionBlock) {
+    vector<TableItem>& Consts = functionBlock.getFunctionConsts();
+    int rank = 0;
+    for (TableItem item : symbolTable.getSymbolTable()[0].getItems()) {
+        if (item.kind == FUNC) {
+            rank++;
+            if (item.name == functionBlock.getName()) break;
+        }
+    }
+    Level nowFunction = symbolTable.getSymbolTable()[rank]; //得到当前函数符号表
+    for (TableItem item1 : nowFunction.getItems()) {
+        if (item1.kind == CONST) {
+            Consts.push_back(item1);
+        }
+    }
+}
+
 void setFunction_Variable(FunctionBlock& functionBlock) {
     vector<Variable>& functionVariable = functionBlock.getFunctionVariables();
     int rank = 0;
@@ -315,9 +344,10 @@ void setFunction_Variable(FunctionBlock& functionBlock) {
         }
     }
     Level nowFunction = symbolTable.getSymbolTable()[rank]; //得到当前函数符号表
-    for (Variable variable : globalVariable) {
-        functionVariable.push_back(variable);
-    }   //全局变量，该函数中当然也有，但是注意重定义，所以下面是处理
+    //for (Variable variable : globalVariable) {
+    //    functionVariable.push_back(variable);
+    //}
+    // 下面是当前函数变量处理
     int paraRegister = 4;
     for (TableItem item1 : nowFunction.getItems()) {
         Variable* var = nullptr;

@@ -356,6 +356,7 @@ void Function_Main(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) 
 void Program_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     symbolTable.addLevel();
     Const_Analysis(Words, PointNum, output);
+    setGlobalConst();
     Variable_Analysis(Words, PointNum, output);
     setGlobalVariable(Words);
     while (Function_With_Return_Value(Words, PointNum, output) ||
