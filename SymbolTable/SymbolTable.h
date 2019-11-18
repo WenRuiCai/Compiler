@@ -86,10 +86,10 @@ public:
         functionParameterError.addError('f', line);
     }
 
-    void nowLevelAddItem(string type, string name, KIND kind, int line, int dimension) {
+    TableItem* nowLevelAddItem(string type, string name, KIND kind, int line, int dimension) {
         if (nameDuplicated(name)) {
             nameDefineError.addError('b', line);
-            return;
+            return nullptr;
         }
         this->symbolStackTable[nowlevel].addItem(type, name, kind, line, dimension, symbolStackTable.size() - 1);
         //cout << symbolStackTable[symbolStackTable.size() - 1].getItems().size() << endl;
@@ -97,6 +97,8 @@ public:
             this->getNowBlock().functionBlock_addParameter(
                     TableItem(type, name, kind, line, dimension, symbolStackTable.size() - 1));
         }
+        TableItem* item = this->symbolStackTable[nowlevel].getNewestItem();
+        return (item->kind == CONST) ? item : nullptr;
     }
 
     bool parameterNumHasError(string functionName, int line, int paraNum) {

@@ -20,6 +20,10 @@ struct TableItem {
     int line;          ///所在行数
     int dimension;     ///维数
     int level;         ///所在程序层数
+
+    int const_int_value;
+    char const_char_value;
+
     TableItem(string type, string name, KIND kind, int line, int dimension, int level):
         type(type), name(name), kind(kind), line(line), dimension(dimension), level(level) {}
 };
@@ -35,6 +39,10 @@ public:
 
     vector<TableItem> getItems() {
         return this->items;
+    }
+
+    TableItem* getNewestItem() {
+        return &this->items[this->items.size() - 1];
     }
 };
 

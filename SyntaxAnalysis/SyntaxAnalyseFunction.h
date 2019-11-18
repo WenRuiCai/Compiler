@@ -82,22 +82,26 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     if ("INTTK" == WORD_TYPE) {
         PRINT_WORD_AND_ADDPOINT;
         while (true) {
+            TableItem* item1 = nullptr;
             if (WORD_TYPE == "IDENFR") {
-                symbolTable.nowLevelAddItem("INTTK", WORD_VALUE, CONST, LINE, 0);
+                item1 = symbolTable.nowLevelAddItem("INTTK", WORD_VALUE, CONST, LINE, 0);
                 PRINT_WORD_AND_ADDPOINT;
             }
             if (WORD_TYPE == "ASSIGN") {
                 PRINT_WORD_AND_ADDPOINT;
             }
             int errorflag = 0;
-            if (!Number(Words, PointNum, output, nullptr)) {
+            int num = 0, isChar = 0;
+            if (!Number(Words, PointNum, output, &num)) {
                 if (WORD_TYPE == "CHARCON") {
+                    if (item1 != nullptr) item1->const_int_value = WORD_VALUE[0];  isChar = 1;
                     PRINT_WORD_AND_ADDPOINT;
                 } else {
                     symbolTable.addAssignValueError(PRE_WORD_LINE);
                     errorflag = 1;
                 }
             }
+            if (!isChar && errorflag == 0) item1->const_int_value = num;
             if ((NEXT_WORD_TYPE == "SEMICN" || NEXT_WORD_TYPE == "COMMA") && errorflag == 1) {
                 PointNum++;
             }
@@ -116,20 +120,24 @@ void Const_Define(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output) {
     else if ("CHARTK" == WORD_TYPE) {
         PRINT_WORD_AND_ADDPOINT;
         while (true) {
+            TableItem* item1 = nullptr;
             if (WORD_TYPE == "IDENFR") {
-                symbolTable.nowLevelAddItem("CHARTK", WORD_VALUE, CONST, LINE, 0);
+                item1 = symbolTable.nowLevelAddItem("CHARTK", WORD_VALUE, CONST, LINE, 0);
                 PRINT_WORD_AND_ADDPOINT;
             }
             if (WORD_TYPE == "ASSIGN") {
                 PRINT_WORD_AND_ADDPOINT;
             }
             int errorflag = 0;
+            int num = 0, isChar = 0;
             if (WORD_TYPE == "CHARCON") {
+                if (item1 != nullptr) item1->const_char_value = WORD_VALUE[0]; isChar = 1;
                 PRINT_WORD_AND_ADDPOINT;
-            } else if (!Number(Words, PointNum, output, nullptr)) {
+            } else if (!Number(Words, PointNum, output, &num)) {
                 symbolTable.addAssignValueError(PRE_WORD_LINE);
                 errorflag = 1;
             }
+            if (!isChar && errorflag == 0) item1->const_char_value = num;
             if ((NEXT_WORD_TYPE == "SEMICN" || NEXT_WORD_TYPE == "COMMA") && errorflag == 1) {
                 PointNum++;
             }
