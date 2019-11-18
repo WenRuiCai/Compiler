@@ -318,11 +318,11 @@ void setFunction_Variable(FunctionBlock& functionBlock) {
     for (Variable variable : globalVariable) {
         functionVariable.push_back(variable);
     }   //全局变量，该函数中当然也有，但是注意重定义，所以下面是处理
-    int para = 8;
+    int paraRegister = 4;
     for (TableItem item1 : nowFunction.getItems()) {
         Variable* var = nullptr;
         if (item1.kind == PARA) {
-            var = new Variable(item1.name, item1.type, para++);
+            var = new Variable(item1.name, item1.type, paraRegister++);
         }
         if (item1.kind == VAR) {
             if (item1.dimension == 0)
