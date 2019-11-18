@@ -11,6 +11,9 @@ enum ExpressionFlag {
 #include "../Errors/FunctionParameterError.h"
 #include "../Errors/SymbolError.h"
 #include "../Codemid/FunctionBlock.h"
+#include "../MIPSCode/Variable.h"
+
+void setFunction_Variable(FunctionBlock& functionBlock);
 
 class SymbolTable {
 private:
@@ -76,6 +79,7 @@ public:
 
     void dropOutLevel() {
         this->nowlevel = 0;
+        setFunction_Variable(getNowBlock());
     }
 
     vector<Level> getSymbolTable() {
@@ -98,7 +102,7 @@ public:
                     TableItem(type, name, kind, line, dimension, symbolStackTable.size() - 1));
         }
         TableItem* item = this->symbolStackTable[nowlevel].getNewestItem();
-        return (item->kind == CONST) ? item : nullptr;
+        return item;
     }
 
     bool parameterNumHasError(string functionName, int line, int paraNum) {
@@ -284,3 +288,58 @@ public:
 };
 
 SymbolTable symbolTable;
+
+void setGlobalVariable(vector<SINGLE_WORD> words) {
+    for (SINGLE_WORD word : words) {
+        if (word.WORD.first == "STRCON") {
+            globalVariable.push_back(Variable(word.WORD.second));
+        }
+    }
+    for (TableItem item : symbolTable.getSymbolTable()[0].getItems()) {
+        if (item.kind == VAR && item.dimension == 0) {
+            globalVariable.push_back(Variable(item.name, item.type));
+        }
+        if (item.kind == VAR && item.dimension > 0) {
+            globalVariable.push_back(Variable(item.name, item.array_lenth, item.type));
+        }
+    }
+}
+
+void setFunction_Variable(FunctionBlock& functionBlock) {
+    vector<Variable>& functionVariable = functionBlock.getFunctionVariables();
+    int rank = 0;
+    for (TableItem item : symbolTable.getSymbolTable()[0].getItems()) {
+        if (item.kind == FUNC) {
+            rank++;
+            if (item.name == functionBlock.getName()) break;
+        }
+    }
+    Level nowFunction = symbolTable.getSymbolTable()[rank]; //得到当前函数符号表
+    for (Variable variable : globalVariable) {
+        functionVariable.push_back(variable);
+    }   //全局变量，该函数中当然也有，但是注意重定义，所以下面是处理
+    int para = 8;
+    for (TableItem item1 : nowFunction.getItems()) {
+        Variable* var = nullptr;
+        if (item1.kind == PARA) {
+            var = new Variable(item1.name, item1.type, para++);
+        }
+        if (item1.kind == VAR) {
+            if (item1.dimension == 0)
+                var = new Variable(item1.name, item1.type);
+            else
+                var = new Variable(item1.name, item1.array_lenth, item1.type);
+        }
+        if (var == nullptr) continue;
+        for (auto iterator = functionVariable.begin(); iterator != functionVariable.end(); iterator++) {
+            if ((*iterator).VariableName == var->VariableName) {
+                functionVariable.erase(iterator);
+                break;
+            }
+        }
+        functionVariable.push_back(*var);
+    }
+    for (Variable variable1 : functionVariable) {
+        functionBlock.getVarMap().insert(make_pair(variable1.VariableName, variable1));
+    }
+}
