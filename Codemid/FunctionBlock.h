@@ -17,6 +17,10 @@
 #include "ScanfCentece.h"
 #include "../MIPSCode/Variable.h"
 
+vector<Variable> nowFunctionVariables;
+map<string, Variable> nowFunction_GetVar_byName_Map;
+vector<TableItem> nowFunctionConsts;
+
 class FunctionBlock {
     string kind;
     string functionName;
@@ -59,6 +63,10 @@ public:
     }
 
     string toString() {
+        nowFunction_GetVar_byName_Map = this->function_GetVar_byName_Map;
+        nowFunctionConsts = this->functionConsts;
+        nowFunctionVariables = this->functionVariables;
+
         string result = "";
         result += (this->kind == "INTTK") ? "int " :
                 ((this->kind == "CHARTK") ? "char " : "void ");
