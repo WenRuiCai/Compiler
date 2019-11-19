@@ -47,18 +47,20 @@ string getVarAddr(string var, int* flag) {
     return "";
 }
 
-bool isConst(string name, int* num) {
+bool isConst(string name, int* num, int* type) {
     if (nowFunction_GetVar_byName_Map.find(name) != nowFunction_GetVar_byName_Map.end())
         return false;
     for (TableItem item : nowFunctionConsts) {
         if (name == item.name) {
             (*num) = (item.type == "INTTK") ? item.const_int_value : item.const_char_value;
+            if (type != nullptr) (*type) = (item.type == "INTTK") ? 1 : 0;
             return true;
         }
     }
     for (TableItem item1 : globalConst) {
         if (name == item1.name) {
             (*num) = (item1.type == "INTTK") ? item1.const_int_value : item1.const_char_value;
+            if (type != nullptr) (*type) = (item1.type == "INTTK") ? 1 : 0;
             return true;
         }
     }

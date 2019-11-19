@@ -6,7 +6,7 @@
 #define COMPILER_MIDDLECODE_H
 int label_counter = 0;
 string getVarAddr(string var, int* flag);
-extern bool isConst(string name, int* num);
+extern bool isConst(string name, int* num, int* type);
 string getArrayItemAddr(string s, int* num);
 string getArrayOpNum(string s, int* num, bool op1);
 
@@ -36,7 +36,7 @@ string resultIDtoMIPS(string resultID) {
         if (isCharCon(resultID, &num)) {
             result += "li $t8, " + to_string(num) + '\n';
         }
-        else if (isConst(resultID, &num)) {
+        else if (isConst(resultID, &num, nullptr)) {
             result += "li $t9, " + to_string(num) + '\n';
         } else if (resultID.at(resultID.length() - 1) != ']') {
             string varAddr = getVarAddr(resultID, &num);
@@ -86,7 +86,7 @@ string translateConditionCentence(string midCode) {
         if (isCharCon(left, &num)) {
             result += "li $t8, " + to_string(num) + '\n';
         }
-        else if (isConst(left, &num)) {
+        else if (isConst(left, &num, nullptr)) {
             result += "li $t9, " + to_string(num) + '\n';
         } else if (left.at(left.length() - 1) != ']') {
             string varAddr = getVarAddr(left, &num);
@@ -109,7 +109,7 @@ string translateConditionCentence(string midCode) {
         if (isCharCon(right, &num)) {
             result += "li $t8, " + to_string(num) + '\n';
         }
-        else if (isConst(right, &num)) {
+        else if (isConst(right, &num, nullptr)) {
             result += "li $t8, " + to_string(num) + '\n';
         } else if (right.at(right.length() - 1) != ']') {
             string varAddr = getVarAddr(right, &num);
@@ -177,7 +177,7 @@ string getArrayItemAddr(string s, int* num) {
 
     if (isNum(index)) {
         result += "li $s7, " + index + '\n';
-    } else if (isConst(index, &num1)) {
+    } else if (isConst(index, &num1, nullptr)) {
         result += "li $s7, " + to_string(num1) + '\n';
     } else {
         int num_var_index = 0;
@@ -227,7 +227,7 @@ string transLateExp_leftIsArray(string left, string right_op_1, string right_op_
             result += "li $t7, " + to_string(num1) + '\n';
             if (num == 1) result += "sw $t7, 0($t8)\n";
             else result += "sb $t7, 0($t8)\n";
-        } else if (isConst(right_op_1, &num1)) {
+        } else if (isConst(right_op_1, &num1, nullptr)) {
             result += "li $t7, " + to_string(num1) + '\n';
             if (num == 1) result += "sw $t7, 0($t8)\n";
             else result += "sb $t7, 0($t8)\n";
@@ -261,7 +261,7 @@ string transLateExp_leftIsArray(string left, string right_op_1, string right_op_
             result += "li $t7, " + right_op_1 + '\n';
         } else if (isCharCon(right_op_1, &num1)) {
             result += "li $t7, " + to_string(num1) + '\n';
-        } else if (isConst(right_op_1, &num1)) {
+        } else if (isConst(right_op_1, &num1, nullptr)) {
             result += "li $t7, " + to_string(num1) + '\n';
         } else if (right_op_1.at(right_op_1.size() - 1) != ']') {
             op1_addr = getVarAddr(right_op_1, &num1);
@@ -279,7 +279,7 @@ string transLateExp_leftIsArray(string left, string right_op_1, string right_op_
             result += "li $t6, " + right_op_2 + '\n';
         } else if (isCharCon(right_op_2, &num2)) {
             result += "li $t6, " + to_string(num2) + '\n';
-        } else if (isConst(right_op_2, &num2)) {
+        } else if (isConst(right_op_2, &num2, nullptr)) {
             result += "li $t6, " + to_string(num2) + '\n';
         } else if (right_op_2.at(right_op_2.length() - 1) != ']') {
             op2_addr = getVarAddr(right_op_2, &num2);
@@ -364,7 +364,7 @@ string translateExp(string exp_midCode) {
                     if (num == 1) result += "sw $t7, " + leftAddr + "($0)\n";
                     else result += "sb $t7, " + leftAddr + "($0)\n";
                 }
-            } else if (isConst(right_op_1, &num1)) {
+            } else if (isConst(right_op_1, &num1, nullptr)) {
                 if (leftAddr[0] == '$') {result += "li " + leftAddr + ", " + to_string(num1) + '\n';}
                 else {
                     result += "li $t7, " + to_string(num1) + '\n';
@@ -405,7 +405,7 @@ string translateExp(string exp_midCode) {
                 result += "li $t7, " + right_op_1 + '\n';
             } else if (isCharCon(right_op_1, &num1)) {
                 result += "li $t7, " + to_string(num1) + '\n';
-            } else if (isConst(right_op_1, &num1)) {
+            } else if (isConst(right_op_1, &num1, nullptr)) {
                 result += "li $t7, " + to_string(num1) + '\n';
             } else if (right_op_1.at(right_op_1.size() - 1) != ']') {
                 op1_addr = getVarAddr(right_op_1, &num1);
@@ -423,7 +423,7 @@ string translateExp(string exp_midCode) {
                 result += "li $t6, " + right_op_2 + '\n';
             } else if (isCharCon(right_op_2, &num2)) {
                 result += "li $t6, " + to_string(num2) + '\n';
-            } else if (isConst(right_op_2, &num2)) {
+            } else if (isConst(right_op_2, &num2, nullptr)) {
                 result += "li $t6, " + to_string(num2) + '\n';
             } else if (right_op_2.at(right_op_2.length() - 1) != ']') {
                 op2_addr = getVarAddr(right_op_2, &num2);
