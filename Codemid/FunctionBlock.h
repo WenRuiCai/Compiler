@@ -24,6 +24,12 @@ extern vector<TableItem> globalConst;
 
 string getVarAddr(string var, int* flag) {
     if (nowFunction_GetVar_byName_Map.count(var) == 0) {
+        for (Variable variable : globalVariable) {
+            if (variable.VariableName == var) {
+                (*flag) = (variable.var_type == INT_VAR) ? 1 : 0;
+                return to_string(variable.var_addr);
+            }
+        }
         return "$" + var;
     }
     long int addr = nowFunction_GetVar_byName_Map.at(var).var_addr;
@@ -38,6 +44,7 @@ string getVarAddr(string var, int* flag) {
         } else (*flag) = 0;
         return to_string(addr);
     }
+    return "";
 }
 
 bool isConst(string name, int* num) {
