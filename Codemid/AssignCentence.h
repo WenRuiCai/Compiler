@@ -58,9 +58,10 @@ public:
 
             /*
              * 数组的情况还要处理~
+             * 处理完成！
              */
-            result += IDENFR + "[" + ID_EXP.getExpResultID() + "]" + " = " +
-                    ID_VALUE.getExpResultID() + "\n";
+            result += translateExp(IDENFR + "[" + ID_EXP.getExpResultID() + "]" + " = " +
+                    ID_VALUE.getExpResultID() + "\n");
         } else {
             //result += ID_VALUE.toString();
             //result += IDENFR + " = " + ID_VALUE.getExpResultID() + "\n";
