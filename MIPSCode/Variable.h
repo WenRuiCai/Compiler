@@ -10,6 +10,7 @@
 using namespace std;
 
 long int addr = 0;
+int globalStringCounter = 0;
 enum VariableType {
     INT_VAR,
     INT_PARA,
@@ -62,7 +63,7 @@ public:
     }
 
     Variable(string s) { //字符串
-        this->VariableName = "string_" + s;
+        this->VariableName = "string_" + to_string(globalStringCounter++);
         this->string_var = s;
         this->var_type = STRING_VAR;
         this->var_addr = addr;
@@ -72,4 +73,13 @@ public:
 
 vector<Variable> globalVariable;
 vector<Variable> globalStrings;
+
+string getStringLabel(string s) {
+    for (Variable v : globalStrings) {
+        if (v.string_var == s) {
+            return v.VariableName;
+        }
+    }
+    return "";
+}
 #endif //COMPILER_VARIABLE_H
