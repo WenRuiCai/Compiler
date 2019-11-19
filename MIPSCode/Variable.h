@@ -43,9 +43,9 @@ public:
         this->var_addr = (type == "INTTK") ?
                 ((addr % 4 == 0) ? addr : addr + 4 - (addr % 4)) : addr;
         if (this->var_type == INT_ARRAY) {
-            addr += 4 * length;
+            addr = this->var_addr + 4 * length;
         } else if (this->var_type == CHAR_ARRAY) {
-            addr += length;
+            addr = this->var_addr + length;
         }
     }
 
@@ -55,9 +55,9 @@ public:
         this->var_addr = (type == "INTTK") ?
                 ((addr % 4 == 0) ? addr : addr + 4 - (addr % 4)) : addr;
         if (this->var_type == INT_VAR) {
-            addr += 4;
+            addr = this->var_addr + 4;
         } else if (this->var_type == CHAR_VAR) {
-            addr += 1;
+            addr = this->var_addr + 1;
         }
     }
 
