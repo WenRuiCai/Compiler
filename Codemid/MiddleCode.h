@@ -27,6 +27,34 @@ bool isCharCon(string s, int* num) {
     return false;
 }
 
+string resultIDtoMIPS(string resultID) {
+    string result = "";
+    if (isNum(resultID)) {
+        result += "li $t9, " + resultID + '\n';
+    } else {
+        int num = 0;
+        if (isCharCon(resultID, &num)) {
+            result += "li $t8, " + to_string(num) + '\n';
+        }
+        else if (isConst(resultID, &num)) {
+            result += "li $t9, " + to_string(num) + '\n';
+        } else if (resultID.at(resultID.length() - 1) != ']') {
+            string varAddr = getVarAddr(resultID, &num);
+            if (varAddr[0] == '$') {
+                result += "move $t9, " + varAddr + '\n';
+            } else {
+                if (num) result += "lw $t9, " + varAddr + "($0)\n";
+                else result += "lb $t9, " + varAddr + "($0)\n";
+            }
+        } else {
+            int num111 = 0;
+            result += getArrayOpNum(resultID, &num111, true);
+            result += "move $t9, $t7\n";
+        }
+    }
+    return result;
+}
+
 string translateConditionCentence(string midCode) {
     stringstream ss;
     ss << midCode;
@@ -168,7 +196,7 @@ string getArrayItemAddr(string s, int* num) {
 }
 /*
  * 函数功能，将数组符号代表的元素取出并存在t6或t7寄存器中
- * 数组元素作为赋值符号右部已完成，但是数组元素作为print、return、push均未实现
+ * 数组元素作为赋值符号右部已完成，但是数组元素作为print、push均未实现
  */
 string getArrayOpNum(string s, int* num, bool op1) {
     string result = getArrayItemAddr(s, num);

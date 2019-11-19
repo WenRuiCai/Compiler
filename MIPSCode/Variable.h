@@ -71,5 +71,5 @@ public:
 };
 
 vector<Variable> globalVariable;
-
+vector<Variable> globalStrings;
 #endif //COMPILER_VARIABLE_H

@@ -305,6 +305,7 @@ void setGlobalVariable(vector<SINGLE_WORD> words) {
     for (SINGLE_WORD word : words) {
         if (word.WORD.first == "STRCON") {
             globalVariable.push_back(Variable(word.WORD.second));
+            globalStrings.push_back(globalVariable[globalVariable.size() - 1]);
         }
     }
     for (TableItem item : symbolTable.getSymbolTable()[0].getItems()) {
