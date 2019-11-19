@@ -23,9 +23,9 @@ private:
 
     string getConditionString() {
         string conditionString = "";
-        conditionString += conditionLeftExp.toString();
+        conditionString += translateExp(conditionLeftExp.toString());
         if (conditionRightExp.expHasInit()) {
-            conditionString += conditionRightExp.toString();
+            conditionString += translateExp(conditionRightExp.toString());
             switch (this->compare) {
                 case LESS:
                     conditionString += conditionLeftExp.getExpResultID() + " < " +

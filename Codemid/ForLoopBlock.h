@@ -28,9 +28,9 @@ private:
 
     string getConditionString() {
         string conditionString = "";
-        conditionString += conditionLeftExp.toString();
+        conditionString += translateExp(conditionLeftExp.toString());
         if (conditionRightExp.expHasInit()) {
-            conditionString += conditionRightExp.toString();
+            conditionString += translateExp(conditionRightExp.toString());
             switch (this->compare) {
                 case LESS:
                     conditionString += conditionLeftExp.getExpResultID() + " < " +
@@ -119,8 +119,10 @@ public:
 
     string toString() {
         string result = "";
-        result += this->IDENFR_VALUE.toString();
-        result += this->IDENFR + " = " + this->IDENFR_VALUE.getExpResultID() + "\n";
+        //result += this->IDENFR_VALUE.toString();
+        //result += this->IDENFR + " = " + this->IDENFR_VALUE.getExpResultID() + "\n";
+        result += translateExp(this->IDENFR_VALUE.toString() +
+                this->IDENFR + " = " + this->IDENFR_VALUE.getExpResultID() + "\n");
 
         string conditionLabel = "condition_" + to_string(label_counter++);
         string loopLabel = "ForLoop_" + to_string(label_counter++);
@@ -138,8 +140,11 @@ public:
         result += loopLabel + ":\n";
         result += get_centences_component_string(this->loopBlock);
 
-        result += this->IDENFR_STEP + " = " +
-                this->IDENFR_STEP1 + ((this->isAdd) ? " + " : " - ") + to_string(step) + "\n";
+        //result += this->IDENFR_STEP + " = " +
+        //        this->IDENFR_STEP1 + ((this->isAdd) ? " + " : " - ") + to_string(step) + "\n";
+        result += translateExp(this->IDENFR_STEP + " = " +
+                this->IDENFR_STEP1 + ((this->isAdd) ? " + " : " - ") + to_string(step) + "\n");
+
         //result += "GOTO " + conditionLabel + "\n";
         result += "j " + conditionLabel + "\n";
 

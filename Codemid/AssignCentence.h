@@ -52,13 +52,21 @@ public:
     string toString() {
         string result = "";
         if (ID_EXP.expHasInit()) {
-            result += ID_EXP.toString();
-            result += ID_VALUE.toString();
+            //result += ID_EXP.toString();
+            //result += ID_VALUE.toString();
+            result += translateExp(ID_EXP.toString() + ID_VALUE.toString());
+
+            /*
+             * 数组的情况还要处理~
+             */
             result += IDENFR + "[" + ID_EXP.getExpResultID() + "]" + " = " +
                     ID_VALUE.getExpResultID() + "\n";
         } else {
-            result += ID_VALUE.toString();
-            result += IDENFR + " = " + ID_VALUE.getExpResultID() + "\n";
+            //result += ID_VALUE.toString();
+            //result += IDENFR + " = " + ID_VALUE.getExpResultID() + "\n";
+            result +=
+                    translateExp(ID_VALUE.toString() +
+                    IDENFR + " = " + ID_VALUE.getExpResultID() + "\n");
         }
         return result;
     }
