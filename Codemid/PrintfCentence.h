@@ -29,7 +29,13 @@ public:
         string result = "";
         if (this->print_string.length() == 0 && this->exp.expHasInit()) {
             result += translateExp(this->exp.toString());
-            result += "PRINT " + this->exp.getExpResultID() + "\n";
+            //result += "PRINT " + this->exp.getExpResultID() + "\n";
+            int num;
+            result += resultIDtoMIPS(this->exp.getExpResultID(), &num);
+            result += "move $a0, $t9\n";
+            if (num == 1) result += "li $v0, 1\n";
+            else result += "li $v0, 11\n";
+            result += "syscall\n";
         }
         if (!this->exp.expHasInit()) {
             result += "PRINT \"" + this->print_string + "\"\n";

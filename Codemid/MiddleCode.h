@@ -27,29 +27,34 @@ bool isCharCon(string s, int* num) {
     return false;
 }
 
-string resultIDtoMIPS(string resultID) {
+string resultIDtoMIPS(string resultID, int* type) {
     string result = "";
     if (isNum(resultID)) {
         result += "li $t9, " + resultID + '\n';
+        if (type != nullptr) *type = 1;
     } else {
         int num = 0;
         if (isCharCon(resultID, &num)) {
             result += "li $t8, " + to_string(num) + '\n';
+            if (type != nullptr) *type = 0;
         }
-        else if (isConst(resultID, &num, nullptr)) {
+        else if (isConst(resultID, &num, type)) {
             result += "li $t9, " + to_string(num) + '\n';
         } else if (resultID.at(resultID.length() - 1) != ']') {
             string varAddr = getVarAddr(resultID, &num);
             if (varAddr[0] == '$') {
                 result += "move $t9, " + varAddr + '\n';
+                if (type != nullptr) *type = 1;
             } else {
                 if (num) result += "lw $t9, " + varAddr + "($0)\n";
                 else result += "lb $t9, " + varAddr + "($0)\n";
+                if (type != nullptr) *type = num;
             }
         } else {
             int num111 = 0;
             result += getArrayOpNum(resultID, &num111, true);
             result += "move $t9, $t7\n";
+            if (type != nullptr) *type = num111;
         }
     }
     return result;

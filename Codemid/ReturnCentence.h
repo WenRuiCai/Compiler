@@ -26,7 +26,7 @@ public:
         if (this->returnExp.expHasInit()) {
             result += translateExp(this->returnExp.toString());
             //result += "ret " + this->returnExp.getExpResultID() + "\n";
-            result += resultIDtoMIPS(this->returnExp.getExpResultID());
+            result += resultIDtoMIPS(this->returnExp.getExpResultID(), nullptr);
             result += "move $v1, $t9\n";
             result += "jr $ra\n";
         } else {
