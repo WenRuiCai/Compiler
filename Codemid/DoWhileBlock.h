@@ -95,8 +95,10 @@ public:
 
         result += get_centences_component_string(this->loopBlock);    //语句列
         result += conditionlabel + ":\n";
-        result += this->getConditionString();
-        result += "BNZ " + loopLabel + "\n";
+        //result += this->getConditionString();
+        //result += "BNZ " + loopLabel + "\n";
+        result +=
+                translateConditionCentence(this->getConditionString() + "BNZ " + loopLabel + "\n");
 
         return result;
     }

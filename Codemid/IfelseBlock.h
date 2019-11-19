@@ -104,13 +104,19 @@ public:
 
         string result = "";
         result += conditionLabel + ":\n";
-        result += this->getConditionString();
-        result += "BNZ " + satisfieldLabel + "\n";
+
+        //result += this->getConditionString();
+        //result += "BNZ " + satisfieldLabel + "\n";
+        result +=
+                translateConditionCentence(this->getConditionString() + "BNZ " + satisfieldLabel + "\n");
+
+
         if (this->conditionUnsatisfieldBlock.size() > 0) {
             result += unsatisfieldLabel + ":\n";
             result += get_centences_component_string(this->conditionUnsatisfieldBlock);
         }
-        result += "GOTO " + leaveLabel + "\n";
+        //result += "GOTO " + leaveLabel + "\n";
+        result += "j " + leaveLabel + "\n";
 
         result += satisfieldLabel + ":\n";
         result += get_centences_component_string(this->conditionSatisfieldBlock);

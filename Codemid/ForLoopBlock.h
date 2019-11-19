@@ -127,16 +127,22 @@ public:
         string leavelLabel = "label_" + to_string(label_counter);
 
         result += conditionLabel + ":\n";
-        result += getConditionString();
-        result += "BNZ " + loopLabel + "\n";
-        result += "GOTO " + leavelLabel + "\n";
+        //result += getConditionString();
+        //result += "BNZ " + loopLabel + "\n";
+        result +=
+                translateConditionCentence(this->getConditionString() + "BNZ " + loopLabel + "\n");
+
+        //result += "GOTO " + leavelLabel + "\n";
+        result += "j " + leavelLabel + "\n";
 
         result += loopLabel + ":\n";
         result += get_centences_component_string(this->loopBlock);
 
         result += this->IDENFR_STEP + " = " +
                 this->IDENFR_STEP1 + ((this->isAdd) ? " + " : " - ") + to_string(step) + "\n";
-        result += "GOTO " + conditionLabel + "\n";
+        //result += "GOTO " + conditionLabel + "\n";
+        result += "j " + conditionLabel + "\n";
+
         result += leavelLabel + ":\n";
         return result;
     }

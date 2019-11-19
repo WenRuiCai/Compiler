@@ -94,13 +94,18 @@ public:
         string leaveLabel = "label_" + to_string(label_counter++);
 
         string result = conditionlabel + ":\n";
-        result += this->getConditionString();
-        result += "BNZ " + loopLabel + "\n";
-        result += "GOTO " + leaveLabel + "\n";
+        //result += this->getConditionString();
+        //result += "BNZ " + loopLabel + "\n";
+        result +=
+                translateConditionCentence(this->getConditionString() + "BNZ " + loopLabel + "\n");
+
+        //result += "GOTO " + leaveLabel + "\n";
+        result += "j " + leaveLabel + "\n";
         result += loopLabel + ":\n";
 
         result += get_centences_component_string(this->loopBlock);
-        result += "GOTO " + conditionlabel + "\n";
+        //result += "GOTO " + conditionlabel + "\n";
+        result += "j " + conditionlabel + "\n";
         result += leaveLabel + ":\n";
 
         return result;

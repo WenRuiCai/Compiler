@@ -20,6 +20,45 @@
 vector<Variable> nowFunctionVariables;
 map<string, Variable> nowFunction_GetVar_byName_Map;
 vector<TableItem> nowFunctionConsts;
+extern vector<TableItem> globalConst;
+
+string getVarAddr(string var, int* flag) {
+    if (nowFunction_GetVar_byName_Map.count(var) == 0) {
+        return "$" + var;
+    }
+    long int addr = nowFunction_GetVar_byName_Map.at(var).var_addr;
+    string reg = nowFunction_GetVar_byName_Map.at(var).thisRegister;
+    if (nowFunction_GetVar_byName_Map.at(var).var_type == INT_PARA ||
+        nowFunction_GetVar_byName_Map.at(var).var_type == CHAR_PARA) {
+        return reg;
+    } else if (nowFunction_GetVar_byName_Map.at(var).var_type == INT_VAR ||
+               nowFunction_GetVar_byName_Map.at(var).var_type == CHAR_VAR) {
+        if (nowFunction_GetVar_byName_Map.at(var).var_type == INT_VAR) {
+            (*flag) = 1;
+        } else (*flag) = 0;
+        return to_string(addr);
+    }
+}
+
+bool isConst(string name, int* num) {
+    if (nowFunction_GetVar_byName_Map.find(name) != nowFunction_GetVar_byName_Map.end())
+        return false;
+    for (TableItem item : nowFunctionConsts) {
+        if (name == item.name) {
+            (*num) = (item.type == "INTTK") ? item.const_int_value : item.const_char_value;
+            return true;
+        }
+    }
+    for (TableItem item1 : globalConst) {
+        if (name == item1.name) {
+            (*num) = (item1.type == "INTTK") ? item1.const_int_value : item1.const_char_value;
+            return true;
+        }
+    }
+    return false;
+}
+
+
 
 class FunctionBlock {
     string kind;
