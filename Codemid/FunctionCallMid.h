@@ -59,7 +59,7 @@ public:
         string returnCode = this->functionReturnValueID + " = RET\n";
         for (ExpressionMidCode value : this->parameterValues) {
             if (!value.hasOnlyOneItem())
-                result += value.toString();
+                result += translateExp(value.toString());
         }
         for (ExpressionMidCode value : this->parameterValues) {
             result += "push " + value.getExpResultID() + "\n";

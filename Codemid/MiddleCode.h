@@ -119,14 +119,133 @@ string translateConditionCentence(string midCode) {
 string translateExp(string exp_midCode) {
     stringstream ss;
     ss << exp_midCode;
+    string result = "";
     string tmp;
     while (getline(ss, tmp)) {
         stringstream ss1;
         ss1 << tmp;
-        string left, right_op_1, right_op_2, op;
-        ss1 >> left; ss1 >> tmp; ss1 >> right_op_1; ss1 >> op; ss1 >> right_op_2;
+        string left, assignSymbol, right_op_1, right_op_2, op;
+        ss1 >> left; ss1 >> assignSymbol; ss1 >> right_op_1; ss1 >> op; ss1 >> right_op_2;
+        if ((left == "push" || left == "call") && assignSymbol != "=") {
+            result += tmp + '\n';
+            continue;
+        }
+        else {
+            int hasTranslated = 0;
+            for (int i = 0; i < tmp.length(); i++)
+                if (tmp.at(i) == '$') {
+                    hasTranslated = 1; break;
+                }
+            if (hasTranslated == 1) {result += tmp + '\n'; continue;}
+        }
+        int num = 0, num1 = 0, num2 = 0;
+        string leftAddr = getVarAddr(left, &num);
+        if (op.length() == 0) {
+            //纯赋值语句
+            if (isNum(right_op_1)) {
+                if (leftAddr[0] == '$') {result += "li " + leftAddr + ", " + right_op_1 + '\n';}
+                else {
+                    result += "li $t7, " + right_op_1 + '\n';
+                    if (num == 1) result += "sw $t7, " + leftAddr + "($0)\n";
+                    else result += "sb $t7, " + leftAddr + "($0)\n";
+                }
+            } else if (isCharCon(right_op_1, &num1)) {
+                if (leftAddr[0] == '$') {result += "li " + leftAddr + ", " + to_string(num1) + '\n';}
+                else {
+                    result += "li $t7, " + to_string(num1) + '\n';
+                    if (num == 1) result += "sw $t7, " + leftAddr + "($0)\n";
+                    else result += "sb $t7, " + leftAddr + "($0)\n";
+                }
+            } else if (isConst(right_op_1, &num1)) {
+                if (leftAddr[0] == '$') {result += "li " + leftAddr + ", " + to_string(num1) + '\n';}
+                else {
+                    result += "li $t7, " + to_string(num1) + '\n';
+                    if (num == 1) result += "sw $t7, " + leftAddr + "($0)\n";
+                    else result += "sb $t7, " + leftAddr + "($0)\n";
+                }
+            } else {
+                string rightAddr = getVarAddr(right_op_1, &num1);
+                if (rightAddr[0] == '$') {
+                    if (leftAddr[0] == '$') result += "move " + leftAddr + ", " + rightAddr + '\n';
+                    else {
+                        if (num == 1) result += "sw " + rightAddr + ", " + leftAddr + "($0)\n";
+                        else result += "sb " + rightAddr + ", " + leftAddr + "($0)\n";
+                    }
+                } else {
+                    if (num1 == 1) result += "lw $t6, " + rightAddr + "($0)\n";
+                    else result += "lb $t6, " + rightAddr + "($0)\n";
+                    if (leftAddr[0] == '$') result += "move " + leftAddr + ", $t6\n";
+                    else {
+                        if (num == 1) result += "sw $t6, " + leftAddr + "($0)\n";
+                        else result += "sb $t6, " + leftAddr + "($0)\n";
+                    }
+                }
+            }
+        } else {
+            string op1_addr;
+            string op2_addr;
+            string reg_op1 = "$t7", reg_op2 = "$t6";
+            if (isNum(right_op_1)) {
+                result += "li $t7, " + right_op_1 + '\n';
+            } else if (isCharCon(right_op_1, &num1)) {
+                result += "li $t7, " + to_string(num1) + '\n';
+            } else if (isConst(right_op_1, &num1)) {
+                result += "li $t7, " + to_string(num1) + '\n';
+            } else {
+                op1_addr = getVarAddr(right_op_1, &num1);
+                if (op1_addr[0] == '$') { reg_op1 = op1_addr; }
+                else {
+                    if (num1 == 1) result += "lw $t7, " + op1_addr + "($0)\n";
+                    else result += "lb $t7, " + op1_addr + "($0)\n";
+                }
+            }
 
+            if (isNum(right_op_2)) {
+                result += "li $t6, " + right_op_2 + '\n';
+            } else if (isCharCon(right_op_2, &num2)) {
+                result += "li $t6, " + to_string(num2) + '\n';
+            } else if (isConst(right_op_2, &num2)) {
+                result += "li $t6, " + to_string(num2) + '\n';
+            } else {
+                op2_addr = getVarAddr(right_op_2, &num2);
+                if (op2_addr[0] == '$') reg_op2 = op2_addr;
+                else {
+                    if (num2 == 1) result += "lw $t6, " + op2_addr + "($0)\n";
+                    else result += "lb $t6, " + op2_addr + "($0)\n";
+                }
+            }
+            if (op == "+") {
+                if (leftAddr[0] == '$') {
+                    result += "add " + leftAddr + ", " + reg_op1 + ", " + reg_op2 + "\n";
+                } else {
+                    result += "add $t6, " + reg_op1 + ", " + reg_op2 + "\n";
+                    result += "sw $t6, " + leftAddr + "($0)\n";
+                }
+            } else if (op == "-") {
+                if (leftAddr[0] == '$') {
+                    result += "sub " + leftAddr + ", " + reg_op1 + ", " + reg_op2 + '\n';
+                } else {
+                    result += "sub $t6, " + reg_op1 + ", " + reg_op2 + "\n";
+                    result += "sw $t6, " + leftAddr + "($0)\n";
+                }
+            } else if (op == "*") {
+                result += "mult " + reg_op1 + ", " + reg_op2 + '\n';
+                if (leftAddr[0] == '$') result += "mflo " + leftAddr + '\n';
+                else {
+                    result += "mflo $t6\n";
+                    result += "sw $t6, " + leftAddr + "($0)\n";
+                }
+            } else if (op == "/") {
+                result += "div " + reg_op1 + ", " + reg_op2 + '\n';
+                if (leftAddr[0] == '$') result += "mflo " + leftAddr + '\n';
+                else {
+                    result += "mflo $t6\n";
+                    result += "sw $t6, " + leftAddr + "($0)\n";
+                }
+            }
+        }
     }
+    return result;
 }
 
 #endif //COMPILER_MIDDLECODE_H
