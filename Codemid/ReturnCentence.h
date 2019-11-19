@@ -25,9 +25,13 @@ public:
         string result  = "";
         if (this->returnExp.expHasInit()) {
             result += translateExp(this->returnExp.toString());
-            result += "ret " + this->returnExp.getExpResultID() + "\n";
+            //result += "ret " + this->returnExp.getExpResultID() + "\n";
+            result += resultIDtoMIPS(this->returnExp.getExpResultID());
+            result += "move $v1, $t9\n";
+            result += "jr $ra\n";
         } else {
-            result += "ret\n";
+            //result += "ret\n";
+            result += "jr $ra\n";
         }
         return result;
     }
