@@ -20,7 +20,18 @@ public:
     string toString() {
         string result = "";
         for (string string1 : this->IDENFRS) {
-            result += "SCANF " + string1 + "\n";
+            //result += "SCANF " + string1 + "\n";
+            int num = 0;
+            string varAddr = getVarAddr(string1, &num);
+            if (num == 1) {
+                result += "li $v0, 5\n";
+                result += "syscall\n";
+                result += "sw $v0, " + varAddr + "($0)\n";
+            } else {
+                result += "li $v0, 12\n";
+                result += "syscall\n";
+                result += "sb $v0, " + varAddr + "($0)\n";
+            }
         }
         return result;
     }
