@@ -335,7 +335,7 @@ string translateExp(string exp_midCode) {
         ss1 << tmp;
         string left, assignSymbol, right_op_1, right_op_2, op;
         ss1 >> left; ss1 >> assignSymbol; ss1 >> right_op_1; ss1 >> op; ss1 >> right_op_2;
-        if ((left == "push" || left == "call") && assignSymbol != "=") {
+        if (assignSymbol != "=") {
             result += tmp + '\n';
             continue;
         }

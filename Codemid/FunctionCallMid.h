@@ -55,7 +55,8 @@ public:
 
     string toString() {
         string result = "";
-        string call = "call " + this->functionName + "\n";
+        //string call = "call " + this->functionName + "\n";
+        string call = "jal " + this->functionName + "\n";
         string returnCode = this->functionReturnValueID + " = RET\n";
         for (ExpressionMidCode value : this->parameterValues) {
             if (!value.hasOnlyOneItem())
