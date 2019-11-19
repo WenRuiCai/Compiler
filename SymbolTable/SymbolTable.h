@@ -349,7 +349,7 @@ void setFunction_Variable(FunctionBlock& functionBlock) {
     //    functionVariable.push_back(variable);
     //}
     // 下面是当前函数变量处理
-    int paraRegister = 4;
+    int paraRegister = 5;
     for (TableItem item1 : nowFunction.getItems()) {
         Variable* var = nullptr;
         if (item1.kind == PARA) {
