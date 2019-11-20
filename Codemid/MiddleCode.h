@@ -126,7 +126,7 @@ string translateConditionCentence(string midCode) {
             }
         } else {
             int num111 = 0;
-            result += getArrayOpNum(left, &num111, true);
+            result += getArrayOpNum(right, &num111, true);
             result += "move $t8, $t7\n";
         }
     }
