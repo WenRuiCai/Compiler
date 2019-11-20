@@ -26,7 +26,7 @@ string getVarAddr(string var, int* flag) {
     if (nowFunction_GetVar_byName_Map.count(var) == 0) {
         for (Variable variable : globalVariable) {
             if (variable.VariableName == var) {
-                (*flag) = (variable.var_type == INT_VAR) ? 1 : 0;
+                (*flag) = (variable.var_type == INT_VAR || variable.var_type == INT_ARRAY) ? 1 : 0;
                 return to_string(variable.var_addr);
             }
         }
@@ -38,13 +38,70 @@ string getVarAddr(string var, int* flag) {
         nowFunction_GetVar_byName_Map.at(var).var_type == CHAR_PARA) {
         return reg;
     } else if (nowFunction_GetVar_byName_Map.at(var).var_type == INT_VAR ||
-               nowFunction_GetVar_byName_Map.at(var).var_type == CHAR_VAR) {
-        if (nowFunction_GetVar_byName_Map.at(var).var_type == INT_VAR) {
+               nowFunction_GetVar_byName_Map.at(var).var_type == CHAR_VAR ||
+               nowFunction_GetVar_byName_Map.at(var).var_type == CHAR_ARRAY ||
+               nowFunction_GetVar_byName_Map.at(var).var_type == INT_ARRAY) {
+        if (nowFunction_GetVar_byName_Map.at(var).var_type == INT_VAR ||
+            nowFunction_GetVar_byName_Map.at(var).var_type == INT_ARRAY) {
             (*flag) = 1;
         } else (*flag) = 0;
         return to_string(addr);
     }
     return "";
+}
+
+string pushStack() {
+    string result = "#------------------压栈-------------------------#\n";
+    result += "#------压临时寄存器------#\n";
+    result += "sw $t3, 0($sp)\nsub $sp, $sp, 4\n";result += "sw $t4, 0($sp)\nsub $sp, $sp, 4\n";
+    result += "sw $t5, 0($sp)\nsub $sp, $sp, 4\n";result += "sw $s0, 0($sp)\nsub $sp, $sp, 4\n";
+    result += "sw $s1, 0($sp)\nsub $sp, $sp, 4\n";result += "sw $s2, 0($sp)\nsub $sp, $sp, 4\n";
+    result += "sw $s3, 0($sp)\nsub $sp, $sp, 4\n";result += "sw $s4, 0($sp)\nsub $sp, $sp, 4\n";
+    result += "sw $s5, 0($sp)\nsub $sp, $sp, 4\n";result += "sw $s6, 0($sp)\nsub $sp, $sp, 4\n";
+    result += "#------压函数变量------#\n";
+    for (int i = 0; i < nowFunctionVariables.size(); i++) {
+        int type = 0;
+        string varAddr = getVarAddr(nowFunctionVariables[i].VariableName, &type);
+        if (varAddr.at(0) != '$') {
+            if (type == 1) result += "lw $t9, " + varAddr + "($0)\n";
+            else result += "lb $t9, " + varAddr + "($0)\n";
+            result += "sw $t9, 0($sp)\n";
+        } else {
+            result += "sw " + varAddr + ", 0($sp)\n";
+        }
+        result += "sub $sp, $sp, 4\n";
+    }
+    result += "sw $ra, 0($sp)\n";
+    result += "sub $sp, $sp, 4\n";
+    result += "#------------------压栈完成----------------------#\n";
+    return result;
+}
+
+string popStack() {
+    string result = "#--------------------出栈-------------------#\n";
+    result += "#------恢复函数变量------#\n";
+    result += "add $sp, $sp, 4\n";
+    result += "lw $ra, 0($sp)\n";
+    for (int i = nowFunctionVariables.size() - 1; i >= 0; i--) {
+        result += "add $sp, $sp, 4\n";
+        int type = 0;
+        string varAddr = getVarAddr(nowFunctionVariables[i].VariableName, &type);
+        if (varAddr[0] != '$') {
+            result += "lw $t9, 0($sp)\n";
+            if (type == 1) result += "sw $t9, " + varAddr + "($0)\n";
+            else result += "sb $t9, " + varAddr + "($0)\n";
+        } else {
+            result += "lw " + varAddr + ", 0($sp)\n";
+        }
+    }
+    result += "#-----恢复临时寄存器-----#\n";
+    result += "add $sp, $sp, 4\nlw $s6, 0($sp)\n";result += "add $sp, $sp, 4\nlw $s5, 0($sp)\n";
+    result += "add $sp, $sp, 4\nlw $s4, 0($sp)\n";result += "add $sp, $sp, 4\nlw $s3, 0($sp)\n";
+    result += "add $sp, $sp, 4\nlw $s2, 0($sp)\n";result += "add $sp, $sp, 4\nlw $s1, 0($sp)\n";
+    result += "add $sp, $sp, 4\nlw $s0, 0($sp)\n";result += "add $sp, $sp, 4\nlw $t5, 0($sp)\n";
+    result += "add $sp, $sp, 4\nlw $t4, 0($sp)\n";result += "add $sp, $sp, 4\nlw $t3, 0($sp)\n";
+    result += "#--------------------出栈完成-------------------#\n";
+    return result;
 }
 
 bool isConst(string name, int* num, int* type) {
@@ -116,13 +173,12 @@ public:
         nowFunctionVariables = this->functionVariables;
 
         string result = "";
-        result += (this->kind == "INTTK") ? "int " :
-                ((this->kind == "CHARTK") ? "char " : "void ");
-        result += this->functionName + "()\n";
+        //result += (this->kind == "INTTK") ? "int " : ((this->kind == "CHARTK") ? "char " : "void ");
+        result += this->functionName + ":\n";
         for (TableItem item : this->parameters) {
-            result += "para ";
-            result += (item.type == "INTTK") ? "int " : "char ";
-            result += item.name + "\n";
+            //result += "para ";
+            //result += (item.type == "INTTK") ? "int " : "char ";
+            //result += item.name + "\n";
         }
         result += get_centences_component_string(this->centences);
         return result;
