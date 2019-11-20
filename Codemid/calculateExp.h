@@ -5,7 +5,12 @@
 #ifndef COMPILER_CALCULATEEXP_H
 #define COMPILER_CALCULATEEXP_H
 
-#include "bits/stdc++.h"
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <map>
+
 using namespace std;
 
 static int ID_counter = 0;

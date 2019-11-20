@@ -2,6 +2,7 @@
 // Created by 84443 on 2019/9/28.
 //
 #include "CentencesAnalysis.h"
+#include "../MIPSCode/MipsGenerator.h"
 #ifndef COMPILER_SYNTAXANALYSEFUNCTION_H
 #define COMPILER_SYNTAXANALYSEFUNCTION_H
 
@@ -362,5 +363,16 @@ void Program_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
     while (Function_With_Return_Value(Words, PointNum, output) ||
            Function_Not_With_Return_Value(Words, PointNum, output));
     Function_Main(Words, PointNum, output);
+
+    string mipsCode = symbolTable.toString();
+    stringstream mips_with_tmp;
+    mips_with_tmp << ".data\n";
+    for (Variable v : globalStrings) {
+        mips_with_tmp << "\t" + v.VariableName + ": .asciiz " + "\"" + v.string_var + "\"\n";
+    }
+    mips_with_tmp << ".text\n";
+    mips_with_tmp << "jal main\nli $v0, 10\nsyscall\n";
+    mips_with_tmp << mipsCode;
+    selectTempRegister(mips_with_tmp, output);
     //cout << "<程序>" << endl;
 }

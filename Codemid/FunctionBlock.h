@@ -181,6 +181,12 @@ public:
             //result += item.name + "\n";
         }
         result += get_centences_component_string(this->centences);
+        string lastLine = "";
+        for (int i = result.length() - 2; ; i--) {
+            if (result.at(i) == '\n') break;
+            lastLine = result.at(i) + lastLine;
+        }
+        if (lastLine != "jr $ra") result += "jr $ra\n";
         return result;
     }
 

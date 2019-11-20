@@ -60,6 +60,11 @@ string resultIDtoMIPS(string resultID, int* type) {
     return result;
 }
 
+/*
+ * $t9 :条件左部
+ * $t8 :条件右部
+ * 不可中途更改t8 t9
+ */
 string translateConditionCentence(string midCode) {
     stringstream ss;
     ss << midCode;
@@ -89,7 +94,7 @@ string translateConditionCentence(string midCode) {
     } else {
         int num = 0;
         if (isCharCon(left, &num)) {
-            result += "li $t8, " + to_string(num) + '\n';
+            result += "li $t9, " + to_string(num) + '\n';
         }
         else if (isConst(left, &num, nullptr)) {
             result += "li $t9, " + to_string(num) + '\n';
@@ -159,6 +164,10 @@ string translateConditionCentence(string midCode) {
 
 }
 
+/*
+ * $s7 :数组元素的地址 得到后在使用前不可更改
+ * $t6, $t7可更改
+ */
 string getArrayItemAddr(string s, int* num) {
     string arrayName = ""; int place = 0;
     for (int i = 0; i < s.length(); i++) {
@@ -175,10 +184,10 @@ string getArrayItemAddr(string s, int* num) {
     string beginAddr = getVarAddr(arrayName, num);
     string result = "";
     int num1 = 0;
-    result += "li $t9, " + beginAddr + '\n';
+    result += "li $t6, " + beginAddr + '\n';
     if (*num == 1) {
-        result += "li $t8, 4\n";
-    } else result += "li $t8, 1\n";
+        result += "li $t7, 4\n";
+    } else result += "li $t7, 1\n";
 
     if (isNum(index)) {
         result += "li $s7, " + index + '\n';
@@ -194,28 +203,34 @@ string getArrayItemAddr(string s, int* num) {
             else result += "lb $s7, " + indexAddr + "($0)\n";
         }
     }
-    result += "mult $t8, $s7\n";
-    result += "mflo $t8\n";
-    result += "add $t8, $t8, $t9\n";
+    result += "mult $t7, $s7\n";
+    result += "mflo $t7\n";
+    result += "add $s7, $t7, $t6\n";
     return result;
 }
 /*
  * 函数功能，将数组符号代表的元素取出并存在t6或t7寄存器中
  * 数组元素作为赋值符号右部已完成，但是数组元素作为print、push均未实现
+ * $t7 : 存左操作数
+ * $t6 : 存右操作数
+ * 不可更改t8 t9
  */
 string getArrayOpNum(string s, int* num, bool op1) {
     string result = getArrayItemAddr(s, num);
     if (op1) {
-        if (*num == 1) result += "lw $t7, 0($t8)\n";
-        else result += "lb $t7, 0($t8)\n";
+        if (*num == 1) result += "lw $t7, 0($s7)\n";
+        else result += "lb $t7, 0($s7)\n";
     }
     else {
-        if (*num == 1) result += "lw $t6, 0($t8)\n";
-        else result += "lb $t6, 0($t8)\n";
+        if (*num == 1) result += "lw $t6, 0($s7)\n";
+        else result += "lb $t6, 0($s7)\n";
     }
     return result;
 }
 
+/*
+ * 调用完后可以更改任何寄存器
+ */
 string transLateExp_leftIsArray(string left, string right_op_1, string right_op_2, string op) {
     string result = "";
     int num = 0, num1 = 0, num2 = 0;
@@ -225,43 +240,45 @@ string transLateExp_leftIsArray(string left, string right_op_1, string right_op_
         if (isNum(right_op_1)) {
 
             result += "li $t7, " + right_op_1 + '\n';
-            if (num == 1) result += "sw $t7, 0($t8)\n";
-            else result += "sb $t7, 0($t8)\n";
+            if (num == 1) result += "sw $t7, 0($s7)\n";
+            else result += "sb $t7, 0($s7)\n";
 
         } else if (isCharCon(right_op_1, &num1)) {
             result += "li $t7, " + to_string(num1) + '\n';
-            if (num == 1) result += "sw $t7, 0($t8)\n";
-            else result += "sb $t7, 0($t8)\n";
+            if (num == 1) result += "sw $t7, 0($s7)\n";
+            else result += "sb $t7, 0($s7)\n";
         } else if (isConst(right_op_1, &num1, nullptr)) {
             result += "li $t7, " + to_string(num1) + '\n';
-            if (num == 1) result += "sw $t7, 0($t8)\n";
-            else result += "sb $t7, 0($t8)\n";
+            if (num == 1) result += "sw $t7, 0($s7)\n";
+            else result += "sb $t7, 0($s7)\n";
         } else if (right_op_1.at(right_op_1.length() - 1) != ']') {
             string rightAddr = getVarAddr(right_op_1, &num1);
             if (rightAddr[0] == '$') {
 
-                if (num == 1) result += "sw " + rightAddr + ", " + "0($t8)\n";
-                else result += "sb " + rightAddr + ", " + "0($t8)\n";
+                if (num == 1) result += "sw " + rightAddr + ", " + "0($s7)\n";
+                else result += "sb " + rightAddr + ", " + "0($s7)\n";
 
             } else {
                 if (num1 == 1) result += "lw $t6, " + rightAddr + "($0)\n";
                 else result += "lb $t6, " + rightAddr + "($0)\n";
 
-                if (num == 1) result += "sw $t6, 0($t8)\n";
-                else result += "sb $t6, 0($t8)\n";
+                if (num == 1) result += "sw $t6, 0($s7)\n";
+                else result += "sb $t6, 0($s7)\n";
 
             }
         } else {
             int num_array = 0;
+            result += "move $t5, $s7\n";
             result += getArrayOpNum(right_op_1, &num_array, true);
 
-            if (num == 1) result += "sw $t7, 0($t8)\n";
-            else result += "sb $t7, 0($t8)\n";
+            if (num == 1) result += "sw $t7, 0($t5)\n";
+            else result += "sb $t7, 0($t5)\n";
         }
     } else {
         string op1_addr;
         string op2_addr;
         string reg_op1 = "$t7", reg_op2 = "$t6";
+        result += "move $t5, $s7\n";
         if (isNum(right_op_1)) {
             result += "li $t7, " + right_op_1 + '\n';
         } else if (isCharCon(right_op_1, &num1)) {
@@ -301,24 +318,24 @@ string transLateExp_leftIsArray(string left, string right_op_1, string right_op_
         if (op == "+") {
 
             result += "add $t6, " + reg_op1 + ", " + reg_op2 + "\n";
-            result += "sw $t6, 0($t8)\n";
+            result += "sw $t6, 0($t5)\n";
 
         } else if (op == "-") {
 
             result += "sub $t6, " + reg_op1 + ", " + reg_op2 + "\n";
-            result += "sw $t6, 0($t8)\n";
+            result += "sw $t6, 0($t5)\n";
 
         } else if (op == "*") {
             result += "mult " + reg_op1 + ", " + reg_op2 + '\n';
 
             result += "mflo $t6\n";
-            result += "sw $t6, 0($t8)\n";
+            result += "sw $t6, 0($t5)\n";
 
         } else if (op == "/") {
             result += "div " + reg_op1 + ", " + reg_op2 + '\n';
 
             result += "mflo $t6\n";
-            result += "sw $t6, 0($t8)\n";
+            result += "sw $t6, 0($t5)\n";
 
         }
     }

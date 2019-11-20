@@ -59,6 +59,9 @@ public:
             else result += "li $v0, 11\n";
             result += "syscall\n";
         }
+        result += "li $a0, 10\n";
+        result += "li $v0, 11\n";
+        result += "syscall\n";
         return result;
     }
 

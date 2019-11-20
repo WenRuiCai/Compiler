@@ -5,11 +5,16 @@
 #ifndef COMPILER_VARIABLE_H
 #define COMPILER_VARIABLE_H
 
-#include "bits/stdc++.h"
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <map>
+#include <vector>
 
 using namespace std;
 
-long int addr = 0;
+long int addr = 0x10010000; //268500992
 int globalStringCounter = 0;
 enum VariableType {
     INT_VAR,
@@ -67,7 +72,7 @@ public:
         this->string_var = s;
         this->var_type = STRING_VAR;
         this->var_addr = addr;
-        addr += s.length();
+        addr += s.length() + 1;
     }
 };
 

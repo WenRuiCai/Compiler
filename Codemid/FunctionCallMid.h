@@ -11,6 +11,9 @@
 /////////////////////////////////////////////////
 ///                 函数调用                   ///
 /////////////////////////////////////////////////
+extern string pushStack();
+extern string popStack();
+
 class FunctionCallMidCode : public CentenceMid {
 private:
     vector<ExpressionMidCode> parameterValues;
@@ -55,20 +58,31 @@ public:
 
     string toString() {
         string result = "";
+        /*
+         * 调用函数前要压栈
+         */
         //string call = "call " + this->functionName + "\n";
         string call = "jal " + this->functionName + "\n";
-        string returnCode = this->functionReturnValueID + " = RET\n";
+        //string returnCode = this->functionReturnValueID + " = RET\n";
+        string returnCode = "move $" + this->functionReturnValueID + ", $v1\n";
         for (ExpressionMidCode value : this->parameterValues) {
-            if (!value.hasOnlyOneItem())
-                result += translateExp(value.toString());
+            //if (!value.hasOnlyOneItem())
+            result += translateExp(value.toString());
         }
+        int reg = 5;
         for (ExpressionMidCode value : this->parameterValues) {
-            result += "push " + value.getExpResultID() + "\n";
+            result += resultIDtoMIPS(value.getExpResultID(), nullptr);
+            //result += "push " + value.getExpResultID() + "\n";
+            result += "move $" + to_string(reg) + ", $t9\n";
+            reg++;
         }
+        /*
+         * 函数调用之后要恢复变量哦
+         */
         if (this->hasReturnValue)
-            return result + call + returnCode;
+            return pushStack() + result + call + returnCode + popStack();
         else
-            return result + call;
+            return pushStack() + result + call + popStack();
     }
 };
 
