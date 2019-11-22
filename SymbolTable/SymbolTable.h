@@ -45,6 +45,15 @@ private:
     }
 
 public:
+    string toMips() {
+        string result = "";
+        for (FunctionBlock block : this->functionBlocks) {
+            result += block.toMips();
+        }
+        result += MainBlock.toMips();
+        return result;
+    }
+
     string toString() {
         string result = "";
         for (FunctionBlock block : this->functionBlocks) {
