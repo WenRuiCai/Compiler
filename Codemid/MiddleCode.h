@@ -9,6 +9,7 @@ string getVarAddr(string var, int* flag);
 extern bool isConst(string name, int* num, int* type);
 string getArrayItemAddr(string s, int* num);
 string getArrayOpNum(string s, int* num, bool op1);
+string translateExp(string exp_midCode);
 
 bool isNum(string s) {
     for (int i = 0; i < s.length(); i++) {
@@ -80,6 +81,7 @@ string translateConditionCentence(string midCode) {
         getline(ss, tmp);
         result += tmp + '\n';
     }
+    result = translateExp(result);
     ////////////////////////////////////////////////将判断以及跳转语句翻译
     getline(ss, tmp);
 
