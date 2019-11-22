@@ -46,6 +46,7 @@ void selectTempRegister(stringstream& mips_with_tmp, ofstream& output) {
         if ((place = line.find("TEMP_VAR_CWR")) == string::npos) {
             output << line << '\n';
         } else {
+            loop:
             string nowLine = line.substr(0, place);
 
             int numplace = place + 12;
@@ -64,6 +65,10 @@ void selectTempRegister(stringstream& mips_with_tmp, ofstream& output) {
                 nowLine += line.substr(numplace, line.length());
                 reg[temp_valid_register.at(num)] = 0;
                 temp_valid_register.erase(num);
+            }
+            line = nowLine;
+            if ((place = line.find("TEMP_VAR_CWR")) != string::npos) {
+                goto loop;
             }
 
             output << nowLine << '\n';
