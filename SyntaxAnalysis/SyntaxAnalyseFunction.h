@@ -364,8 +364,10 @@ void Program_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
            Function_Not_With_Return_Value(Words, PointNum, output));
     Function_Main(Words, PointNum, output);
 
-    string mipsCode = symbolTable.toString();
+    string midCode = symbolTable.toString();
+    cout << midCode;
     stringstream mips_with_tmp;
+    string mipsCode = symbolTable.toMips();
     mips_with_tmp << ".data\n";
     for (Variable v : globalStrings) {
         mips_with_tmp << "\t" + v.VariableName + ": .asciiz " + "\"" + v.string_var + "\"\n";

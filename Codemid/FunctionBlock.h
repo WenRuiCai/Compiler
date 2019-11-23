@@ -168,6 +168,20 @@ public:
     }
 
     string toString() {
+        string result = "";
+        result += (this->kind == "INTTK") ? "int " :
+                  ((this->kind == "CHARTK") ? "char " : "void ");
+        result += this->functionName + "()\n";
+        for (TableItem item : this->parameters) {
+            result += "para ";
+            result += (item.type == "INTTK") ? "int " : "char ";
+            result += item.name + "\n";
+        }
+        result += get_centences_component_string(this->centences);
+        return result;
+    }
+
+    string toMips() {
         nowFunction_GetVar_byName_Map = this->function_GetVar_byName_Map;
         nowFunctionConsts = this->functionConsts;
         nowFunctionVariables = this->functionVariables;
@@ -180,7 +194,11 @@ public:
             //result += (item.type == "INTTK") ? "int " : "char ";
             //result += item.name + "\n";
         }
-        result += get_centences_component_string(this->centences);
+        result += get_centences_component_mips(this->centences);
+        if (result.find("jr $ra") == string::npos) {
+            result += "jr $ra\n";
+            return result;
+        }
         string lastLine = "";
         for (int i = result.length() - 2; ; i--) {
             if (result.at(i) == '\n') break;
@@ -275,6 +293,44 @@ public:
 };
 
 string get_centences_component_string(vector<CentenceMid*>& centencesBlock);
+
+string get_centences_component_mips(vector<CentenceMid*>& centencesBlock);
+
+string get_centences_component_mips(vector<CentenceMid*>& centencesBlock) {
+    string result = "";
+    for (CentenceMid* centence : centencesBlock) {
+        switch (centence->kind) {
+            case IFELSE:
+                result += static_cast<IfelseBlock*>(centence)->toMips();
+                break;
+            case WHILE:
+                result += static_cast<WhileBlock*>(centence)->toMips();
+                break;
+            case DOWHILE:
+                result += static_cast<DoWhileBlock*>(centence)->toMips();
+                break;
+            case FOR:
+                result += static_cast<ForLoopBlock*>(centence)->toMips();
+                break;
+            case PRINTF:
+                result += static_cast<PrintfCentence*>(centence)->toMips();
+                break;
+            case SCANF:
+                result += static_cast<ScanfCentece*>(centence)->toMips();
+                break;
+            case FUNCTIONCALL:
+                result += static_cast<FunctionCallMidCode*>(centence)->toMips();
+                break;
+            case ASSIGN:
+                result += static_cast<AssignCentence*>(centence)->toMips();
+                break;
+            case RETURN:
+                result += static_cast<ReturnCentence*>(centence)->toMips();
+                break;
+        }
+    }
+    return result;
+}
 
 string get_centences_component_string(vector<CentenceMid*>& centencesBlock) {
     string result = "";

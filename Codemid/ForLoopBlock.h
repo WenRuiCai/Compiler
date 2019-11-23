@@ -10,7 +10,7 @@
  * 语句列中的语句可以是任何，但是在本类中无法将其转换成别的语句，所以需要在最顶层中设置接口
  */
 extern string get_centences_component_string(vector<CentenceMid*>& centencesBlock);
-
+extern string get_centences_component_mips(vector<CentenceMid*>& centencesBlock);
 class ForLoopBlock : public CentenceMid {
 private:
     string IDENFR;
@@ -28,9 +28,9 @@ private:
 
     string getConditionString() {
         string conditionString = "";
-        conditionString += translateExp(conditionLeftExp.toString());
+        conditionString += conditionLeftExp.toString();
         if (conditionRightExp.expHasInit()) {
-            conditionString += translateExp(conditionRightExp.toString());
+            conditionString += conditionRightExp.toString();
             switch (this->compare) {
                 case LESS:
                     conditionString += conditionLeftExp.getExpResultID() + " < " +
@@ -119,6 +119,30 @@ public:
 
     string toString() {
         string result = "";
+        result += this->IDENFR_VALUE.toString();
+        result += this->IDENFR + " = " + this->IDENFR_VALUE.getExpResultID() + "\n";
+
+        string conditionLabel = "condition_" + to_string(label_counter++);
+        string loopLabel = "ForLoop_" + to_string(label_counter++);
+        string leavelLabel = "label_" + to_string(label_counter);
+
+        result += conditionLabel + ":\n";
+        result += getConditionString();
+        result += "BNZ " + loopLabel + "\n";
+        result += "GOTO " + leavelLabel + "\n";
+
+        result += loopLabel + ":\n";
+        result += get_centences_component_string(this->loopBlock);
+
+        result += this->IDENFR_STEP + " = " +
+                  this->IDENFR_STEP1 + ((this->isAdd) ? " + " : " - ") + to_string(step) + "\n";
+        result += "GOTO " + conditionLabel + "\n";
+        result += leavelLabel + ":\n";
+        return result;
+    }
+
+    string toMips() {
+        string result = "";
         //result += this->IDENFR_VALUE.toString();
         //result += this->IDENFR + " = " + this->IDENFR_VALUE.getExpResultID() + "\n";
         result += translateExp(this->IDENFR_VALUE.toString() +
@@ -138,7 +162,7 @@ public:
         result += "j " + leavelLabel + "\n";
 
         result += loopLabel + ":\n";
-        result += get_centences_component_string(this->loopBlock);
+        result += get_centences_component_mips(this->loopBlock);
 
         //result += this->IDENFR_STEP + " = " +
         //        this->IDENFR_STEP1 + ((this->isAdd) ? " + " : " - ") + to_string(step) + "\n";

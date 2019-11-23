@@ -31,6 +31,22 @@ public:
     string toString() {
         string result = "";
         if (this->print_string.length() == 0 && this->exp.expHasInit()) {
+            result += this->exp.toString();
+            result += "PRINT " + this->exp.getExpResultID() + "\n";
+        }
+        if (!this->exp.expHasInit()) {
+            result += "PRINT \"" + this->print_string + "\"\n";
+        }
+        if (this->print_string.length() > 0 && this->exp.expHasInit()) {
+            result += this->exp.toString();
+            result += "PRINT \"" + this->print_string + "\" " + this->exp.getExpResultID() + "\n";
+        }
+        return result;
+    }
+
+    string toMips() {
+        string result = "";
+        if (this->print_string.length() == 0 && this->exp.expHasInit()) {
             result += translateExp(this->exp.toString());
             //result += "PRINT " + this->exp.getExpResultID() + "\n";
             int num;

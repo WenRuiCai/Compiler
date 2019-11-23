@@ -344,6 +344,26 @@ string transLateExp_leftIsArray(string left, string right_op_1, string right_op_
     return result;
 }
 
+extern string pushStack();
+extern string popStack();
+string translateFunctionFactor(string functionFactorMid, int reg) {
+    string result = "";
+    stringstream ss;
+    ss << functionFactorMid;
+    string one, two, three;
+    ss >> one;  ss >> two; ss >> three;
+    if (one == "push") {
+        result += resultIDtoMIPS(two, nullptr);
+        result += "move $" + to_string(reg) + ", $t9\n";
+    } else if (one == "call") {
+        result += "jal " + two + '\n';
+    } else {
+        result += popStack();
+        result += "move $" + one + ", $v1\n";
+    }
+    return result;
+}
+
 string translateExp(string exp_midCode) {
     stringstream ss;
     ss << exp_midCode;
@@ -354,6 +374,19 @@ string translateExp(string exp_midCode) {
         ss1 << tmp;
         string left, assignSymbol, right_op_1, right_op_2, op;
         ss1 >> left; ss1 >> assignSymbol; ss1 >> right_op_1; ss1 >> op; ss1 >> right_op_2;
+        if (left == "push" || left == "call") {
+            result += pushStack();
+            int reg = 5;
+            result += translateFunctionFactor(tmp + '\n', reg++);
+            while (true) {
+                getline(ss, tmp);
+                result += translateFunctionFactor(tmp + '\n', reg++);
+                if (tmp.find("RET") != string::npos && tmp.find("=") != string::npos) {
+                    break;
+                }
+            }
+            continue;
+        }
         if (assignSymbol != "=") {
             result += tmp + '\n';
             continue;

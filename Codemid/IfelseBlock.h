@@ -11,6 +11,7 @@
  * 语句列中的语句可以是任何，但是在本类中无法将其转换成别的语句，所以需要在最顶层中设置接口
  */
 extern string get_centences_component_string(vector<CentenceMid*>& centencesBlock);
+extern string get_centences_component_mips(vector<CentenceMid*>& centencesBlock);
 
 class IfelseBlock : public CentenceMid {
 private:
@@ -25,9 +26,9 @@ private:
 
     string getConditionString() {
         string conditionString = "";
-        conditionString += translateExp(conditionLeftExp.toString());
+        conditionString += conditionLeftExp.toString();
         if (conditionRightExp.expHasInit()) {
-            conditionString += translateExp(conditionRightExp.toString());
+            conditionString += conditionRightExp.toString();
             switch (this->compare) {
                 case LESS:
                     conditionString += conditionLeftExp.getExpResultID() + " < " +
@@ -95,8 +96,30 @@ public:
                  )));
     }
 
-
     string toString() {
+        string conditionLabel = "condition_" + to_string(label_counter++);
+        string satisfieldLabel = "Satisfield_" + to_string(label_counter++);
+        string unsatisfieldLabel = "Unsatisfield_" + to_string(label_counter++);
+        string leaveLabel = "label_" + to_string(label_counter++);
+
+        string result = "";
+        result += conditionLabel + ":\n";
+        result += this->getConditionString();
+        result += "BNZ " + satisfieldLabel + "\n";
+        if (this->conditionUnsatisfieldBlock.size() > 0) {
+            result += unsatisfieldLabel + ":\n";
+            result += get_centences_component_string(this->conditionUnsatisfieldBlock);
+        }
+        result += "GOTO " + leaveLabel + "\n";
+
+        result += satisfieldLabel + ":\n";
+        result += get_centences_component_string(this->conditionSatisfieldBlock);
+        result += leaveLabel + ":\n";
+
+        return result;
+    }
+
+    string toMips() {
         string conditionLabel = "condition_" + to_string(label_counter++);
         string satisfieldLabel = "Satisfield_" + to_string(label_counter++);
         string unsatisfieldLabel = "Unsatisfield_" + to_string(label_counter++);
@@ -113,13 +136,13 @@ public:
 
         if (this->conditionUnsatisfieldBlock.size() > 0) {
             result += unsatisfieldLabel + ":\n";
-            result += get_centences_component_string(this->conditionUnsatisfieldBlock);
+            result += get_centences_component_mips(this->conditionUnsatisfieldBlock);
         }
         //result += "GOTO " + leaveLabel + "\n";
         result += "j " + leaveLabel + "\n";
 
         result += satisfieldLabel + ":\n";
-        result += get_centences_component_string(this->conditionSatisfieldBlock);
+        result += get_centences_component_mips(this->conditionSatisfieldBlock);
         result += leaveLabel + ":\n";
 
         return result;

@@ -11,6 +11,7 @@
  * 语句列中的语句可以是任何，但是在本类中无法将其转换成别的语句，所以需要在最顶层中设置接口
  */
 extern string get_centences_component_string(vector<CentenceMid*>& centencesBlock);
+extern string get_centences_component_mips(vector<CentenceMid*>& centencesBlock);
 
 class WhileBlock : public CentenceMid {
 private:
@@ -23,9 +24,9 @@ private:
 
     string getConditionString() {
         string conditionString = "";
-        conditionString += translateExp(conditionLeftExp.toString());
+        conditionString += conditionLeftExp.toString();
         if (conditionRightExp.expHasInit()) {
-            conditionString += translateExp(conditionRightExp.toString());
+            conditionString += conditionRightExp.toString();
             switch (this->compare) {
                 case LESS:
                     conditionString += conditionLeftExp.getExpResultID() + " < " +
@@ -94,6 +95,24 @@ public:
         string leaveLabel = "label_" + to_string(label_counter++);
 
         string result = conditionlabel + ":\n";
+        result += this->getConditionString();
+        result += "BNZ " + loopLabel + "\n";
+        result += "GOTO " + leaveLabel + "\n";
+        result += loopLabel + ":\n";
+
+        result += get_centences_component_string(this->loopBlock);
+        result += "GOTO " + conditionlabel + "\n";
+        result += leaveLabel + ":\n";
+
+        return result;
+    }
+
+    string toMips() {
+        string loopLabel = "whileloop_" + to_string(label_counter++);
+        string conditionlabel = "condition_" + to_string(label_counter++);
+        string leaveLabel = "label_" + to_string(label_counter++);
+
+        string result = conditionlabel + ":\n";
         //result += this->getConditionString();
         //result += "BNZ " + loopLabel + "\n";
         result +=
@@ -103,7 +122,7 @@ public:
         result += "j " + leaveLabel + "\n";
         result += loopLabel + ":\n";
 
-        result += get_centences_component_string(this->loopBlock);
+        result += get_centences_component_mips(this->loopBlock);
         //result += "GOTO " + conditionlabel + "\n";
         result += "j " + conditionlabel + "\n";
         result += leaveLabel + ":\n";

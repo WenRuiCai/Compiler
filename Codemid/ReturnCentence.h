@@ -24,6 +24,17 @@ public:
     string toString() {
         string result  = "";
         if (this->returnExp.expHasInit()) {
+            result += this->returnExp.toString();
+            result += "ret " + this->returnExp.getExpResultID() + "\n";
+        } else {
+            result += "ret\n";
+        }
+        return result;
+    }
+
+    string toMips() {
+        string result  = "";
+        if (this->returnExp.expHasInit()) {
             result += translateExp(this->returnExp.toString());
             //result += "ret " + this->returnExp.getExpResultID() + "\n";
             result += resultIDtoMIPS(this->returnExp.getExpResultID(), nullptr);

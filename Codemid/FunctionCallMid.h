@@ -58,6 +58,23 @@ public:
 
     string toString() {
         string result = "";
+        string call = "call " + this->functionName + "\n";
+        string returnCode = this->functionReturnValueID + " = RET\n";
+        for (ExpressionMidCode value : this->parameterValues) {
+            if (!value.hasOnlyOneItem())
+                result += value.toString();
+        }
+        for (ExpressionMidCode value : this->parameterValues) {
+            result += "push " + value.getExpResultID() + "\n";
+        }
+        if (this->hasReturnValue)
+            return result + call + returnCode;
+        else
+            return result + call;
+    }
+
+    string toMips() {
+        string result = "";
         /*
          * 调用函数前要压栈
          */

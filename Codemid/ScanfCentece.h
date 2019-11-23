@@ -20,6 +20,14 @@ public:
     string toString() {
         string result = "";
         for (string string1 : this->IDENFRS) {
+            result += "SCANF " + string1 + "\n";
+        }
+        return result;
+    }
+
+    string toMips() {
+        string result = "";
+        for (string string1 : this->IDENFRS) {
             //result += "SCANF " + string1 + "\n";
             int num = 0;
             string varAddr = getVarAddr(string1, &num);
