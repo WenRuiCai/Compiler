@@ -41,7 +41,7 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
             expBlock.getNowItem().getNowFactor().factor_is_functioncall();
             functionCall(Words, PointNum, output, 1,
                     expBlock.getNowItem().getNowFactorPointer(), nullptr);
-
+            expBlock.getNowItem().getNowFactor().getFunctionCall().functionHasReturnValue();
             expBlock.getNowItem().getNowFactor().setString_FUNCTION(
                     expBlock.getNowItem().getNowFactor().getFunctionCall().toString(),
                     expBlock.getNowItem().getNowFactor().getFunctionCall().getFunctionReturnValueID()
