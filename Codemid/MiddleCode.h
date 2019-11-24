@@ -36,7 +36,7 @@ string resultIDtoMIPS(string resultID, int* type) {
     } else {
         int num = 0;
         if (isCharCon(resultID, &num)) {
-            result += "li $t8, " + to_string(num) + '\n';
+            result += "li $t9, " + to_string(num) + '\n';
             if (type != nullptr) *type = 0;
         }
         else if (isConst(resultID, &num, type)) {
