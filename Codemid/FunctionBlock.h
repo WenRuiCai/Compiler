@@ -30,12 +30,16 @@ string getVarAddr(string var, int* flag) {
                 return to_string(variable.var_addr);
             }
         }
+        (*flag) = 1;
         return "$" + var;
     }
     long int addr = nowFunction_GetVar_byName_Map.at(var).var_addr;
     string reg = nowFunction_GetVar_byName_Map.at(var).thisRegister;
     if (nowFunction_GetVar_byName_Map.at(var).var_type == INT_PARA ||
         nowFunction_GetVar_byName_Map.at(var).var_type == CHAR_PARA) {
+        if (nowFunction_GetVar_byName_Map.at(var).var_type == INT_PARA) {
+            (*flag) = 1;
+        } else (*flag) = 0;
         return reg;
     } else if (nowFunction_GetVar_byName_Map.at(var).var_type == INT_VAR ||
                nowFunction_GetVar_byName_Map.at(var).var_type == CHAR_VAR ||

@@ -42,10 +42,11 @@ string resultIDtoMIPS(string resultID, int* type) {
         else if (isConst(resultID, &num, type)) {
             result += "li $t9, " + to_string(num) + '\n';
         } else if (resultID.at(resultID.length() - 1) != ']') {
+            num = 1;
             string varAddr = getVarAddr(resultID, &num);
             if (varAddr[0] == '$') {
                 result += "move $t9, " + varAddr + '\n';
-                if (type != nullptr) *type = 1;
+                if (type != nullptr) *type = num;
             } else {
                 if (num) result += "lw $t9, " + varAddr + "($0)\n";
                 else result += "lb $t9, " + varAddr + "($0)\n";
