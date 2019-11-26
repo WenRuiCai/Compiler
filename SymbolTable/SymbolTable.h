@@ -315,17 +315,6 @@ string getNowFunctionType_ByName(string name) {
     return "";
 }
 
-int getNowFunctionParaNum() {
-    int num = 0;
-    for (FunctionBlock block : symbolTable.getFunctionBlocks()) {
-        if (block.getName() == nowTranslateFunctionName) {
-            num = block.getParaNum();
-            return num;
-        }
-    }
-    return num;
-}
-
 void setGlobalConst() {
     for (TableItem item : symbolTable.getSymbolTable()[0].getItems()) {
         if (item.kind == CONST) {

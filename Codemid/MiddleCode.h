@@ -7,7 +7,6 @@
 int label_counter = 0;
 string getVarAddr(string var, int* flag);
 extern bool isConst(string name, int* num, int* type);
-extern int getNowFunctionParaNum();
 string getArrayItemAddr(string s, int* num);
 string getArrayOpNum(string s, int* num, bool op1);
 string translateExp(string exp_midCode);
@@ -48,8 +47,7 @@ string resultIDtoMIPS(string resultID, int* type, bool isFunctionCall) {
             if (varAddr[0] == '$') {
                 if (varAddr.length() == 2) { //函数参数作为函数内函数调用，此时必须从栈里取参数，不然会出现覆盖现象
                     int regNum = varAddr[1] - '0';
-                    int paraNum = getNowFunctionParaNum();
-                    int offset = (paraNum - (regNum - 4)) * 4 + 8;
+                    int offset = (regNum - 4) * 4 + 4;
                     result += "lw $t9, " + to_string(offset) + "($sp)\n";
                 } else
                     result += "move $t9, " + varAddr + '\n';

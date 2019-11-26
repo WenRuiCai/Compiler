@@ -74,7 +74,7 @@ string pushStack() {
     result += "sw $s3, 0($sp)\nsub $sp, $sp, 4\n";result += "sw $s4, 0($sp)\nsub $sp, $sp, 4\n";
     result += "sw $s5, 0($sp)\nsub $sp, $sp, 4\n";result += "sw $s6, 0($sp)\nsub $sp, $sp, 4\n";
     result += "#------压函数变量------#\n";
-    for (int i = 0; i < nowFunctionVariables.size(); i++) {
+    for (int i = nowFunctionVariables.size() - 1; i >= 0; i--) {
         int type = 0;
         string varAddr = getVarAddr(nowFunctionVariables[i].VariableName, &type);
         if (varAddr.at(0) != '$') {
@@ -97,7 +97,7 @@ string popStack() {
     result += "#------恢复函数变量------#\n";
     result += "add $sp, $sp, 4\n";
     result += "lw $ra, 0($sp)\n";
-    for (int i = nowFunctionVariables.size() - 1; i >= 0; i--) {
+    for (int i = 0; i < nowFunctionVariables.size(); i++) {
         result += "add $sp, $sp, 4\n";
         int type = 0;
         string varAddr = getVarAddr(nowFunctionVariables[i].VariableName, &type);
