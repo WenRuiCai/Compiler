@@ -370,7 +370,12 @@ void Program_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
     string mipsCode = symbolTable.toMips();
     mips_with_tmp << ".data\n";
     for (Variable v : globalStrings) {
-        mips_with_tmp << "\t" + v.VariableName + ": .asciiz " + "\"" + v.string_var + "\"\n";
+        string str = "";
+        for (char c : v.string_var) {
+            if (c == '\\')  str += '\\';
+            str += c;
+        }
+        mips_with_tmp << "\t" + v.VariableName + ": .asciiz " + "\"" + str + "\"\n";
     }
     mips_with_tmp << ".text\n";
     mips_with_tmp << "jal main\nli $v0, 10\nsyscall\n";

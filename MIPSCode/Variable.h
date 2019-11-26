@@ -72,7 +72,10 @@ public:
         this->string_var = s;
         this->var_type = STRING_VAR;
         this->var_addr = addr;
-        addr += s.length() + 1;
+        int cnt = 0;
+        for (char c : s)
+            if (c == '\\') cnt++;
+        addr += s.length() + 1 + cnt;
     }
 };
 
