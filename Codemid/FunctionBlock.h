@@ -35,8 +35,12 @@ string getVarAddr(string var, int* flag) {
         /*
          * 注意char型函数的返回值
          */
-        if (getNowFunctionType(var) == "CHARTK") {
-            (*flag) = 0;
+        try {
+            if (getNowFunctionType(var) == "CHARTK") {
+                (*flag) = 0;
+            }
+        } catch (exception e) {
+            (*flag) = 1;
         }
         return "$" + var;
     }
