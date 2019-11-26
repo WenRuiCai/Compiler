@@ -15,7 +15,7 @@ extern string pushStack();
 extern string popStack();
 
 map<string, string> functionResultID_2_type;
-string getNowFunctionType_ByName(string name);
+extern string getNowFunctionType_ByName(string name);
 string getNowFunctionType(string resultID) {
     return functionResultID_2_type.at(resultID);
 }
