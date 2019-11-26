@@ -128,7 +128,7 @@ bool isConst(string name, int* num, int* type) {
     return false;
 }
 
-
+string nowTranslateFunctionName;
 
 class FunctionBlock {
     string kind;
@@ -147,6 +147,10 @@ class FunctionBlock {
     }
 
 public:
+    int getParaNum() {
+        return this->parameters.size();
+    }
+
     string getName() { return this->functionName; }
 
     vector<TableItem>& getFunctionConsts() { return this->functionConsts;}
@@ -186,6 +190,7 @@ public:
     }
 
     string toMips() {
+        nowTranslateFunctionName = this->functionName;
         nowFunction_GetVar_byName_Map = this->function_GetVar_byName_Map;
         nowFunctionConsts = this->functionConsts;
         nowFunctionVariables = this->functionVariables;

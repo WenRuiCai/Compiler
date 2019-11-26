@@ -45,6 +45,10 @@ private:
     }
 
 public:
+    vector<FunctionBlock>& getFunctionBlocks() {
+        return this->functionBlocks;
+    }
+
     string toMips() {
         string result = "";
         for (FunctionBlock block : this->functionBlocks) {
@@ -301,6 +305,17 @@ public:
 SymbolTable symbolTable;
 
 vector<TableItem> globalConst;
+
+int getNowFunctionParaNum() {
+    int num = 0;
+    for (FunctionBlock block : symbolTable.getFunctionBlocks()) {
+        if (block.getName() == nowTranslateFunctionName) {
+            num = block.getParaNum();
+            return num;
+        }
+    }
+    return num;
+}
 
 void setGlobalConst() {
     for (TableItem item : symbolTable.getSymbolTable()[0].getItems()) {

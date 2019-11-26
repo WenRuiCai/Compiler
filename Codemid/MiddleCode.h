@@ -7,6 +7,7 @@
 int label_counter = 0;
 string getVarAddr(string var, int* flag);
 extern bool isConst(string name, int* num, int* type);
+extern int getNowFunctionParaNum();
 string getArrayItemAddr(string s, int* num);
 string getArrayOpNum(string s, int* num, bool op1);
 string translateExp(string exp_midCode);
@@ -26,6 +27,46 @@ bool isCharCon(string s, int* num) {
         return true;
     }
     return false;
+}
+
+string resultIDtoMIPS(string resultID, int* type, bool isFunctionCall) {
+    string result = "";
+    if (isNum(resultID)) {
+        result += "li $t9, " + resultID + '\n';
+        if (type != nullptr) *type = 1;
+    } else {
+        int num = 0;
+        if (isCharCon(resultID, &num)) {
+            result += "li $t9, " + to_string(num) + '\n';
+            if (type != nullptr) *type = 0;
+        }
+        else if (isConst(resultID, &num, type)) {
+            result += "li $t9, " + to_string(num) + '\n';
+        } else if (resultID.at(resultID.length() - 1) != ']') {
+            num = 1;
+            string varAddr = getVarAddr(resultID, &num);
+            if (varAddr[0] == '$') {
+                if (varAddr.length() == 2) { //函数参数作为函数内函数调用，此时必须从栈里取参数，不然会出现覆盖现象
+                    int regNum = varAddr[1] - '0';
+                    int paraNum = getNowFunctionParaNum();
+                    int offset = (paraNum - (regNum - 4)) * 4 + 8;
+                    result += "lw $t9, " + to_string(offset) + "($sp)\n";
+                } else
+                    result += "move $t9, " + varAddr + '\n';
+                if (type != nullptr) *type = num;
+            } else {
+                if (num) result += "lw $t9, " + varAddr + "($0)\n";
+                else result += "lb $t9, " + varAddr + "($0)\n";
+                if (type != nullptr) *type = num;
+            }
+        } else {
+            int num111 = 0;
+            result += getArrayOpNum(resultID, &num111, true);
+            result += "move $t9, $t7\n";
+            if (type != nullptr) *type = num111;
+        }
+    }
+    return result;
 }
 
 string resultIDtoMIPS(string resultID, int* type) {
@@ -354,7 +395,7 @@ string translateFunctionFactor(string functionFactorMid, int reg) {
     string one, two, three;
     ss >> one;  ss >> two; ss >> three;
     if (one == "push") {
-        result += resultIDtoMIPS(two, nullptr);
+        result += resultIDtoMIPS(two, nullptr, true);
         result += "move $" + to_string(reg) + ", $t9\n";
     } else if (one == "call") {
         result += "jal " + two + '\n';

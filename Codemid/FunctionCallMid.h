@@ -88,7 +88,7 @@ public:
         }
         int reg = 5;
         for (ExpressionMidCode value : this->parameterValues) {
-            result += resultIDtoMIPS(value.getExpResultID(), nullptr);
+            result += resultIDtoMIPS(value.getExpResultID(), nullptr, true);
             //result += "push " + value.getExpResultID() + "\n";
             result += "move $" + to_string(reg) + ", $t9\n";
             reg++;
