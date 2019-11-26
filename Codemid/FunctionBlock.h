@@ -21,6 +21,7 @@ vector<Variable> nowFunctionVariables;
 map<string, Variable> nowFunction_GetVar_byName_Map;
 vector<TableItem> nowFunctionConsts;
 extern vector<TableItem> globalConst;
+extern string getNowFunctionType(string resultID);
 
 string getVarAddr(string var, int* flag) {
     if (nowFunction_GetVar_byName_Map.count(var) == 0) {
@@ -31,6 +32,12 @@ string getVarAddr(string var, int* flag) {
             }
         }
         (*flag) = 1;
+        /*
+         * 注意char型函数的返回值
+         */
+        if (getNowFunctionType(var) == "CHARTK") {
+            (*flag) = 0;
+        }
         return "$" + var;
     }
     long int addr = nowFunction_GetVar_byName_Map.at(var).var_addr;

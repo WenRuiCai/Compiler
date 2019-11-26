@@ -306,6 +306,15 @@ SymbolTable symbolTable;
 
 vector<TableItem> globalConst;
 
+string getNowFunctionType_ByName(string name) {
+    for (TableItem item : symbolTable.getSymbolTable()[0].getItems()) {
+        if (item.kind == FUNC && item.name == name) {
+            return item.type;
+        }
+    }
+    return "";
+}
+
 int getNowFunctionParaNum() {
     int num = 0;
     for (FunctionBlock block : symbolTable.getFunctionBlocks()) {

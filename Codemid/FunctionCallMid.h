@@ -14,6 +14,12 @@
 extern string pushStack();
 extern string popStack();
 
+map<string, string> functionResultID_2_type;
+string getNowFunctionType_ByName(string name);
+string getNowFunctionType(string resultID) {
+    return functionResultID_2_type.at(resultID);
+}
+
 class FunctionCallMidCode : public CentenceMid {
 private:
     vector<ExpressionMidCode> parameterValues;
@@ -34,6 +40,8 @@ public:
         this->functionName = name;
         this->functionReturnValueID = "TEMP_VAR_CWR" + to_string(ID_counter++);
         this->kind = FUNCTIONCALL;
+        functionResultID_2_type.insert(make_pair(this->functionReturnValueID,
+                getNowFunctionType_ByName(this->functionName)));
     }
 
     void functionHasReturnValue() {
