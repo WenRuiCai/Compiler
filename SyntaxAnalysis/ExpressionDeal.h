@@ -19,6 +19,7 @@ extern bool Number(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, 
 extern bool functionCall(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output,
         int isFactor, factorMidCode* factorMid, vector<CentenceMid*>* centenceBlock);
 
+static int hasBefore = 0;
 #endif //COMPILER_EXPRESSIONDEAL_H
 
 ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, ExpressionMidCode& expBlock) {
@@ -117,6 +118,14 @@ ExpressionFlag factor(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
 ExpressionFlag item(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output, ExpressionMidCode& expBlock) {
     expBlock.addItem();
     int counter = 0;
+    if (hasBefore == 2) {
+        expBlock.getNowItem().addFactor();
+        expBlock.getNowItem().getNowFactor().factor_is_intcon(-1);
+
+        expBlock.getNowItem().getNowFactor().setString_CHAR_INT_IDENFR();
+        expBlock.getNowItem().addOp(MULT);
+        hasBefore = 0;
+    }
     ExpressionFlag flag = factor(Words, PointNum, output, expBlock);
     counter++;
     /*
@@ -136,6 +145,8 @@ ExpressionFlag item(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output,
 ExpressionFlag expression(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& output,
         int expflag, factorMidCode* factorMid, CentenceMid* centence) {
     if (WORD_TYPE == "PLUS" || WORD_TYPE == "MINU") {
+        if (WORD_TYPE == "PLUS")    hasBefore = 1;
+        if (WORD_TYPE == "MINU")    hasBefore = 2;
         PRINT_WORD_AND_ADDPOINT;
     }
     if (expflag <= 0) {

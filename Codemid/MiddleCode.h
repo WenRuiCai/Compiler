@@ -12,7 +12,12 @@ string getArrayOpNum(string s, int* num, bool op1);
 string translateExp(string exp_midCode);
 
 bool isNum(string s) {
-    for (int i = 0; i < s.length(); i++) {
+    if (!(s[0] == '+' || s[0] == '-' || (s[0] >= '0' && s[0] <= '9'))) {
+        return false;
+    }
+    int j = 0;
+    j = (s[0] == '+' || s[0] == '-') ? 1 : 0;
+    for (int i = j; i < s.length(); i++) {
         if (!(s[i] >= '0' && s[i] <= '9')) {
             return false;
         }
