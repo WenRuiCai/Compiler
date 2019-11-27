@@ -69,8 +69,8 @@ public:
         string call = "call " + this->functionName + "\n";
         string returnCode = this->functionReturnValueID + " = RET\n";
         for (ExpressionMidCode value : this->parameterValues) {
-            if (!value.hasOnlyOneItem())
-                result += value.toString();
+            //if (!value.hasOnlyOneItem())
+            result += value.toString();
         }
         for (ExpressionMidCode value : this->parameterValues) {
             result += "push " + value.getExpResultID() + "\n";
@@ -105,7 +105,7 @@ public:
          * 函数调用之后要恢复变量哦
          */
         if (this->hasReturnValue)
-            return pushStack() + result + call + returnCode + popStack();
+            return pushStack() + result + call + popStack() + returnCode;
         else
             return pushStack() + result + call + popStack();
     }
