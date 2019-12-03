@@ -242,6 +242,9 @@ string getArrayItemAddr(string s, int* num) {
         result += "li $s7, " + to_string(num1) + '\n';
     } else {
         int num_var_index = 0;
+        /*
+         * 评测中出现的'$'后不跟TEMP_VAR_CWR的情况都是数组索引中出现的
+         */
         string indexAddr = getVarAddr(index, &num_var_index);
         if (indexAddr[0] == '$') {
             result += "move $s7, " + indexAddr + '\n';
@@ -342,6 +345,8 @@ string transLateExp_leftIsArray(string left, string right_op_1, string right_op_
         } else {
             int num_array = 0;
             result += getArrayOpNum(right_op_1, &num_array, true);
+            result += "move $t8, $t7\n";
+            reg_op1 = "$t8";
         }
 
         if (isNum(right_op_2)) {
@@ -519,6 +524,8 @@ string translateExp(string exp_midCode) {
             } else {
                 int num_array = 0;
                 result += getArrayOpNum(right_op_1, &num_array, true);
+                result += "move $t8, $t7\n";
+                reg_op1 = "$t8";
             }
 
             if (isNum(right_op_2)) {
