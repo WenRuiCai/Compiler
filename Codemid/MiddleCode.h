@@ -345,8 +345,6 @@ string transLateExp_leftIsArray(string left, string right_op_1, string right_op_
         } else {
             int num_array = 0;
             result += getArrayOpNum(right_op_1, &num_array, true);
-            result += "move $t8, $t7\n";
-            reg_op1 = "$t8";
         }
 
         if (isNum(right_op_2)) {
@@ -363,6 +361,8 @@ string transLateExp_leftIsArray(string left, string right_op_1, string right_op_
                 else result += "lb $t6, " + op2_addr + "($0)\n";
             }
         } else {
+            result += "move $t8, $t7\n";
+            reg_op1 = "$t8";
             int num_array = 0;
             result += getArrayOpNum(right_op_2, &num_array, false);
         }
@@ -524,8 +524,6 @@ string translateExp(string exp_midCode) {
             } else {
                 int num_array = 0;
                 result += getArrayOpNum(right_op_1, &num_array, true);
-                result += "move $t8, $t7\n";
-                reg_op1 = "$t8";
             }
 
             if (isNum(right_op_2)) {
@@ -542,6 +540,8 @@ string translateExp(string exp_midCode) {
                     else result += "lb $t6, " + op2_addr + "($0)\n";
                 }
             } else {
+                result += "move $t8, $t7\n";
+                reg_op1 = "$t8";
                 int num_array = 0;
                 result += getArrayOpNum(right_op_2, &num_array, false);
             }
