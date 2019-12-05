@@ -68,8 +68,9 @@ public:
         string result = "";
         string call = "call " + this->functionName + "\n";
         string returnCode = this->functionReturnValueID + " = RET\n";
-        for (ExpressionMidCode value : this->parameterValues) {
+        for (int i = this->parameterValues.size() - 1; i >= 0; i--) {
             //if (!value.hasOnlyOneItem())
+            ExpressionMidCode& value = this->parameterValues[i];
             result += value.toString();
         }
         for (ExpressionMidCode value : this->parameterValues) {
@@ -90,8 +91,9 @@ public:
         string call = "jal " + this->functionName + "\n";
         //string returnCode = this->functionReturnValueID + " = RET\n";
         string returnCode = "move $" + this->functionReturnValueID + ", $v1\n";
-        for (ExpressionMidCode value : this->parameterValues) {
+        for (int i = this->parameterValues.size() - 1; i >= 0; i--) {
             //if (!value.hasOnlyOneItem())
+            ExpressionMidCode& value = this->parameterValues[i];
             result += translateExp(value.toString());
         }
         int reg = 5;
