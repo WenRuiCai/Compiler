@@ -28,6 +28,8 @@ private:
     int nowParameter = -1;
     bool hasReturnValue;
 
+    string paraValueExp = "";
+
     void addParameterValue() {
         ExpressionMidCode expressionMidCode = ExpressionMidCode();
         expressionMidCode.init();
@@ -69,17 +71,19 @@ public:
         string call = "call " + this->functionName + "\n";
         string returnCode = this->functionReturnValueID + " = RET\n";
         for (int i = this->parameterValues.size() - 1; i >= 0; i--) {
-            //if (!value.hasOnlyOneItem())
             ExpressionMidCode& value = this->parameterValues[i];
-            result += value.toString();
+            this->paraValueExp += value.toString();
         }
+
+        result += this->paraValueExp;
         for (ExpressionMidCode value : this->parameterValues) {
             result += "push " + value.getExpResultID() + "\n";
         }
         if (this->hasReturnValue)
-            return result + call + returnCode;
+            this->midCode = result + call + returnCode;
         else
-            return result + call;
+            this->midCode = result + call;
+        return this->midCode;
     }
 
     string toMips() {
@@ -87,19 +91,14 @@ public:
         /*
          * 调用函数前要压栈
          */
-        //string call = "call " + this->functionName + "\n";
         string call = "jal " + this->functionName + "\n";
-        //string returnCode = this->functionReturnValueID + " = RET\n";
         string returnCode = "move $" + this->functionReturnValueID + ", $v1\n";
-        for (int i = this->parameterValues.size() - 1; i >= 0; i--) {
-            //if (!value.hasOnlyOneItem())
-            ExpressionMidCode& value = this->parameterValues[i];
-            result += translateExp(value.toString());
-        }
+
+        result += translateExp(this->paraValueExp);
+
         int reg = 5;
         for (ExpressionMidCode value : this->parameterValues) {
             result += resultIDtoMIPS(value.getExpResultID(), nullptr, true);
-            //result += "push " + value.getExpResultID() + "\n";
             result += "move $" + to_string(reg) + ", $t9\n";
             reg++;
         }

@@ -22,6 +22,7 @@ public:
         for (string string1 : this->IDENFRS) {
             result += "SCANF " + string1 + "\n";
         }
+        this->midCode = result;
         return result;
     }
 

@@ -24,6 +24,13 @@ private:
     vector<CentenceMid*> conditionUnsatisfieldBlock;
     int isElseBlock = 0;
 
+    string conditionLabel;
+    string satisfieldLabel;
+    string unsatisfieldLabel;
+    string leaveLabel;
+
+    string conditionString = "";
+
     string getConditionString() {
         string conditionString = "";
         conditionString += conditionLeftExp.toString();
@@ -97,15 +104,18 @@ public:
     }
 
     string toString() {
-        string conditionLabel = "condition_" + to_string(label_counter++);
-        string satisfieldLabel = "Satisfield_" + to_string(label_counter++);
-        string unsatisfieldLabel = "Unsatisfield_" + to_string(label_counter++);
-        string leaveLabel = "label_" + to_string(label_counter++);
+        this->conditionLabel = "condition_" + to_string(label_counter++);
+        this->satisfieldLabel = "Satisfield_" + to_string(label_counter++);
+        this->unsatisfieldLabel = "Unsatisfield_" + to_string(label_counter++);
+        this->leaveLabel = "label_" + to_string(label_counter++);
 
         string result = "";
+
         result += conditionLabel + ":\n";
-        result += this->getConditionString();
-        result += "BNZ " + satisfieldLabel + "\n";
+        this->conditionString += this->getConditionString();
+        this->conditionString += "BNZ " + satisfieldLabel + "\n";
+
+        result += this->conditionString;
         if (this->conditionUnsatisfieldBlock.size() > 0) {
             result += unsatisfieldLabel + ":\n";
             result += get_centences_component_string(this->conditionUnsatisfieldBlock);
@@ -116,29 +126,21 @@ public:
         result += get_centences_component_string(this->conditionSatisfieldBlock);
         result += leaveLabel + ":\n";
 
+        this->midCode = result;
         return result;
     }
 
     string toMips() {
-        string conditionLabel = "condition_" + to_string(label_counter++);
-        string satisfieldLabel = "Satisfield_" + to_string(label_counter++);
-        string unsatisfieldLabel = "Unsatisfield_" + to_string(label_counter++);
-        string leaveLabel = "label_" + to_string(label_counter++);
-
         string result = "";
         result += conditionLabel + ":\n";
 
-        //result += this->getConditionString();
-        //result += "BNZ " + satisfieldLabel + "\n";
-        result +=
-                translateConditionCentence(this->getConditionString() + "BNZ " + satisfieldLabel + "\n");
-
+        result += translateConditionCentence(this->conditionString);
 
         if (this->conditionUnsatisfieldBlock.size() > 0) {
             result += unsatisfieldLabel + ":\n";
             result += get_centences_component_mips(this->conditionUnsatisfieldBlock);
         }
-        //result += "GOTO " + leaveLabel + "\n";
+
         result += "j " + leaveLabel + "\n";
 
         result += satisfieldLabel + ":\n";

@@ -153,6 +153,8 @@ class FunctionBlock {
     map<string, Variable> function_GetVar_byName_Map;
     vector<TableItem> functionConsts;
 
+    string midCode;
+
     void addCentence(vector<CentenceMid*>* centenceBlock, CentenceMid* centence) {
         centenceBlock->push_back(centence);
     }
@@ -197,6 +199,7 @@ public:
             result += item.name + "\n";
         }
         result += get_centences_component_string(this->centences);
+        this->midCode = result;
         return result;
     }
 
@@ -207,13 +210,8 @@ public:
         nowFunctionVariables = this->functionVariables;
 
         string result = "";
-        //result += (this->kind == "INTTK") ? "int " : ((this->kind == "CHARTK") ? "char " : "void ");
         result += this->functionName + ":\n";
-        for (TableItem item : this->parameters) {
-            //result += "para ";
-            //result += (item.type == "INTTK") ? "int " : "char ";
-            //result += item.name + "\n";
-        }
+
         result += get_centences_component_mips(this->centences);
         if (result.find("jr $ra") == string::npos) {
             result += "jr $ra\n";

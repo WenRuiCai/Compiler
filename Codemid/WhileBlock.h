@@ -22,6 +22,12 @@ private:
 
     vector<CentenceMid*> loopBlock;
 
+    string loopLabel;
+    string conditionlabel;
+    string leaveLabel;
+
+    string conditionString = "";
+
     string getConditionString() {
         string conditionString = "";
         conditionString += conditionLeftExp.toString();
@@ -90,13 +96,16 @@ public:
     }
 
     string toString() {
-        string loopLabel = "whileloop_" + to_string(label_counter++);
-        string conditionlabel = "condition_" + to_string(label_counter++);
-        string leaveLabel = "label_" + to_string(label_counter++);
+        this->loopLabel = "whileloop_" + to_string(label_counter++);
+        this->conditionlabel = "condition_" + to_string(label_counter++);
+        this->leaveLabel = "label_" + to_string(label_counter++);
 
         string result = conditionlabel + ":\n";
-        result += this->getConditionString();
-        result += "BNZ " + loopLabel + "\n";
+
+        this->conditionString += this->getConditionString();
+        this->conditionString += "BNZ " + loopLabel + "\n";
+
+        result += this->conditionString;
         result += "GOTO " + leaveLabel + "\n";
         result += loopLabel + ":\n";
 
@@ -104,21 +113,14 @@ public:
         result += "GOTO " + conditionlabel + "\n";
         result += leaveLabel + ":\n";
 
+        this->midCode = result;
         return result;
     }
 
     string toMips() {
-        string loopLabel = "whileloop_" + to_string(label_counter++);
-        string conditionlabel = "condition_" + to_string(label_counter++);
-        string leaveLabel = "label_" + to_string(label_counter++);
-
         string result = conditionlabel + ":\n";
-        //result += this->getConditionString();
-        //result += "BNZ " + loopLabel + "\n";
-        result +=
-                translateConditionCentence(this->getConditionString() + "BNZ " + loopLabel + "\n");
+        result += translateConditionCentence(this->conditionString);
 
-        //result += "GOTO " + leaveLabel + "\n";
         result += "j " + leaveLabel + "\n";
         result += loopLabel + ":\n";
 

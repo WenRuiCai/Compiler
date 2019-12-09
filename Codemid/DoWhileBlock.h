@@ -20,6 +20,10 @@ private:
     ExpressionMidCode conditionRightExp;
     int flag = -1;
 
+    string loopLabel;
+    string conditionlabel;
+    string conditionString = "";
+
     vector<CentenceMid*> loopBlock;
 
     string getConditionString() {
@@ -89,31 +93,30 @@ public:
     }
 
     string toString() {
-        string loopLabel = "dowhileloop_" + to_string(label_counter++);
-        string conditionlabel = "condition_" + to_string(label_counter++);
+        this->loopLabel = "dowhileloop_" + to_string(label_counter++);
+        this->conditionlabel = "condition_" + to_string(label_counter++);
 
         string result = loopLabel + ":\n";
 
         result += get_centences_component_string(this->loopBlock);    //语句列
         result += conditionlabel + ":\n";
-        result += this->getConditionString();
-        result += "BNZ " + loopLabel + "\n";
 
+        this->conditionString += this->getConditionString();
+        this->conditionString += "BNZ " + loopLabel + "\n";
+
+        result += this->conditionString;
+
+        this->midCode = result;
         return result;
     }
 
     string toMips() {
-        string loopLabel = "dowhileloop_" + to_string(label_counter++);
-        string conditionlabel = "condition_" + to_string(label_counter++);
-
         string result = loopLabel + ":\n";
 
         result += get_centences_component_mips(this->loopBlock);    //语句列
         result += conditionlabel + ":\n";
-        //result += this->getConditionString();
-        //result += "BNZ " + loopLabel + "\n";
-        result +=
-                translateConditionCentence(this->getConditionString() + "BNZ " + loopLabel + "\n");
+
+        result += translateConditionCentence(this->conditionString);
 
         return result;
     }

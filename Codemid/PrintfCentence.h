@@ -41,6 +41,8 @@ public:
             result += this->exp.toString();
             result += "PRINT \"" + this->print_string + "\" " + this->exp.getExpResultID() + "\n";
         }
+
+        this->midCode = result;
         return result;
     }
 

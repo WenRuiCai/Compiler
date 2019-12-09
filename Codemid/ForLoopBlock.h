@@ -26,6 +26,13 @@ private:
     bool isAdd = false;
     vector<CentenceMid*> loopBlock;
 
+    //////中间代码部分///////
+    string conditionLabel;
+    string loopLabel;
+    string leavelLabel;
+    string conditionString;
+    ////////////////////////
+
     string getConditionString() {
         string conditionString = "";
         conditionString += conditionLeftExp.toString();
@@ -122,13 +129,16 @@ public:
         result += this->IDENFR_VALUE.toString();
         result += this->IDENFR + " = " + this->IDENFR_VALUE.getExpResultID() + "\n";
 
-        string conditionLabel = "condition_" + to_string(label_counter++);
-        string loopLabel = "ForLoop_" + to_string(label_counter++);
-        string leavelLabel = "label_" + to_string(label_counter);
+        this->conditionLabel = "condition_" + to_string(label_counter++);
+        this->loopLabel = "ForLoop_" + to_string(label_counter++);
+        this->leavelLabel = "label_" + to_string(label_counter);
 
         result += conditionLabel + ":\n";
-        result += getConditionString();
-        result += "BNZ " + loopLabel + "\n";
+
+        this->conditionString = getConditionString();
+        this->conditionString += "BNZ " + loopLabel + "\n";
+
+        result += this->conditionString;
         result += "GOTO " + leavelLabel + "\n";
 
         result += loopLabel + ":\n";
@@ -138,38 +148,29 @@ public:
                   this->IDENFR_STEP1 + ((this->isAdd) ? " + " : " - ") + to_string(step) + "\n";
         result += "GOTO " + conditionLabel + "\n";
         result += leavelLabel + ":\n";
+
+        this->midCode = result;
         return result;
     }
 
     string toMips() {
         string result = "";
-        //result += this->IDENFR_VALUE.toString();
-        //result += this->IDENFR + " = " + this->IDENFR_VALUE.getExpResultID() + "\n";
+
         result += translateExp(this->IDENFR_VALUE.toString() +
                 this->IDENFR + " = " + this->IDENFR_VALUE.getExpResultID() + "\n");
 
-        string conditionLabel = "condition_" + to_string(label_counter++);
-        string loopLabel = "ForLoop_" + to_string(label_counter++);
-        string leavelLabel = "label_" + to_string(label_counter);
-
         result += conditionLabel + ":\n";
-        //result += getConditionString();
-        //result += "BNZ " + loopLabel + "\n";
-        result +=
-                translateConditionCentence(this->getConditionString() + "BNZ " + loopLabel + "\n");
 
-        //result += "GOTO " + leavelLabel + "\n";
+        result += translateConditionCentence(this->conditionString);
+
         result += "j " + leavelLabel + "\n";
 
         result += loopLabel + ":\n";
         result += get_centences_component_mips(this->loopBlock);
 
-        //result += this->IDENFR_STEP + " = " +
-        //        this->IDENFR_STEP1 + ((this->isAdd) ? " + " : " - ") + to_string(step) + "\n";
         result += translateExp(this->IDENFR_STEP + " = " +
                 this->IDENFR_STEP1 + ((this->isAdd) ? " + " : " - ") + to_string(step) + "\n");
 
-        //result += "GOTO " + conditionLabel + "\n";
         result += "j " + conditionLabel + "\n";
 
         result += leavelLabel + ":\n";

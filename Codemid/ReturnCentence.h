@@ -29,6 +29,7 @@ public:
         } else {
             result += "ret\n";
         }
+        this->midCode = result;
         return result;
     }
 

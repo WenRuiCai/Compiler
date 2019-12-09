@@ -60,30 +60,12 @@ public:
             result += ID_VALUE.toString();
             result += IDENFR + " = " + ID_VALUE.getExpResultID() + "\n";
         }
+        this->midCode = result;
         return result;
     }
 
     string toMips() {
-        string result = "";
-        if (ID_EXP.expHasInit()) {
-            //result += ID_EXP.toString();
-            //result += ID_VALUE.toString();
-            result += translateExp(ID_EXP.toString() + ID_VALUE.toString());
-
-            /*
-             * 数组的情况还要处理~
-             * 处理完成！
-             */
-            result += translateExp(IDENFR + "[" + ID_EXP.getExpResultID() + "]" + " = " +
-                    ID_VALUE.getExpResultID() + "\n");
-        } else {
-            //result += ID_VALUE.toString();
-            //result += IDENFR + " = " + ID_VALUE.getExpResultID() + "\n";
-            result +=
-                    translateExp(ID_VALUE.toString() +
-                    IDENFR + " = " + ID_VALUE.getExpResultID() + "\n");
-        }
-        return result;
+        return translateExp(this->midCode);
     }
 
 };
