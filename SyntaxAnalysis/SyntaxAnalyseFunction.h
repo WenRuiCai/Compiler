@@ -363,23 +363,5 @@ void Program_Analysis(vector<SINGLE_WORD>& Words, int& PointNum, ofstream& outpu
     while (Function_With_Return_Value(Words, PointNum, output) ||
            Function_Not_With_Return_Value(Words, PointNum, output));
     Function_Main(Words, PointNum, output);
-
-    string midCode = symbolTable.toString();
-    cout << midCode;
-    stringstream mips_with_tmp;
-    string mipsCode = symbolTable.toMips();
-    mips_with_tmp << ".data\n";
-    for (Variable v : globalStrings) {
-        string str = "";
-        for (char c : v.string_var) {
-            if (c == '\\')  str += '\\';
-            str += c;
-        }
-        mips_with_tmp << "\t" + v.VariableName + ": .asciiz " + "\"" + str + "\"\n";
-    }
-    mips_with_tmp << ".text\n";
-    mips_with_tmp << "jal main\nli $v0, 10\nsyscall\n";
-    mips_with_tmp << mipsCode;
-    selectTempRegister(mips_with_tmp, output);
     //cout << "<程序>" << endl;
 }
