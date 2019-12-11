@@ -98,10 +98,7 @@ public:
                   factorMidCodes[0].getFactorKind() == PURE_IDENFR)) {
                 result += factorMidCodes[0].toString();
             }
-            if (factorMidCodes[0].getFactorResultID().find('[') != string::npos) {
-                result += this->itemResultID + " = " + factorMidCodes[0].getFactorResultID() + "\n";
-            } else
-                this->itemResultID = factorMidCodes[0].getFactorResultID();
+            this->itemResultID = factorMidCodes[0].getFactorResultID();
             return result;
         }
         for (int i = 0; i < mid_three_unit_Exps.size(); i++) {

@@ -57,7 +57,7 @@ public:
 
     void setString_ARRAY(string arrayIndexString, string expID) {
         this->thisString = arrayIndexString;    //如果数组索引是表达式，那么需要先进行表达式运算
-        this->factorResultID = this->IDENFR + "[" + expID + "]";
+        this->thisString += this->factorResultID + " = " + this->IDENFR + "[" + expID + "]\n";
     }
 
     void setString_FUNCTION(string functionString, string functionReturnValueID) {
