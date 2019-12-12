@@ -188,6 +188,10 @@ public:
         this->functionName = name;
     }
 
+    void Optim() {
+        Function_Flow_Blocks flowBlocks = Function_Flow_Blocks(this->midCode);
+    }
+
     string toString() {
         string result = "";
         result += (this->kind == "INTTK") ? "int " :
@@ -200,6 +204,7 @@ public:
         }
         result += get_centences_component_string(this->centences);
         this->midCode = result;
+        //Optim();
         return result;
     }
 

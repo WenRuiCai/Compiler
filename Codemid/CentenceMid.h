@@ -7,6 +7,7 @@
 
 #include "ExpressionMidCode.h"
 #include "MiddleCode.h"
+#include "../Optim/FlowGraph.h"
 
 enum conditionCompare {
     GRT,
