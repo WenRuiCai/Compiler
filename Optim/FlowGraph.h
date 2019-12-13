@@ -8,6 +8,8 @@
 #include "Exp_OneBlock.h"
 #include "Optim_Functions.h"
 #include "FlowBlock.h"
+#include "InterferenceGraph.h"
+#include <assert.h>
 
 class Function_Flow_Blocks {
 private:
@@ -116,6 +118,37 @@ public:
         calcu_in_and_out();
 
         ///@brief: 构建冲突图
+            ///@details: 找出跨基本块活跃的变量
+        set<string> var_cross;
+        for (int i = 0; i < this->flowBlocks.size(); i++) {
+            for (string var : flowBlocks[i].in) {
+                for (int j = i + 1; j < this->flowBlocks.size(); j++) {
+                    int flag = 0;
+                    for (string var1 : flowBlocks[j].in) {
+                        if (var == var1) {
+                            var_cross.insert(var);  flag = 1;
+                            break;
+                        }
+                    }
+                    if (flag == 1) break;
+                }
+            }
+        }
+            ///@details: 构建冲突图
+        InterferenceGraph interferenceGraph = InterferenceGraph(var_cross);
+        for (FlowBlock block1 : this->flowBlocks) {
+            for (string in_var : block1.in) {
+                for (string def_var : block1.def) {
+                    assert(in_var != def_var);
+                    if (var_cross.find(in_var) != var_cross.end() &&
+                        var_cross.find(def_var) != var_cross.end()) {
+                        interferenceGraph.add_edge(in_var, def_var);
+                    }
+                }
+            }
+        }
+        ///@brief: 图着色分析寄存器分配
+
 
     }
 };

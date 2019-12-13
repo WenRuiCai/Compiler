@@ -30,8 +30,8 @@ public:
     vector<string> fourUnitExps;
     vector<FlowBlock*> nextBlock;
     vector<FlowBlock*> frontBlock;
-    vector<string> use;
-    vector<string> def;
+    set<string> use;
+    set<string> def;
     set<string> in;
     set<string> out;
 
@@ -67,11 +67,11 @@ public:
     void fillUse_And_Def() {
         for (string fourUnitExp : fourUnitExps) {
             for (string usedVar : get_SingleExp_Used_Var(fourUnitExp)) {
-                if (!varHasDefined(usedVar)) this->use.push_back(usedVar);
+                if (!varHasDefined(usedVar)) this->use.insert(usedVar);
             }
             if (!varHasUsed(get_SingleExp_Defined_Var(fourUnitExp))) {
                 if (get_SingleExp_Defined_Var(fourUnitExp).length() > 0)
-                    this->def.push_back(get_SingleExp_Defined_Var(fourUnitExp));
+                    this->def.insert(get_SingleExp_Defined_Var(fourUnitExp));
             }
         }
     }
