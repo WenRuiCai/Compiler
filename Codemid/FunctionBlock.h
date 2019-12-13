@@ -193,6 +193,11 @@ public:
     }
 
     string toString() {
+        nowTranslateFunctionName = this->functionName;
+        nowFunction_GetVar_byName_Map = this->function_GetVar_byName_Map;
+        nowFunctionConsts = this->functionConsts;
+        nowFunctionVariables = this->functionVariables;
+
         string result = "";
         result += (this->kind == "INTTK") ? "int " :
                   ((this->kind == "CHARTK") ? "char " : "void ");
@@ -203,8 +208,14 @@ public:
             result += item.name + "\n";
         }
         result += get_centences_component_string(this->centences);
+
+        string lastLine = "";
+        for (int i = result.length() - 2; ; i--) {
+            if (result.at(i) == '\n') break;
+            lastLine = result.at(i) + lastLine;
+        }
+        if (lastLine.substr(0, 3) != "ret") result += "ret\n";
         this->midCode = result;
-        //Optim();
         return result;
     }
 
