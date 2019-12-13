@@ -51,7 +51,7 @@ public:
 
     string toMips() {
         string result = "";
-        for (FunctionBlock block : this->functionBlocks) {
+        for (FunctionBlock& block : this->functionBlocks) {
             result += block.toMips();
         }
         result += MainBlock.toMips();
@@ -67,7 +67,7 @@ public:
 
     string toString() {
         string result = "";
-        for (FunctionBlock block : this->functionBlocks) {
+        for (FunctionBlock& block : this->functionBlocks) {
             result += block.toString();
         }
         result += MainBlock.toString();
