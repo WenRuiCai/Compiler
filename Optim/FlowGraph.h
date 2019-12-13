@@ -6,40 +6,39 @@
 #define COMPILER_FLOWGRAPH_H
 
 #include "Exp_OneBlock.h"
-
-class FlowBlock {
-public:
-    ///@details: fourUnitExps存储这个基本块里面的所有四元式语句
-    ///          nextBlock存储这个基本块的所有后继
-    ///          frontBlock存储这个基本块的所有前驱
-    vector<string> fourUnitExps;
-    vector<FlowBlock*> nextBlock;
-    vector<FlowBlock*> frontBlock;
-
-    void addFourUnitExp(string line) {
-        this->fourUnitExps.push_back(line);
-    }
-
-    string flowBlockString() {
-        string result = "";
-        for (string s : fourUnitExps) {
-            result += s;
-            result += '\n';
-        }
-        return result;
-    }
-
-    void addFrontBlock(FlowBlock* block) {
-        this->frontBlock.push_back(block);
-    }
-
-    void addNextBlock(FlowBlock* block) {
-        this->nextBlock.push_back(block);
-        block->addFrontBlock(this);
-    }
-};
+#include "Optim_Functions.h"
+#include "FlowBlock.h"
 
 class Function_Flow_Blocks {
+private:
+    void calcu_in_and_out() {
+        while (true) {
+            int flag = 0;
+            for (int i = this->flowBlocks.size() - 1; i >= 0; i--) {
+                FlowBlock &block = this->flowBlocks[i];
+                for (FlowBlock *nextflowBlock : block.nextBlock) {
+                    for (string in : nextflowBlock->in) {
+                        block.out.insert(in);
+                    }
+                }
+                set <string> chaji;
+                set_difference(block.out.begin(), block.out.end(),
+                               block.def.begin(), block.def.end(), inserter(chaji, chaji.begin()));
+                set<string> previousIn = block.in;
+                set_union(block.use.begin(), block.use.end(),
+                          chaji.begin(), chaji.end(), inserter(block.in, block.in.begin()));
+                /*
+                 * 检查previousIn和现在的in是否相等
+                 */
+                if (previousIn != block.in) {
+                    flag = 1;
+                }
+            }
+            if (flag == 0) {
+                break;
+            }
+        }
+    }
 public:
     vector<FlowBlock> flowBlocks;
 
@@ -103,10 +102,18 @@ public:
             } else if (last.find("ret") == string::npos) {
                 if (i + 1 < flowBlocks.size()) flowBlock1->addNextBlock(&flowBlocks[i + 1]);
             }
-            //cout << "----------------flow block begin--------------\n";
-            //cout << flowBlock1.flowBlockString();
-            //cout << "----------------flow block end----------------\n";
         }
+
+        ///@brief: 针对每个基本块做块内表达式优化
+        //for (int i = 0; i < flowBlocks.size(); i++) {
+        //    flowBlocks[i].Optim();
+        //}
+
+        ///@brief: 活跃变量分析
+        for (FlowBlock& block : this->flowBlocks) {
+            block.fillUse_And_Def();
+        }
+        calcu_in_and_out();
     }
 };
 

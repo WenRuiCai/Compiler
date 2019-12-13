@@ -14,6 +14,7 @@ int main() {
 
     string midCode = symbolTable.toString();
     cout << midCode;
+    symbolTable.Optim_MidCode_And_Prepare_Mips();
     //stringstream mips_with_tmp;
     //string mipsCode = symbolTable.toMips();
     //mips_with_tmp << ".data\n";

@@ -213,12 +213,12 @@ public:
                     exp_oneBlock_TransChar = (exp_oneBlock_TransChar == 'z') ? 'A' : (exp_oneBlock_TransChar + 1);
                 }
             }
-            cout << transLine << endl;
+            //cout << transLine << endl;
             build(transLine);
         }
-        cout << "********************\n";
+        //cout << "********************\n";
         DAGOptim();
-        cout << getExp_Optim();
+        //cout << getExp_Optim();
     }
 };
 #endif //COMPILER_EXP_ONEBLOCK_H
