@@ -210,7 +210,7 @@ public:
         result += get_centences_component_string(this->centences);
 
         string lastLine = "";
-        for (int i = result.length() - 2; ; i--) {
+        for (int i = result.length() - 2; i >= 0; i--) {
             if (result.at(i) == '\n') break;
             lastLine = result.at(i) + lastLine;
         }

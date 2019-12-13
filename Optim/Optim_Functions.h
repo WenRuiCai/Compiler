@@ -52,7 +52,7 @@ vector<string> get_SingleExp_Used_Var(string fourUnitExp) {
             if (five.length() != 0 && !isConst(five)) result.push_back(five);
         }
     } else if (one == "push" || one == "ret") {
-        if (!isConst(two)) result.push_back(two);
+        if (!isConst(two) && two.length() > 0) result.push_back(two);
     } else if (one == "PRINT") {
         if (fourUnitExp.at(fourUnitExp.length() - 1) != '"') {
             string printVar = "";

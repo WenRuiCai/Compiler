@@ -114,6 +114,9 @@ public:
             block.fillUse_And_Def();
         }
         calcu_in_and_out();
+
+        ///@brief: 构建冲突图
+
     }
 };
 
