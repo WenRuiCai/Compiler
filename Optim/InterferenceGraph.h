@@ -76,7 +76,7 @@ public:
     void allocate_reg() {
         if (this->var_nodes.size() < 8) {
             int i = 0;
-            for (var_node node : var_nodes) {
+            for (var_node& node : var_nodes) {
                 node.reg = global_reg (i++);
             }
             return;
@@ -152,6 +152,7 @@ public:
             }
             this->var_nodes.insert(this->var_nodes.begin(), removed_node[i]);
         }
+        return;
     }
 };
 
