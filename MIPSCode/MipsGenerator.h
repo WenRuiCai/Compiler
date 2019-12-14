@@ -7,18 +7,6 @@
 
 #include "Variable.h"
 
-enum regForTmp {
-    s6 = 0,
-    s5,
-    s4,
-    s3,
-    s2,
-    s1,
-    s0,
-    t4,
-    t3
-};
-
 int reg[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 map<string, int> temp_valid_register;
 

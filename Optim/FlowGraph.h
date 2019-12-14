@@ -58,7 +58,6 @@ public:
             }
             else if (getExpInLine(i, functionMidCode).find("BNZ") != string::npos ||
                 getExpInLine(i, functionMidCode).find("GOTO") != string::npos ||
-                getExpInLine(i, functionMidCode).find("call") != string::npos ||
                 getExpInLine(i, functionMidCode).find("ret") != string::npos) {
                 int flag = 0;
                 for (int x : entryCentence) {if (x == i + 1) flag = 1;}
@@ -85,10 +84,7 @@ public:
         for (int i = 0; i < flowBlocks.size(); i++) {
             FlowBlock* flowBlock1 = &flowBlocks[i];
             string last = flowBlock1->fourUnitExps[flowBlock1->fourUnitExps.size() - 1];
-            if (last.find("call") != string::npos) {
-                if (i + 1 < flowBlocks.size()) flowBlock1->addNextBlock(&flowBlocks[i + 1]);
-            }
-            else if (last.find("GOTO") != string::npos || last.find("BNZ") != string::npos) {
+            if (last.find("GOTO") != string::npos || last.find("BNZ") != string::npos) {
                 string action, label;
                 stringstream ss;    ss << last;
                 ss >> action >> label;
@@ -148,7 +144,13 @@ public:
             }
         }
         ///@brief: 图着色分析寄存器分配
+        interferenceGraph.allocate_reg();
 
+        ///@brief: 完成操作，可以开始翻译了
+
+    }
+
+    string transLateToMips() {
 
     }
 };
