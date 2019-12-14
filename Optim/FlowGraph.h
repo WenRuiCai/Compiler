@@ -151,7 +151,11 @@ public:
     }
 
     string transLateToMips() {
-
+        /**
+         * @details1: 预备动作，先给分好了全局寄存器的变量注册寄存器
+         * @details2: 在完成预备动作后，进入每个基本块中进行代码翻译
+         *           由于需要对variable进行注册，所以和functionBlock类必须有交互
+         */
     }
 };
 
