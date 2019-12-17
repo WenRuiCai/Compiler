@@ -17,11 +17,19 @@
 #include "ScanfCentece.h"
 #include "../MIPSCode/Variable.h"
 
-vector<Variable> nowFunctionVariables;
-map<string, Variable> nowFunction_GetVar_byName_Map;
-vector<TableItem> nowFunctionConsts;
+extern vector<Variable> nowFunctionVariables;
+extern map<string, Variable> nowFunction_GetVar_byName_Map;
+extern vector<TableItem> nowFunctionConsts;
 extern vector<TableItem> globalConst;
 extern string getNowFunctionType(string resultID);
+
+void update_GetVar_byName_Map() {
+    map<string, Variable> update_Map;
+    for (Variable variable1 : nowFunctionVariables) {
+        update_Map.insert(make_pair(variable1.VariableName, variable1));
+    }
+    nowFunction_GetVar_byName_Map = update_Map;
+}
 
 string getVarAddr(string var, int* flag) {
     if (nowFunction_GetVar_byName_Map.count(var) == 0) {
@@ -154,6 +162,7 @@ class FunctionBlock {
     vector<TableItem> functionConsts;
 
     string midCode;
+    Function_Flow_Blocks* flowBlocks;
 
     void addCentence(vector<CentenceMid*>* centenceBlock, CentenceMid* centence) {
         centenceBlock->push_back(centence);
@@ -188,8 +197,19 @@ public:
         this->functionName = name;
     }
 
-    void Optim() {
-        Function_Flow_Blocks flowBlocks = Function_Flow_Blocks(this->midCode);
+    string Optim() {
+        nowTranslateFunctionName = this->functionName;
+        nowFunction_GetVar_byName_Map = this->function_GetVar_byName_Map;
+        nowFunctionConsts = this->functionConsts;
+        nowFunctionVariables = this->functionVariables;
+
+        this->flowBlocks = new Function_Flow_Blocks(this->midCode);
+        this->flowBlocks->registerGlobalVarReg(nowFunctionVariables);
+        update_GetVar_byName_Map();
+        /**
+         * @brief: 开始进入对基本块进行翻译
+         */
+        return this->flowBlocks->translateToMips();
     }
 
     string toString() {

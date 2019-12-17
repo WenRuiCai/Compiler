@@ -16,6 +16,17 @@ enum global_reg {
     s7
 };
 
+string global_reg2string(global_reg reg) {
+    if (reg == s0) return "$s0";
+    if (reg == s1) return "$s1";
+    if (reg == s2) return "$s2";
+    if (reg == s3) return "$s3";
+    if (reg == s4) return "$s4";
+    if (reg == s5) return "$s5";
+    if (reg == s6) return "$s6";
+    else return "$s7";
+}
+
 struct var_node {
     string name;
     bool will_allocate_global_reg = false;
@@ -42,6 +53,7 @@ private:
                 return node;
             }
         }
+        return this->var_nodes[0];
     }
 
     bool hasNodeLink_LessThan_regNum() {

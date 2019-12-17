@@ -35,12 +35,14 @@ public:
     string string_var;
 
     string thisRegister;
+    bool nowThisVariableIsInRegister = false;
 
     Variable(string name, string type, int flag) { //函数参数变量
         this->VariableName = name;
         this->VariableName = name;
         this->var_type = (type == "INTTK") ? INT_PARA : CHAR_PARA;
         this->thisRegister = "$" + to_string(flag);
+        this->nowThisVariableIsInRegister = true;
     }
 
     Variable(string name, int length, string type) { //数组变量

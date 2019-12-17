@@ -30,6 +30,8 @@ string get_SingleExp_Defined_Var(string fourUnitExp) {
     stringstream ss;
     ss << fourUnitExp; ss >> one >> two >> three >> four >> five;
     if (two == "=" && IS_NOT_COMPARE_SYMBOL(two)) {
+        if (one.find("[") != string::npos)
+            return result;
         result = one;
     }
     return result;
@@ -40,14 +42,29 @@ string get_SingleExp_Defined_Var(string fourUnitExp) {
  * @return : 这条四元式语句的使用变量
  * @details : 单条语句可能有多个使用变量，所以在这里使用一个vector存储
  * @brief : 本函数用于活跃变量分析过程
+ *
+ * @attention: 对于数组元素，比如arr[n]，显然此时的使用变量为n
+ *             数组元素只可能出现在赋值语句中
  */
 vector<string> get_SingleExp_Used_Var(string fourUnitExp) {
     vector<string> result;
     string one, two, three, four, five;
     stringstream ss;
     ss << fourUnitExp; ss >> one >> two >> three >> four >> five;
+    if (one.find("[") != string::npos && two == "=") {
+        string index = one.substr(one.find('[') + 1, one.find(']') - one.find('[') - 1);
+        if (!isConst(index)) result.push_back(index);
+    }
     if (two == "=" && IS_NOT_COMPARE_SYMBOL(two)) {
         if (!(one.find("TEMP_VAR_CWR") != string::npos && three == "RET" && five.length() == 0)) {
+            if (three.find("[") != string::npos) {
+                int place1 = three.find("["), place2 = three.find("]");
+                three = three.substr(place1 + 1, place2 - place1 - 1);
+            }
+            if (five.find("[") != string::npos) {
+                int place1 = five.find("["), place2 = five.find("]");
+                five = five.substr(place1 + 1, place2 - place1 - 1);
+            }
             if (!isConst(three)) result.push_back(three);
             if (five.length() != 0 && !isConst(five)) result.push_back(five);
         }

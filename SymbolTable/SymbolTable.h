@@ -58,11 +58,13 @@ public:
         return result;
     }
 
-    void Optim_MidCode_And_Prepare_Mips() {
+    string Optim_MidCode_And_Prepare_Mips() {
+        string result = "";
         for (FunctionBlock& block : this->functionBlocks) {
-            block.Optim();
+            result += block.Optim();
         }
-        MainBlock.Optim();
+        result += MainBlock.Optim();
+        return result;
     }
 
     string toString() {
