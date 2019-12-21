@@ -9,6 +9,7 @@
 #include "Optim_Functions.h"
 #include "FlowBlock.h"
 #include "InterferenceGraph.h"
+#include "../MIPSCode/Variable.h"
 #include <assert.h>
 
 class Function_Flow_Blocks {
@@ -43,6 +44,7 @@ private:
     }
 public:
     vector<FlowBlock> flowBlocks;
+    InterferenceGraph* interferenceGraph;
 
     Function_Flow_Blocks(string functionMidCode) {
         vector<int> entryCentence;
@@ -51,14 +53,15 @@ public:
 
         ///@brief: 找出所有入口语句
         for (int i = 2; i <= lineNum; i++) {
-            if (getExpInLine(i, functionMidCode).find(':') != string::npos) {
+            if (getExpInLine(i, functionMidCode).find(':') != string::npos &&
+                getExpInLine(i, functionMidCode).find("PRINT ") == string::npos) {
                 int flag = 0;
                 for (int x : entryCentence) {if (x == i) flag = 1;}
                 if (flag == 0) entryCentence.push_back(i);
             }
-            else if (getExpInLine(i, functionMidCode).find("BNZ") != string::npos ||
-                getExpInLine(i, functionMidCode).find("GOTO") != string::npos ||
-                getExpInLine(i, functionMidCode).find("ret") != string::npos) {
+            else if (getExpInLine(i, functionMidCode).substr(0, 4) == "BNZ " ||
+                getExpInLine(i, functionMidCode).substr(0, 5) == "GOTO " ||
+                getExpInLine(i, functionMidCode).substr(0, 4) == "ret ") {
                 int flag = 0;
                 for (int x : entryCentence) {if (x == i + 1) flag = 1;}
                 if (flag == 0 && i + 1 <= lineNum) entryCentence.push_back(i + 1);
@@ -130,32 +133,97 @@ public:
                 }
             }
         }
+            ///@details: 用正确的方法计算出冲突图的每条边
+            ///@bug: 还是感觉不对啊啊啊啊，操蛋的
+        /*
+        vector<pair<string, string>> edges;
+        for (int i = 0; i < this->flowBlocks.size(); i++) {
+            set<string> live = this->flowBlocks[i].out;
+            for (int j = this->flowBlocks[i].fourUnitExps.size() - 1; j >= 0; j--) {
+                set<string> def;
+                string defined = get_SingleExp_Defined_Var(this->flowBlocks[i].fourUnitExps[j]);
+                if (this->flowBlocks[i].def.find(defined) != this->flowBlocks[i].def.end())
+                    def.insert(defined);
+
+                for (string y : live) {
+                    for (string x : def) {
+                        int flag = 0;
+                        for (pair<string, string> edge : edges) {
+                            if ((edge.first == y && edge.second == x) ||
+                                (edge.first == x && edge.second == y)) {
+                                flag = 1;
+                                break;
+                            }
+                        }
+                        if (flag == 0 && y != x) edges.push_back(make_pair(y, x));
+                    }
+                }
+
+                set<string> diffSet;
+                set_difference(live.begin(), live.end(),
+                        def.begin(), def.end(), inserter(diffSet, diffSet.begin()));
+
+                set<string> use;    set<string> newLive;
+                for (string string1 : get_SingleExp_Used_Var(this->flowBlocks[i].fourUnitExps[j])) {
+                    if (this->flowBlocks[i].use.find(string1) != this->flowBlocks[i].use.end())
+                        use.insert(string1);
+                }
+                set_union(use.begin(), use.end(), diffSet.begin(), diffSet.end(),
+                        inserter(newLive, newLive.begin()));
+                live = newLive;
+            }
+        }
+
             ///@details: 构建冲突图
-        InterferenceGraph interferenceGraph = InterferenceGraph(var_cross);
+        this->interferenceGraph = new InterferenceGraph(var_cross);
         for (FlowBlock block1 : this->flowBlocks) {
             for (string in_var : block1.in) {
                 for (string def_var : block1.def) {
                     assert(in_var != def_var);
                     if (var_cross.find(in_var) != var_cross.end() &&
                         var_cross.find(def_var) != var_cross.end()) {
-                        interferenceGraph.add_edge(in_var, def_var);
+                        interferenceGraph->add_edge(in_var, def_var);
                     }
                 }
             }
         }
         ///@brief: 图着色分析寄存器分配
-        interferenceGraph.allocate_reg();
+        interferenceGraph->allocate_reg();
 
         ///@brief: 完成操作，可以开始翻译了
-
+        */
     }
 
-    string transLateToMips() {
+    void registerGlobalVarReg(vector<Variable>& functionVariables) {
         /**
          * @details1: 预备动作，先给分好了全局寄存器的变量注册寄存器
          * @details2: 在完成预备动作后，进入每个基本块中进行代码翻译
          *           由于需要对variable进行注册，所以和functionBlock类必须有交互
+         * @bug: 图染色法分配寄存器存在bug，先姑且认为分配寄存器成功吧。。。
+         * @bug: 图染色是真的全是bug，所以先尝试用暴力全局分配吧。。。
          */
+         int arr[8] = {0};
+         for (Variable& variable : functionVariables) {
+             if (!variable.nowThisVariableIsInRegister) {
+                 for (int i = 0; i < 8; i++) {
+                     if (arr[i] == 0) {
+                         variable.thisRegister = global_reg2string((global_reg) i);
+                         variable.nowThisVariableIsInRegister = true;
+                         arr[i] = 1;
+                         break;
+                     }
+                 }
+             }
+         }
+        return;
+    }
+
+    string translateToMips() {
+        string result = "";
+        for (FlowBlock& block : this->flowBlocks) {
+            result += block.translateToMipsCode();
+        }
+        return result;
     }
 };
 

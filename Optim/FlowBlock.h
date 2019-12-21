@@ -7,6 +7,7 @@
 
 #include <set>
 #include <algorithm>
+#include "TransLate_Interface.h"
 
 class FlowBlock {
 private:
@@ -76,7 +77,7 @@ public:
         }
     }
 
-    void translateToMipsCode() {
+    string translateToMipsCode() {
         /**
          * @brief： 对本块中的语句逐条翻译
          * @details1: 翻译的函数接口已经在Codemid/MiddleCode.h中基本写好
@@ -86,6 +87,149 @@ public:
          *            同样的，在退出基本块时，如果在基本块内有对 程序全局/函数全局 的赋值语句，那么需要回填入内存
          */
 
+        /**
+         * @brief： 为临时变量分配存储
+         * @details：这里准备采用静态分配策略
+         * @bug: 是否需要在开始先重新更新一边globalVariables和functionVariables？
+         *         好像不用
+         *         但是在每个块前必须先把分配临时寄存器的定义变量载入
+         */
+        vector<tmp_Variable> temps;
+        getAllTemps(temps, this->fourUnitExps);
+        alloc_tmp_register(temps);
+        string result = "";
+        /**
+         * @details: 首先将分到临时寄存器的声明变量加载进寄存器里
+         */
+        if (!(fourUnitExps[0].find(':') != string::npos &&
+            fourUnitExps[0].find("PRINT") == string::npos)) {
+            for (int i = 0; i < temps.size(); i++) {
+                if (temps[i].name.find("TEMP_VAR_CWR") == string::npos) {
+                    if (temps[i].isInReg) {
+                        int num = 0;
+                        string string1 = getVarAddr(temps[i].name, &num);
+                        if (num == 0) {
+                            result += "lb " + temp_reg_Enum2String(temps[i].reg) +
+                                      ", " + string1 + "($0)\n";
+                        } else {
+                            result += "lw " + temp_reg_Enum2String(temps[i].reg) +
+                                      ", " + string1 + "($0)\n";
+                        }
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < this->fourUnitExps.size(); i++) {
+            string fourUnitExp = this->fourUnitExps[i];
+            stringstream ss; ss << fourUnitExp; string one, two, three, four, five;
+            ss >> one >> two >> three >> four >> five;
+            if (three.length() == 0 && two.find("()") != string::npos && one != "PRINT") {
+                /**
+                 * @brief: 函数名
+                 */
+                 int place = two.find("(");
+                 result += two.substr(0, place) + ":\n";
+                 while (i + 1 < this->fourUnitExps.size() &&
+                        this->fourUnitExps[i + 1].find("para ") != string::npos) {
+                     i++;
+                 }
+            } else if (two == "=" && IS_NOT_COMPARE_SYMBOL(two)) {
+                string exp = fourUnitExp + '\n';
+                /**
+                 * @brief: 纯赋值语句
+                 */
+                result += new_TranslateAssign(exp, temps, false);
+            } else if (!IS_NOT_COMPARE_SYMBOL(fourUnitExp)) {
+                string condition = fourUnitExp + '\n';
+                string bnz = this->fourUnitExps[i + 1] + '\n';
+                i++;
+                /**
+                 * @brief: 条件比较语句
+                 */
+                 result += new_TranslateCondition(condition, bnz, temps);
+            } else if (one == "PRINT") {
+                /**
+                 * @brief: 打印语句
+                 */
+                 result += new_Print(fourUnitExp, temps);
+            } else if (one == "SCANF") {
+                /**
+                 * @brief: 读语句
+                 */
+                 string id = two;
+                 result += new_Scanf(two, temps);
+            } else if (one == "ret") {
+                /**
+                 * @brief: 返回语句
+                 */
+                 result += new_ret(two, temps);
+            } else if (one.find(":") != string::npos && two.length() == 0) {
+                /**
+                 * @brief: 标签
+                 */
+                result += fourUnitExp + '\n';
+                for (int u = 0; u < temps.size(); u++) {
+                    if (temps[u].name.find("TEMP_VAR_CWR") == string::npos) {
+                        if (temps[u].isInReg) {
+                            int num = 0;
+                            string string1 = getVarAddr(temps[u].name, &num);
+                            if (num == 0) {
+                                result += "lb " + temp_reg_Enum2String(temps[u].reg) +
+                                          ", " + string1 + "($0)\n";
+                            } else {
+                                result += "lw " + temp_reg_Enum2String(temps[u].reg) +
+                                          ", " + string1 + "($0)\n";
+                            }
+                        }
+                    }
+                }
+            } else if (one == "GOTO") {
+                /**
+                 * @brief: 无条件跳转语句
+                 */
+                 result += "j " + two + '\n';
+            } else if (one == "call") {
+                /**
+                 * @brief: 函数调用语句
+                 */
+                 if (i - 1 >= 0 && (fourUnitExps[i - 1].substr(0, 4) != "push" ||
+                    fourUnitExps[i - 1].find('=') != string::npos)) {
+                     result += new_pushStack();
+                 }
+                 string call = two;
+                 result += "jal " + two + '\n';
+                 result += new_popStack();
+                 string retValue;
+                 if (i + 1 < fourUnitExps.size()) {
+                     stringstream ss11; ss11 << fourUnitExps[i + 1];
+                     string one, two, three;    ss11 >> one >> two >> three;
+                     if (two == "=" && three == "RET") {
+                         retValue = fourUnitExps[i + 1];
+                         result += new_TranslateAssign(retValue, temps, true);
+                         i++;
+                     }
+                 }
+            } else if (one == "push") {
+                /**
+                 * @brief: 送参语句
+                 */
+                int reg = 5;
+                result += new_pushStack();
+                result += new_pushPara(two, temps, reg++);
+                for (int j = i + 1; j < fourUnitExps.size(); j++) {
+                    stringstream ss12; ss12 << fourUnitExps[j];
+                    string one12, two12; ss12 >> one12 >> two12;
+                    if (one12 == "push") {
+                        assert(reg <= 8);
+                        result += new_pushPara(two12, temps, reg++);
+                    } else {
+                        i = j - 1;
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
     }
 };
 

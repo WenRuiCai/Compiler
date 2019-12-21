@@ -21,24 +21,26 @@ string new_TranslateAssign(string midCode, vector<tmp_Variable>& temps, bool isF
     }
     else if (op.length() == 0 && op1.find("[") != string::npos) {
         string index = op1.substr(op1.find('[') + 1, op1.find(']') - op1.find('[') - 1);
-        string array = op1.substr(0, op1.find('['));    int num = 0; int num1 = 0;
+        string array = op1.substr(0, op1.find('['));
+        int num = 0;
+        int num1 = 0;
         string array_addr = get_array_begin_addr(array, &num);
         if (isNum(index)) {
-            result += "li $t8, " + index + '\n';
-        }
-        else if (isConst(index, &num1, nullptr)) {
-            result += (num == 0) ? "lb $t8, " : "lw $t8, ";
-            result += to_string(num1 + atoi(array_addr.c_str())) + "($0)\n";
+            result += "li $t9, " + index + '\n';
+            reg2 = "$t9";
+        } else if (isConst(index, &num1, nullptr)) {
+            result += "li $t9, " + to_string(num1) + '\n';
+            reg2 = "$t9";
         } else {
             reg2 = get_VarReg(temps, index, action2, 2);
             result += action2;
-            result += "li $t8, ";
-            result += (num == 0) ? "1\n" : "4\n";
-            result += "mult $t8, " + reg2 + '\n' + "mflo $t8\n";
-            result += "add $t9, $t8, " + array_addr + '\n';
-            result += (num == 0) ? "lb " : "lw ";
-            result += "$t8, 0($t9)\n";
         }
+        result += "li $t8, ";
+        result += (num == 0) ? "1\n" : "4\n";
+        result += "mult $t8, " + reg2 + '\n' + "mflo $t8\n";
+        result += "add $t9, $t8, " + array_addr + '\n';
+        result += (num == 0) ? "lb " : "lw ";
+        result += "$t8, 0($t9)\n";
         reg1 = "$t8";
     } else {
         int num = 0;
@@ -72,59 +74,59 @@ string new_TranslateAssign(string midCode, vector<tmp_Variable>& temps, bool isF
     string action3 = "";
     string reg3 = "";
     if (left.find('[') != string::npos) {
-        string left_array_item_addr = "";
         string index = left.substr(left.find('[') + 1, left.find(']') - left.find('[') - 1);
         string array = left.substr(0, left.find('['));    int num = 0; int num1 = 0;
         string array_addr = get_array_begin_addr(array, &num);
 
         if (isNum(index)) {
-            result += "li $t8, " + index + '\n';
+            result += "li $v0, " + index + '\n';
+            reg3 = "$v0";
         } else if (isConst(index, &num1, nullptr)) {
-            left_array_item_addr = to_string(num1 + atoi(array_addr.c_str()));
-            result += "li $v0, " + left_array_item_addr + "($0)\n";
+            result += "li $v0, " + to_string(num1) + '\n';
+            reg3 = "$v0";
         } else {
             reg3 = get_VarReg(temps, index, action3, 3);
             result += action3;
-            result += "li $v0, ";
-            result += (num == 0) ? "1\n" : "4\n";
-            result += "mult $v0, " + reg3 + '\n' + "mflo $v0\n";
-            result += "add $v0, $v0, " + array_addr + '\n';
         }
+        result += "li $a0, ";
+        result += (num == 0) ? "1\n" : "4\n";
+        result += "mult $a0, " + reg3 + '\n' + "mflo $v0\n";
+        result += "add $v0, $v0, " + array_addr + '\n';
         if (op.length() == 0) result += (num == 1 ? "sw " : "sb ") + reg1 + ", 0($v0)\n";
         else {
-            if (op == "+") result += "add $t0, " + reg1 + ", " + reg2 + '\n';
-            else if (op == "-") result += "sub $t0, " + reg1 + ", " + reg2 + '\n';
-            else if (op == "*") result += "mult " + reg1 + ", " + reg2 + '\n' + "mflo $t0\n";
-            else if (op == "/") result += "div " + reg1 + ", " + reg2 + '\n' + "mflo $t0\n";
-            result += (num == 1 ? "sw " : "sb ");
-            result += "$t0, 0($v0)\n";
+            if (op == "+") result += "add $t1, " + reg1 + ", " + reg2 + '\n';
+            else if (op == "-") result += "sub $t1, " + reg1 + ", " + reg2 + '\n';
+            else if (op == "*") result += "mult " + reg1 + ", " + reg2 + '\n' + "mflo $t1\n";
+            else if (op == "/") result += "div " + reg1 + ", " + reg2 + '\n' + "mflo $t1\n";
+            result += (num == 1) ? "sw " : "sb ";
+            result += "$t1, 0($v0)\n";
         }
     } else {
         if (op.length() == 0) {
-            result += "move $t0, " + reg1 + '\n';
+            result += "move $t1, " + reg1 + '\n';
         }
-        if (op == "+") result += "add $t0, " + reg1 + ", " + reg2 + '\n';
-        else if (op == "-") result += "sub $t0, " + reg1 + ", " + reg2 + '\n';
-        else if (op == "*") result += "mult " + reg1 + ", " + reg2 + '\n' + "mflo $t0\n";
-        else if (op == "/") result += "div " + reg1 + ", " + reg2 + '\n' + "mflo $t0\n";
+        if (op == "+") result += "add $t1, " + reg1 + ", " + reg2 + '\n';
+        else if (op == "-") result += "sub $t1, " + reg1 + ", " + reg2 + '\n';
+        else if (op == "*") result += "mult " + reg1 + ", " + reg2 + '\n' + "mflo $t1\n";
+        else if (op == "/") result += "div " + reg1 + ", " + reg2 + '\n' + "mflo $t1\n";
 
         string addr1 = "";   int num = 0;
         string s = getAssignLeft(temps, left, addr1, &num);
 
         if (num == 0 || num == 6) {
-            result += "move " + s + ", " + "$t0\n";
+            result += "move " + s + ", " + "$t1\n";
         }
         else if (num == 1 || num == 4 || num == 9) {
-            result += "sw $t0, " + s + "($0)\n";
+            result += "sw $t1, " + s + "($0)\n";
         } else if (num == 2 || num == 7) {
-            result += "move " + s + ", " + "$t0\n";
-            result += "sw $t0, " + addr1 + "($0)\n";
+            result += "move " + s + ", " + "$t1\n";
+            result += "sw $t1, " + addr1 + "($0)\n";
             assert(addr1.length() > 0 && addr1.at(0) >= '0' && addr1.at(0) <= '9');
         } else if (num == 3 || num == 8) {
-            result += "move " + s + ", " + "$t0\n";
-            result += "sb $t0, " + addr1 + "($0)\n";
+            result += "move " + s + ", " + "$t1\n";
+            result += "sb $t1, " + addr1 + "($0)\n";
         } else if (num == 5 || num == 10) {
-            result += "sb $t0, " + s + "($0)\n";
+            result += "sb $t1, " + s + "($0)\n";
         }
     }
     return result;

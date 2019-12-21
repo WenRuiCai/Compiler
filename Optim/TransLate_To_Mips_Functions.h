@@ -12,10 +12,17 @@ vector<Variable> nowFunctionVariables;
 map<string, Variable> nowFunction_GetVar_byName_Map;
 vector<TableItem> nowFunctionConsts;
 void update_GetVar_byName_Map();
+bool isGlobalVariable(string name) {
+    for (Variable variable : globalVariable) {
+        if (name == variable.VariableName) {
+            return true;
+        }
+    }
+    return false;
+}
 
 enum temp_Reg {
-    t1 = 0,
-    t2,
+    t2 = 0,
     t3,
     t4,
     t5,
@@ -23,7 +30,6 @@ enum temp_Reg {
     t7
 };
 string temp_reg_Enum2String(temp_Reg tempReg) {
-    if (tempReg == t1) return "$t1";
     if (tempReg == t2) return "$t2";
     if (tempReg == t3) return "$t3";
     if (tempReg == t4) return "$t4";
@@ -66,7 +72,8 @@ void getAllTemps(vector<tmp_Variable>& temps, vector<string> fourUnitExps) {
     for (string s : allVar) {
         int flag = 0;
         for (Variable variable : nowFunctionVariables) {
-            if (variable.VariableName == s && variable.nowThisVariableIsInRegister) {
+            if (variable.VariableName == s && variable.nowThisVariableIsInRegister &&
+                variable.thisRegister.find('t') == string::npos) {
                 flag = 1;
                 break;
             }
@@ -82,12 +89,12 @@ void getAllTemps(vector<tmp_Variable>& temps, vector<string> fourUnitExps) {
 
 void alloc_tmp_register(vector<tmp_Variable>& temps) {
     int gp = 0x10008000;
-    int k = 7;
-    int reg[7] = {0};
+    int k = 6;
+    int reg[6] = {0};
     while (k > 0) {
         int flag = 0;
         for (tmp_Variable variable : temps) {
-            if (!variable.isInReg) {
+            if (!variable.isInReg && !isGlobalVariable(variable.name)) {
                 flag = 1; break;
             }
         }
@@ -104,11 +111,11 @@ void alloc_tmp_register(vector<tmp_Variable>& temps) {
 
         for (int i = 0; i < temps.size(); i++) {
             tmp_Variable variable1 = temps[i];
-            if (variable1.times > max && !variable1.isInReg) {
+            if (variable1.times > max && !variable1.isInReg && !isGlobalVariable(variable1.name)) {
                 max = variable1.times;     place = i;
             }
         }
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 6; i++) {
             if (reg[i] == 0) {
                 temps[place].reg = (temp_Reg) i;
                 reg[i] = 1;
@@ -182,8 +189,8 @@ string get_VarReg(vector<tmp_Variable>& temps, string var, string& pre_action, i
                 if (variable.isInReg) return temp_reg_Enum2String(variable.reg);
                 else {
                     if (place == 3) {
-                        pre_action += "lw $t0, " + variable.addr + "($0)\n";
-                        return "$t0";
+                        pre_action += "lw $t1, " + variable.addr + "($0)\n";
+                        return "$t1";
                     }
                     pre_action += "lw $t" +
                                   to_string((place == 1) ? 8 : 9) + ", " + variable.addr + "($0)\n";
@@ -205,9 +212,9 @@ string get_VarReg(vector<tmp_Variable>& temps, string var, string& pre_action, i
                     pre_action += "lb ";
 
                 if (place == 3) {
-                    pre_action += "$t0, " +
+                    pre_action += "$t1, " +
                                   to_string(variable.var_addr) + "($0)\n";
-                    return "$t0";
+                    return "$t1";
                 }
                 pre_action += "$t" +
                         to_string((place == 1) ? 8 : 9) + ", " +
@@ -227,9 +234,9 @@ string get_VarReg(vector<tmp_Variable>& temps, string var, string& pre_action, i
         pre_action += "lb ";
 
     if (place == 3) {
-        pre_action += "$t0, " +
+        pre_action += "$t1, " +
                       to_string(nowFunction_GetVar_byName_Map.at(var).var_addr) + "($0)\n";
-        return "$t0";
+        return "$t1";
     }
     pre_action += "$t" +
                   to_string((place == 1) ? 8 : 9) + ", " +
@@ -243,8 +250,8 @@ string get_VarReg(vector<tmp_Variable>& temps, string var, string& pre_action, i
 string get_array_begin_addr(string var, int* type) {
     if (nowFunction_GetVar_byName_Map.count(var) == 0) {
         for (Variable variable : globalVariable) {
-            assert(variable.var_type == INT_ARRAY || variable.var_type == CHAR_ARRAY);
             if (variable.VariableName == var) {
+                assert(variable.var_type == INT_ARRAY || variable.var_type == CHAR_ARRAY);
                 if (variable.var_type == INT_ARRAY) *type = 1; else *type = 0;
                 return to_string(variable.var_addr);
             }
