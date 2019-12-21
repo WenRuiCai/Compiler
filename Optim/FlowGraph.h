@@ -12,6 +12,44 @@
 #include "../MIPSCode/Variable.h"
 #include <assert.h>
 
+string nowFunctionMidCode;
+
+int arrayTypeIsInt(string tempVarName) {
+    string line;
+    int lineNum = getLineNum(nowFunctionMidCode);
+    for (int i = 1; i <= lineNum; i++) {
+        if (getExpInLine(i, nowFunctionMidCode).find(tempVarName) != string::npos) {
+            string one, two, three;     stringstream ss; ss << getExpInLine(i, nowFunctionMidCode);
+            ss >> one >> two >> three;
+            if (three.find('[') != string::npos) {
+                string arrayName = three.substr(0, three.find('['));
+                if (nowFunction_GetVar_byName_Map.count(arrayName) > 0) {
+                    if (nowFunction_GetVar_byName_Map.at(arrayName).var_type == INT_ARRAY) {
+                        return 1;
+                    } else if (nowFunction_GetVar_byName_Map.at(arrayName).var_type == CHAR_ARRAY) {
+                        return 0;
+                    } else
+                        return -1;
+                } else {
+                    for (Variable variable : globalVariable) {
+                        if (variable.VariableName == arrayName) {
+                            if (variable.var_type == INT_ARRAY) {
+                                return 1;
+                            } else if (variable.var_type == CHAR_ARRAY) {
+                                return 0;
+                            } else
+                                return -1;
+                        }
+                    }
+                }
+            } else {
+                return -1;
+            }
+        }
+    }
+    return -1;
+}
+
 class Function_Flow_Blocks {
 private:
     void calcu_in_and_out() {
@@ -47,6 +85,7 @@ public:
     InterferenceGraph* interferenceGraph;
 
     Function_Flow_Blocks(string functionMidCode) {
+        nowFunctionMidCode = functionMidCode;
         vector<int> entryCentence;
         entryCentence.push_back(1);
         int lineNum = getLineNum(functionMidCode);

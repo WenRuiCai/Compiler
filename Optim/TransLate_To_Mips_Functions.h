@@ -11,6 +11,8 @@
 vector<Variable> nowFunctionVariables;
 map<string, Variable> nowFunction_GetVar_byName_Map;
 vector<TableItem> nowFunctionConsts;
+
+extern int arrayTypeIsInt(string tempVarName);
 void update_GetVar_byName_Map();
 bool isGlobalVariable(string name) {
     for (Variable variable : globalVariable) {
@@ -354,6 +356,10 @@ string new_resultIDtoMIPS(string resultID, int* type, string& action, vector<tmp
             reg = get_VarReg(temps, resultID, action, 2);
 
             if (type != nullptr) *type = num;
+            int arrayType = arrayTypeIsInt(resultID);
+            if (arrayType != -1 && type != nullptr) {
+                *type = arrayType;
+            }
         }
     }
     return reg;
