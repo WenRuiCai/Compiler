@@ -328,6 +328,81 @@ string new_pushStack() {
     return result;
 }
 
+string new_pushStack(vector<tmp_Variable>& temps) {
+    string result = "";
+    for (int i = temps.size() - 1; i >= 0; i--) {
+        if (temps[i].isInReg) {
+            result += "sw " + temp_reg_Enum2String(temps[i].reg) + ", 0($sp)\n";
+            result += "sub $sp, $sp, 4\n";
+        }
+    }
+    for (int i = nowFunctionVariables.size() - 1; i >= 0; i--) {
+        int flag = 0;
+        for (tmp_Variable variable : temps) {
+            if (variable.name == nowFunctionVariables[i].VariableName) {
+                flag = 1; break;
+            }
+        }
+        if (flag == 1) continue;
+        if (nowFunctionVariables[i].nowThisVariableIsInRegister) {
+            result += "sw " + nowFunctionVariables[i].thisRegister + ", 0($sp)\n";
+            result += "sub $sp, $sp, 4\n";
+        } else {
+            int type = 0;
+            string varAddr = getVarAddr(nowFunctionVariables[i].VariableName, &type);
+            if (varAddr.at(0) != '$') {
+                if (type == 1) result += "lw $t9, " + varAddr + "($0)\n";
+                else result += "lb $t9, " + varAddr + "($0)\n";
+                result += "sw $t9, 0($sp)\n";
+            } else {
+                result += "sw " + varAddr + ", 0($sp)\n";
+            }
+            result += "sub $sp, $sp, 4\n";
+        }
+    }
+    result += "sw $ra, 0($sp)\n";
+    result += "sub $sp, $sp, 4\n";
+    return result;
+}
+
+string new_popStack(vector<tmp_Variable>& temps) {
+    string result = "";
+    result += "add $sp, $sp, 4\n";
+    result += "lw $ra, 0($sp)\n";
+    for (int i = 0; i < nowFunctionVariables.size(); i++) {
+        int flag = 0;
+        for (tmp_Variable variable : temps) {
+            if (variable.name == nowFunctionVariables[i].VariableName) {
+                flag = 1; break;
+            }
+        }
+        if (flag == 1) continue;
+        if (nowFunctionVariables[i].nowThisVariableIsInRegister) {
+            result += "add $sp, $sp, 4\n";
+            result += "lw " + nowFunctionVariables[i].thisRegister + ", 0($sp)\n";
+        } else {
+            result += "add $sp, $sp, 4\n";
+            int type = 0;
+            string varAddr = getVarAddr(nowFunctionVariables[i].VariableName, &type);
+            if (varAddr[0] != '$') {
+                result += "lw $t9, 0($sp)\n";
+                if (type == 1) result += "sw $t9, " + varAddr + "($0)\n";
+                else result += "sb $t9, " + varAddr + "($0)\n";
+            } else {
+                result += "lw " + varAddr + ", 0($sp)\n";
+            }
+        }
+    }
+    for (int i = 0; i < temps.size(); i++) {
+        if (temps[i].isInReg) {
+            result += "add $sp, $sp, 4\n";
+            result += "lw " + temp_reg_Enum2String(temps[i].reg) + ", 0($sp)\n";
+        }
+    }
+
+    return result;
+}
+
 string new_popStack() {
     string result = "";
     result += "add $sp, $sp, 4\n";

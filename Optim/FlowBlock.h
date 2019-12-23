@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "TransLate_Interface.h"
 
+void dynamicManageTempReg(vector<tmp_Variable>& temps, vector<string> fourUnitExps, int nowLine);
 class FlowBlock {
 private:
     bool varHasDefined(string s) {
@@ -102,7 +103,7 @@ public:
          * @details: 首先将分到临时寄存器的声明变量加载进寄存器里
          */
         if (!(fourUnitExps[0].find(':') != string::npos &&
-            fourUnitExps[0].find("PRINT") == string::npos)) {
+              fourUnitExps[0].find("PRINT") == string::npos)) {
             for (int i = 0; i < temps.size(); i++) {
                 if (temps[i].name.find("TEMP_VAR_CWR") == string::npos) {
                     if (temps[i].isInReg) {
@@ -123,16 +124,17 @@ public:
             string fourUnitExp = this->fourUnitExps[i];
             stringstream ss; ss << fourUnitExp; string one, two, three, four, five;
             ss >> one >> two >> three >> four >> five;
+            int needAlloc = 1;
             if (three.length() == 0 && two.find("()") != string::npos && one != "PRINT") {
                 /**
                  * @brief: 函数名
                  */
-                 int place = two.find("(");
-                 result += two.substr(0, place) + ":\n";
-                 while (i + 1 < this->fourUnitExps.size() &&
-                        this->fourUnitExps[i + 1].find("para ") != string::npos) {
-                     i++;
-                 }
+                int place = two.find("(");
+                result += two.substr(0, place) + ":\n";
+                while (i + 1 < this->fourUnitExps.size() &&
+                       this->fourUnitExps[i + 1].find("para ") != string::npos) {
+                    i++;
+                }
             } else if (two == "=" && IS_NOT_COMPARE_SYMBOL(two)) {
                 string exp = fourUnitExp + '\n';
                 /**
@@ -146,23 +148,23 @@ public:
                 /**
                  * @brief: 条件比较语句
                  */
-                 result += new_TranslateCondition(condition, bnz, temps);
+                result += new_TranslateCondition(condition, bnz, temps);
             } else if (one == "PRINT") {
                 /**
                  * @brief: 打印语句
                  */
-                 result += new_Print(fourUnitExp, temps);
+                result += new_Print(fourUnitExp, temps);
             } else if (one == "SCANF") {
                 /**
                  * @brief: 读语句
                  */
-                 string id = two;
-                 result += new_Scanf(two, temps);
+                string id = two;
+                result += new_Scanf(two, temps);
             } else if (one == "ret") {
                 /**
                  * @brief: 返回语句
                  */
-                 result += new_ret(two, temps);
+                result += new_ret(two, temps);
             } else if (one.find(":") != string::npos && two.length() == 0) {
                 /**
                  * @brief: 标签
@@ -187,34 +189,34 @@ public:
                 /**
                  * @brief: 无条件跳转语句
                  */
-                 result += "j " + two + '\n';
+                result += "j " + two + '\n';
             } else if (one == "call") {
                 /**
                  * @brief: 函数调用语句
                  */
-                 if (i - 1 >= 0 && (fourUnitExps[i - 1].substr(0, 4) != "push" ||
-                    fourUnitExps[i - 1].find('=') != string::npos)) {
-                     result += new_pushStack();
-                 }
-                 string call = two;
-                 result += "jal " + two + '\n';
-                 result += new_popStack();
-                 string retValue;
-                 if (i + 1 < fourUnitExps.size()) {
-                     stringstream ss11; ss11 << fourUnitExps[i + 1];
-                     string one, two, three;    ss11 >> one >> two >> three;
-                     if (two == "=" && three == "RET") {
-                         retValue = fourUnitExps[i + 1];
-                         result += new_TranslateAssign(retValue, temps, true);
-                         i++;
-                     }
-                 }
+                if (i - 1 >= 0 && (fourUnitExps[i - 1].substr(0, 4) != "push" ||
+                                   fourUnitExps[i - 1].find('=') != string::npos)) {
+                    result += new_pushStack(temps);
+                }
+                string call = two;
+                result += "jal " + two + '\n';
+                result += new_popStack(temps);
+                string retValue;
+                if (i + 1 < fourUnitExps.size()) {
+                    stringstream ss11; ss11 << fourUnitExps[i + 1];
+                    string one_, two_, three_;    ss11 >> one_ >> two_ >> three_;
+                    if (two_ == "=" && three_ == "RET") {
+                        retValue = fourUnitExps[i + 1];
+                        result += new_TranslateAssign(retValue, temps, true);
+                        i++;
+                    }
+                }
             } else if (one == "push") {
                 /**
                  * @brief: 送参语句
                  */
                 int reg = 5;
-                result += new_pushStack();
+                result += new_pushStack(temps);
                 result += new_pushPara(two, temps, reg++);
                 for (int j = i + 1; j < fourUnitExps.size(); j++) {
                     stringstream ss12; ss12 << fourUnitExps[j];
@@ -227,10 +229,83 @@ public:
                         break;
                     }
                 }
+                needAlloc = 0;
             }
+            /**
+             * 这里可以使用动态临时寄存器分配，如果上一条语句的TEMP_VAR在后面没用了，
+             * 那么我们可以注销掉这个TEMP_VAR, 这个寄存器可以再次分配给其他TEMP_VAR
+             * @attention: 注意一定得是分配给TEMP_VAR
+             */
+            if (needAlloc == 1)
+               dynamicManageTempReg(temps, this->fourUnitExps, i);
         }
         return result;
     }
 };
 
 #endif //COMPILER_FLOWBLOCK_H
+
+void dynamicManageTempReg(vector<tmp_Variable>& temps, vector<string> fourUnitExps, int nowLine) {
+    vector<string> needUseTempVar;
+    for (int nextLine = nowLine + 1; nextLine < fourUnitExps.size(); nextLine++) {
+        string nowFourUnitExp = fourUnitExps[nextLine];
+        if (nowFourUnitExp.find("TEMP_VAR_CWR") == string::npos) {
+            continue;
+        } else if (nowFourUnitExp.substr(0, 6) == "PRINT " &&
+                   nowFourUnitExp.find('"') != string::npos) {
+            int i = nowFourUnitExp.length() - 1;
+            while (nowFourUnitExp.at(i) != '"') i--;
+            string string1 = nowFourUnitExp.substr(i, nowFourUnitExp.length() - i);
+            if (string1.find("TEMP_VAR_CWR") == string::npos) {
+                continue;
+            }
+        }
+        for (int i = 0; i < nowFourUnitExp.length(); i++) {
+            string s;
+            if (i + 12 > nowFourUnitExp.length()) break;
+            if ((s = nowFourUnitExp.substr(i, 12)) == "TEMP_VAR_CWR") {
+                int j;
+                for (j = i + 12; j < nowFourUnitExp.length() &&
+                                 nowFourUnitExp.at(j) >= '0' && nowFourUnitExp.at(j) <= '9'; j++) {
+                    s = s + nowFourUnitExp.at(j);
+                }
+                needUseTempVar.push_back(s);
+                i = j;
+            }
+        }
+    }
+    for (int i = 0; i < temps.size(); i++) {
+        if (temps[i].name.find("TEMP_VAR_CWR") != string::npos) {
+            int flag = 0;
+            for (string s : needUseTempVar) {
+                if (s == temps[i].name) {
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag == 0) {
+                auto iter = temps.begin(); int num = i;
+                while (num--) iter++;
+                temps.erase(iter);  i--;
+            }
+        }
+    }
+    int reg[6] = {0};
+    for (tmp_Variable variable : temps) {
+        if (variable.isInReg) {
+            reg[variable.reg] = 1;
+        }
+    }
+    for (int i = 0; i < 6; i++) {
+        if (reg[i] == 0) {
+            for (tmp_Variable& variable : temps) {
+                if (!variable.isInReg && variable.name.find("TEMP_VAR_CWR") != string::npos) {
+                    variable.reg = (temp_Reg) i;
+                    variable.isInReg = true;
+                    break;
+                }
+            }
+        }
+    }
+    return;
+}
