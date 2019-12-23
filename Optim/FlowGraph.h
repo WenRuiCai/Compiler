@@ -10,6 +10,7 @@
 #include "FlowBlock.h"
 #include "InterferenceGraph.h"
 #include "../MIPSCode/Variable.h"
+#include "InlineOptim.h"
 #include <assert.h>
 
 string nowFunctionMidCode;
@@ -86,6 +87,9 @@ public:
 
     Function_Flow_Blocks(string functionMidCode) {
         nowFunctionMidCode = functionMidCode;
+        //nowFunctionMidCode = inlineMidCode(functionMidCode);
+        //functionMidCode = inlineMidCode(functionMidCode);
+        //cout << inlineMidCode(functionMidCode);
         vector<int> entryCentence;
         entryCentence.push_back(1);
         int lineNum = getLineNum(functionMidCode);

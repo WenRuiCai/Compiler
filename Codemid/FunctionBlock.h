@@ -22,6 +22,7 @@ extern map<string, Variable> nowFunction_GetVar_byName_Map;
 extern vector<TableItem> nowFunctionConsts;
 extern vector<TableItem> globalConst;
 extern string getNowFunctionType(string resultID);
+extern bool functionHasNoCall_Or_MidReturn(string midCode);
 
 void update_GetVar_byName_Map() {
     map<string, Variable> update_Map;
@@ -169,6 +170,16 @@ class FunctionBlock {
     }
 
 public:
+    /**
+     * @brief: canBeInlined、changedGlobalVar用于内联优化
+     */
+    bool canBeInlined = true;
+    vector<string> changedGlobalVar;
+
+    string getMidCode_No_Optim() {
+        return this->midCode;
+    }
+
     int getParaNum() {
         return this->parameters.size();
     }
@@ -236,6 +247,27 @@ public:
         }
         if (lastLine.substr(0, 3) != "ret") result += "ret\n";
         this->midCode = result;
+        /**
+         * @brief： 用于判别函数是否可以用于内联，这里的条件较弱，函数内部不可以定义任何东西，不能调用函数.
+         *          其实是可以定义常量之类的，为了方便这里没有这么写.
+         *          即函数内不能定义任何东西
+         * @attention: 不过，函数显然是可以修改parameter和全局变量的
+         *          修改parameter没关系，因为内联会用temp_var替换
+         *          但是修改全局变量时候要特别注意，如果func1修改了全局变量且func1可内联
+         *          那么func2要内联func1的话，func2里面的定义不能和func1修改的全局变量重名
+         */
+        for (Variable variable : nowFunctionVariables) {
+            if (variable.var_type != INT_PARA && variable.var_type != CHAR_PARA) {
+                canBeInlined = false;
+            }
+        }
+        if (!functionHasNoCall_Or_MidReturn(result) || nowFunctionConsts.size() > 0) {
+            canBeInlined = false;
+        }
+        /**
+         * @brief: 记录函数修改全局变量的值
+         */
+        changedGlobalVar = global_Variable_Changed(result);
         return result;
     }
 

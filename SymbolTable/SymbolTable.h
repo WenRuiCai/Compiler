@@ -405,3 +405,37 @@ void setFunction_Variable(FunctionBlock& functionBlock) {
         functionBlock.getVarMap().insert(make_pair(variable1.VariableName, variable1));
     }
 }
+
+/**
+ * @brief : 用于函数内联
+ * @brief : 只被函数string inlineMidCode调用
+ */
+string getFunctionMidCode(string name) {
+    for (FunctionBlock block : symbolTable.getFunctionBlocks()) {
+        if (block.getName() == name) {
+            return block.getMidCode_No_Optim();
+        }
+    }
+    return "";
+}
+
+/**
+ * @brief : 用于函数内联,得到某个functionBlock的canBeInlined属性，初步判断能否内联
+ * @brief : 只被 bool functionCanBeInlined 函数调用
+ */
+bool getFunctionCanBeInlined(string name, vector<string>& changedGlobalVars, vector<string>& parasName) {
+    for (FunctionBlock block : symbolTable.getFunctionBlocks()) {
+        if (block.getName() == name) {
+            for (string s : block.changedGlobalVar) {
+                changedGlobalVars.push_back(s);
+            }
+            for (Variable variable : block.getFunctionVariables()) {
+                if (variable.var_type == INT_PARA || variable.var_type == CHAR_PARA) {
+                    parasName.push_back(variable.VariableName);
+                }
+            }
+            return block.canBeInlined;
+        }
+    }
+    return false;
+}
