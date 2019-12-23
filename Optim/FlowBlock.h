@@ -299,7 +299,18 @@ void dynamicManageTempReg(vector<tmp_Variable>& temps, vector<string> fourUnitEx
     for (int i = 0; i < 6; i++) {
         if (reg[i] == 0) {
             for (tmp_Variable& variable : temps) {
+                int hasAssigned = 0;
                 if (!variable.isInReg && variable.name.find("TEMP_VAR_CWR") != string::npos) {
+                    for (int j = nowLine; j >= 0; j--) {
+                        string one, two, three, four, five; stringstream ss; ss << fourUnitExps[j];
+                        ss >> one >> two >> three >> four >> five;
+                        if (two == "=" && one.find(variable.name) != string::npos) {
+                            hasAssigned = 1;
+                            break;
+                        }
+                    }
+                }
+                if (!variable.isInReg && variable.name.find("TEMP_VAR_CWR") != string::npos && hasAssigned == 0) {
                     variable.reg = (temp_Reg) i;
                     variable.isInReg = true;
                     break;
