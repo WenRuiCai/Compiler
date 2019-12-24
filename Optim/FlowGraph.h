@@ -12,6 +12,7 @@
 #include "../MIPSCode/Variable.h"
 #include "InlineOptim.h"
 #include <assert.h>
+#include <iterator>
 
 string nowFunctionMidCode;
 
